@@ -3,12 +3,24 @@
 import type { SectionType } from "@/lib/templates/section-schemas";
 import type { SectionFormProps } from "@/components/dashboard/forms/types";
 import { HeroForm } from "@/components/dashboard/forms/HeroForm";
+import { ProductGridForm } from "@/components/dashboard/forms/ProductGridForm";
+import { MenuForm } from "@/components/dashboard/forms/MenuForm";
+import { ServicesListForm } from "@/components/dashboard/forms/ServicesListForm";
+import { AboutForm } from "@/components/dashboard/forms/AboutForm";
+import { ProgramsForm } from "@/components/dashboard/forms/ProgramsForm";
+import { GalleryForm } from "@/components/dashboard/forms/GalleryForm";
+import { ContactForm } from "@/components/dashboard/forms/ContactForm";
 
 // Dispatcher — same pattern as TemplateRenderer's SECTION_COMPONENTS map.
-// Partial because forms are added incrementally; unmapped types fall back
-// to the "no editor yet" message below instead of crashing.
-const SECTION_FORM_COMPONENTS: Partial<Record<SectionType, React.ComponentType<SectionFormProps>>> = {
+const SECTION_FORM_COMPONENTS: Record<SectionType, React.ComponentType<SectionFormProps>> = {
   hero: HeroForm,
+  product_grid: ProductGridForm,
+  menu: MenuForm,
+  services_list: ServicesListForm,
+  about: AboutForm,
+  programs: ProgramsForm,
+  gallery: GalleryForm,
+  contact: ContactForm,
 };
 
 export function SectionForm(props: SectionFormProps) {
