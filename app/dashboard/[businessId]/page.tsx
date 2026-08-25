@@ -1,46 +1,52 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { checkBusinessMembership, getSiteConfig } from "@/lib/ai/config-store";
-import type { TemplateStructure } from "@/lib/templates/section-schemas";
+import { getTemplateById } from "@/lib/templates/template-store";
+import { DashboardEditor } from "@/components/dashboard/DashboardEditor";
+import type { FeatureToggleState } from "@/components/dashboard/FeatureTogglesPanel";
 
 export default async function DashboardPage({ params }: { params: { businessId: string } }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const membership = await checkBusinessMembership(user.id, params.businessId);
-  if (!membership) redirect("/dashboard");
-
-  const config = await getSiteConfig(params.businessId);
-  if (!config) {
-    return <p>No site config found for this business yet.</p>;
+  if (!user) {
+    redirect("/login");
   }
 
-  const { data: template } = await supabase
-    .from("templates")
-    .select("structure")
-    .eq("id", config.template_id)
-    .single();
+  const membership = await checkBusinessMembership(user.id, params.businessId);
+  if (!membership) {
+    notFound();
+  }
 
-  const structure = template?.structure as TemplateStructure | undefined;
+  const config = await getSiteConfig(params.businessId);
+  if (!config || !config.template_id) {
+    notFound();
+  }
+
+  const template = await getTemplateById(config.template_id);
+  if (!template) {
+    notFound();
+  }
+
+  const { data: featureRows } = await supabase
+    .from("feature_toggles")
+    .select("feature_key, enabled, config")
+    .eq("business_id", params.businessId);
+
+  const initialFeatureToggles: FeatureToggleState[] = (featureRows ?? []).map((row) => ({
+    feature_key: row.feature_key,
+    enabled: row.enabled,
+    config: row.config ?? {},
+  }));
 
   return (
-    <div className="dashboard">
-      <h1>Site sections</h1>
-      <p>
-        Status: {config.status} · Version: {config.version}
-      </p>
-      <ul className="dashboard__section-list">
-        {structure?.sections.map((section) => (
-          <li key={section.id}>
-            <Link href={`/dashboard/${params.businessId}/sections/${section.id}`}>
-              {section.type} — {section.id}
-              {section.required && " (required)"}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <DashboardEditor
+      businessId={params.businessId}
+      initialConfig={config}
+      template={template}
+      initialFeatureToggles={initialFeatureToggles}
+    />
   );
 }
