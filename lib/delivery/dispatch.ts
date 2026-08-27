@@ -1,117 +1,81 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendTemplateMessage } from "@/lib/delivery/whatsapp";
-import { deliveryShortCode } from "@/lib/delivery/types";
-import type { Delivery } from "@/lib/delivery/types";
 
 /**
- * Creates a delivery row (status='broadcast') for an order and sends the
- * WhatsApp broadcast to every available rider for that business. Runs on
- * the admin client — this is triggered by a staff action (order marked
- * ready) or automatically by the order-status flow, not a rider session.
+ * Thin wrappers around claim_delivery / update_delivery_status — split out
+ * from riders.ts to avoid a circular import with dispatch.ts (which also
+ * needs rider lookups). Both RPCs identify the rider by phone number, since
+ * riders authenticate only via WhatsApp, not a Supabase session.
  */
-export async function createAndBroadcastDelivery(orderId: string): Promise<Delivery> {
+
+export async function claimDeliveryByPhone(
+  deliveryId: string,
+  riderPhone: string
+): Promise<{ claimed: boolean; reason?: string; orderId?: string; riderName?: string }> {
   const admin = createAdminClient();
+  const { data, error } = await admin.rpc("claim_delivery", {
+    p_delivery_id: deliveryId,
+    p_rider_phone: riderPhone,
+  });
+  if (error) throw new Error(error.message);
+  return {
+    claimed: data.claimed,
+    reason: data.reason,
+    orderId: data.order_id,
+    riderName: data.rider_name,
+  };
+}
 
-  const { data: order, error: orderError } = await admin
-    .from("orders")
-    .select("id, business_id, customer_name, fulfillment_type")
-    .eq("id", orderId)
-    .single();
+export async function updateDeliveryStatusByPhone(
+  deliveryId: string,
+  riderPhone: string,
+  newStatus: "picked_up" | "delivered" | "cancelled",
+  rawMessage?: string
+): Promise<{ ok: boolean; reason?: string }> {
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc("update_delivery_status", {
+    p_delivery_id: deliveryId,
+    p_rider_phone: riderPhone,
+    p_new_status: newStatus,
+    p_raw_message: rawMessage ?? null,
+  });
+  if (error) throw new Error(error.message);
+  return { ok: data.ok, reason: data.reason };
+}
 
-  if (orderError || !order) {
-    throw new Error("order_not_found");
-  }
-  if (order.fulfillment_type !== "delivery") {
-    throw new Error("order_not_marked_for_delivery");
-  }
+/** Finds a rider's single currently-claimed (not yet delivered) delivery — used when a reply has no short code. */
+export async function findActiveClaimedDelivery(riderPhone: string): Promise<{ id: string } | null> {
+  const admin = createAdminClient();
+  const { data: rider } = await admin.from("riders").select("id").eq("phone", riderPhone).maybeSingle();
+  if (!rider) return null;
 
-  const { data: toggle } = await admin
-    .from("feature_toggles")
-    .select("enabled")
-    .eq("business_id", order.business_id)
-    .eq("feature_key", "delivery")
-    .maybeSingle();
-  if (!toggle?.enabled) {
-    throw new Error("delivery_not_enabled_for_business");
-  }
-
-  const { data: existing } = await admin
+  const { data: delivery } = await admin
     .from("deliveries")
     .select("id")
-    .eq("order_id", orderId)
+    .eq("claimed_by", rider.id)
+    .in("status", ["claimed", "picked_up"])
     .maybeSingle();
-  if (existing) {
-    throw new Error("delivery_already_exists_for_order");
-  }
 
-  const { data: business } = await admin
-    .from("businesses")
-    .select("name")
-    .eq("id", order.business_id)
-    .single();
-
-  const { data: delivery, error: deliveryError } = await admin
-    .from("deliveries")
-    .insert({ order_id: orderId, business_id: order.business_id, status: "broadcast" })
-    .select()
-    .single();
-
-  if (deliveryError || !delivery) {
-    throw new Error(deliveryError?.message ?? "delivery_create_failed");
-  }
-
-  await broadcastToAvailableRiders(delivery as Delivery, business?.name ?? "your order");
-
-  return delivery as Delivery;
-}
-
-/** Sends (or re-sends, for escalation) the broadcast message to every currently-available rider. */
-export async function broadcastToAvailableRiders(delivery: Delivery, businessName: string): Promise<number> {
-  const admin = createAdminClient();
-
-  const { data: riders, error } = await admin
-    .from("riders")
-    .select("id, phone")
-    .eq("business_id", delivery.business_id)
-    .eq("status", "available");
-
-  if (error) throw new Error(error.message);
-  if (!riders?.length) return 0;
-
-  const shortCode = deliveryShortCode(delivery.id);
-  const messageBody = `New delivery available for ${businessName}. Reply "CLAIM ${shortCode}" to accept.`;
-
-  await Promise.allSettled(
-    riders.map((rider) => sendTemplateMessage(rider.phone, "delivery_broadcast", [messageBody]))
-  );
-
-  return riders.length;
+  return delivery ?? null;
 }
 
 /**
- * Sweeps deliveries stuck in 'broadcast' past the timeout (via the
- * escalate_stale_broadcasts RPC), then re-broadcasts each one so waiting
- * riders get a second nudge. The escalated_at flag itself is what a
- * staff dashboard (Workstream F) would surface as "needs attention".
+ * Finds a broadcast delivery by its short code, scoped to the rider's own
+ * business. FIX: this previously took a `businessPhoneScope` param but
+ * never applied it as a filter — a short-code prefix collision across two
+ * different businesses' deliveries could have let a rider claim someone
+ * else's delivery. Now actually filters by business_id.
  */
-export async function escalateAndRebroadcastStale(timeoutMinutes = 15): Promise<{ escalatedCount: number }> {
+export async function findBroadcastDeliveryByShortCode(
+  businessId: string,
+  shortCode: string
+): Promise<{ id: string } | null> {
   const admin = createAdminClient();
-
-  const { data: rpcResult, error: rpcError } = await admin.rpc("escalate_stale_broadcasts", {
-    p_timeout_minutes: timeoutMinutes,
-  });
-  if (rpcError) throw new Error(rpcError.message);
-
-  const { data: escalated } = await admin
+  const { data } = await admin
     .from("deliveries")
-    .select("*, businesses(name)")
-    .not("escalated_at", "is", null)
-    .eq("status", "broadcast");
-
-  for (const row of escalated ?? []) {
-    const { businesses, ...delivery } = row as any;
-    await broadcastToAvailableRiders(delivery as Delivery, businesses?.name ?? "your order");
-  }
-
-  return { escalatedCount: rpcResult.escalated_count };
+    .select("id")
+    .eq("status", "broadcast")
+    .eq("business_id", businessId)
+    .ilike("id", `${shortCode.slice(0, 8)}%`.toLowerCase())
+    .maybeSingle();
+  return data ?? null;
 }
