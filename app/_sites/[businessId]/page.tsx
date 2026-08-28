@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSiteConfig } from "@/lib/ai/config-store";
 import { getTemplateById } from "@/lib/templates/template-store";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
+import "@/styles/site.css";
 
 interface SitePageProps {
   params: { businessId: string };
@@ -13,7 +14,7 @@ async function getPublishedBusiness(businessId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("businesses")
-    .select("id, name, status")
+    .select("id, name, status, category")
     .eq("id", businessId)
     .eq("status", "published")
     .maybeSingle();
@@ -44,6 +45,8 @@ export default async function SitePage({ params }: SitePageProps) {
 
   return (
     <div
+      className="site"
+      data-category={business.category}
       style={
         {
           "--color-primary": colorScheme.primary ?? "#111827",
