@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendTemplateMessage } from "@/lib/delivery/whatsapp";
+import { deliveryShortCode, type Delivery } from "@/lib/delivery/types";
 
 /**
  * Thin wrappers around claim_delivery / update_delivery_status — split out
@@ -78,4 +80,120 @@ export async function findBroadcastDeliveryByShortCode(
     .ilike("id", `${shortCode.slice(0, 8)}%`.toLowerCase())
     .maybeSingle();
   return data ?? null;
+}
+
+/** Sends (or re-sends) the delivery_broadcast template to every available rider for a business. */
+async function notifyAvailableRiders(businessId: string, delivery: Delivery, orderTotal: string) {
+  const admin = createAdminClient();
+  const { data: riders } = await admin
+    .from("riders")
+    .select("id, phone")
+    .eq("business_id", businessId)
+    .eq("status", "available");
+
+  const shortCode = deliveryShortCode(delivery.id);
+  await Promise.all(
+    (riders ?? []).map((r) =>
+      sendTemplateMessage(r.phone, "delivery_broadcast", [shortCode, orderTotal])
+    )
+  );
+}
+
+/**
+ * Creates a delivery for an order and broadcasts it to available riders.
+ * Caller (route handler) is responsible for verifying the requesting user
+ * is a member of the order's business before calling this — this function
+ * itself runs on the admin client and does not re-check membership.
+ */
+export async function createAndBroadcastDelivery(orderId: string): Promise<Delivery> {
+  const admin = createAdminClient();
+
+  const { data: order, error: orderError } = await admin
+    .from("orders")
+    .select("id, business_id, fulfillment_type, total, currency")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (orderError) throw new Error(orderError.message);
+  if (!order) throw new Error("order_not_found");
+  if (order.fulfillment_type !== "delivery") throw new Error("order_not_marked_for_delivery");
+
+  const { data: toggle } = await admin
+    .from("feature_toggles")
+    .select("enabled")
+    .eq("business_id", order.business_id)
+    .eq("feature_key", "delivery")
+    .maybeSingle();
+  if (!toggle?.enabled) throw new Error("delivery_not_enabled_for_business");
+
+  const { data: existing } = await admin
+    .from("deliveries")
+    .select("id")
+    .eq("order_id", orderId)
+    .maybeSingle();
+  if (existing) throw new Error("delivery_already_exists_for_order");
+
+  const { data: delivery, error: insertError } = await admin
+    .from("deliveries")
+    .insert({ order_id: orderId, business_id: order.business_id })
+    .select()
+    .single();
+  if (insertError) throw new Error(insertError.message);
+
+  await admin
+    .from("delivery_status_events")
+    .insert({ delivery_id: delivery.id, status: "broadcast" });
+
+  await notifyAvailableRiders(
+    order.business_id,
+    delivery as Delivery,
+    `${order.currency} ${order.total}`
+  );
+
+  return delivery as Delivery;
+}
+
+/**
+ * Scheduled sweep (see vercel.json's escalate-broadcasts cron). Marks any
+ * broadcast delivery older than the timeout as escalated via the
+ * escalate_stale_broadcasts RPC, then re-notifies available riders for
+ * each newly-escalated delivery so it gets claimed on a second pass.
+ */
+export async function escalateAndRebroadcastStale(
+  timeoutMinutes = 15
+): Promise<{ escalatedCount: number; rebroadcastDeliveryIds: string[] }> {
+  const admin = createAdminClient();
+  const sweepStartedAt = new Date().toISOString();
+
+  const { data, error } = await admin.rpc("escalate_stale_broadcasts", {
+    p_timeout_minutes: timeoutMinutes,
+  });
+  if (error) throw new Error(error.message);
+
+  const escalatedCount: number = data?.escalated_count ?? 0;
+  if (escalatedCount === 0) {
+    return { escalatedCount: 0, rebroadcastDeliveryIds: [] };
+  }
+
+  const { data: escalated } = await admin
+    .from("deliveries")
+    .select("id, business_id, order_id")
+    .eq("status", "broadcast")
+    .gte("escalated_at", sweepStartedAt);
+
+  const rebroadcastDeliveryIds: string[] = [];
+  for (const delivery of escalated ?? []) {
+    const { data: order } = await admin
+      .from("orders")
+      .select("total, currency")
+      .eq("id", delivery.order_id)
+      .maybeSingle();
+    await notifyAvailableRiders(
+      delivery.business_id,
+      delivery as Delivery,
+      order ? `${order.currency} ${order.total}` : ""
+    );
+    rebroadcastDeliveryIds.push(delivery.id);
+  }
+
+  return { escalatedCount, rebroadcastDeliveryIds };
 }
