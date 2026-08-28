@@ -11,7 +11,7 @@ import {
   updateDeliveryStatusByPhone,
   findActiveClaimedDelivery,
   findBroadcastDeliveryByShortCode,
-} from "@/lib/delivery/dispatch-actions";
+} from "@/lib/delivery/dispatch";
 
 /** Meta's subscription verification handshake. */
 export async function GET(req: Request) {
