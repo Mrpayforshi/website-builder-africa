@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { claimDeliveryByPhone, updateDeliveryStatusByPhone } from "@/lib/delivery/dispatch-actions";
+import { claimDeliveryByPhone, updateDeliveryStatusByPhone } from "@/lib/delivery/dispatch";
 import type { Rider } from "@/lib/delivery/types";
 
 /** Staff-side rider roster management — RLS-scoped, "members can manage riders" covers all of this. */
