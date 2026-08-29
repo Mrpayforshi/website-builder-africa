@@ -29,7 +29,7 @@ export function HeroForm({
     setStatus("saving");
     setError(null);
 
-    const nextContent: HeroContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("headline")) nextContent.headline = headline;
     if (allowedFields.includes("subheadline")) nextContent.subheadline = subheadline;
     if (allowedFields.includes("image")) nextContent.image = image;
