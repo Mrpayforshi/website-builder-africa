@@ -61,7 +61,7 @@ export function ProductGridForm({
         ...(item.sku && { sku: item.sku }),
       }));
 
-    const nextContent: ProductGridContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("items")) nextContent.items = cleanedItems;
 
     const result = await submitSectionPatch({ businessId, sectionId, expectedVersion, content: nextContent });
