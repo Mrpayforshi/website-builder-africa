@@ -1,7 +1,1 @@
-{
-  "crons": [
-    { "path": "/api/cron/forfeit-laybys", "schedule": "15 0 * * *" },
-    { "path": "/api/cron/escalate-broadcasts", "schedule": "*/5 * * * *" },
-    { "path": "/api/cron/refresh-maps-sync", "schedule": "0 3 * * *" }
-  ]
-}
+{}
