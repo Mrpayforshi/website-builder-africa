@@ -57,7 +57,7 @@ export function ProgramsForm({
         ...(item.image && { image: item.image }),
       }));
 
-    const nextContent: ProgramsContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("items")) nextContent.items = cleanedItems;
 
     const result = await submitSectionPatch({ businessId, sectionId, expectedVersion, content: nextContent });
