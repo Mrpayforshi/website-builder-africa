@@ -31,7 +31,7 @@ export function AboutForm({
     setStatus("saving");
     setError(null);
 
-    const nextContent: AboutContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("headline")) nextContent.headline = headline;
     if (allowedFields.includes("body")) nextContent.body = body;
     if (allowedFields.includes("image")) nextContent.image = image;
