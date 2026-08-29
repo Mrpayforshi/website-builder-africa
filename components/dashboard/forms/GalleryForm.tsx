@@ -55,7 +55,7 @@ export function GalleryForm({
         ...(img.caption && { caption: img.caption }),
       }));
 
-    const nextContent: GalleryContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("images")) nextContent.images = cleanedImages;
 
     const result = await submitSectionPatch({ businessId, sectionId, expectedVersion, content: nextContent });
