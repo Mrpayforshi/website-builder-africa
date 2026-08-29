@@ -93,7 +93,7 @@ export function MenuForm({
           })),
       }));
 
-    const nextContent: MenuContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("categories")) nextContent.categories = cleanedCategories;
 
     const result = await submitSectionPatch({ businessId, sectionId, expectedVersion, content: nextContent });
