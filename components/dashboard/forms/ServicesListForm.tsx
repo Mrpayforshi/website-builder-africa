@@ -57,7 +57,7 @@ export function ServicesListForm({
         ...(item.price && { price: item.price }),
       }));
 
-    const nextContent: ServicesListContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("items")) nextContent.items = cleanedItems;
 
     const result = await submitSectionPatch({ businessId, sectionId, expectedVersion, content: nextContent });
