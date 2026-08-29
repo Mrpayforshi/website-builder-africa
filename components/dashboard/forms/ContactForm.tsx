@@ -52,7 +52,7 @@ export function ContactForm({
     setStatus("saving");
     setError(null);
 
-    const nextContent: ContactContent = {};
+    const nextContent: Record<string, unknown> = {};
     if (allowedFields.includes("address")) nextContent.address = address;
     if (allowedFields.includes("phone")) nextContent.phone = phone;
     if (allowedFields.includes("email")) nextContent.email = email;
