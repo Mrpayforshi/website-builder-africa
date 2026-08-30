@@ -42,20 +42,25 @@ export async function setRiderStatus(
 }
 
 /**
- * Looks up which business a phone number belongs to as a rider, across all
- * tenants — needed because the webhook receives one shared WhatsApp number
- * for the whole platform, not one per business. Runs on the admin client:
- * there's no rider session to scope RLS to.
+ * Looks up every business a phone number is registered as a rider for.
+ * riders_business_phone_unique is scoped to (business_id, phone), not phone
+ * alone — the same person can legitimately ride for more than one business,
+ * so this can return more than one row. (Previously this used .maybeSingle()
+ * assuming exactly one match, which throws once a phone rides for a second
+ * business — see the webhook route for how callers now handle multiple.)
+ * Runs on the admin client: there's no rider session to scope RLS to, and
+ * this needs to see across every tenant regardless.
  */
-export async function findRiderByPhone(phone: string): Promise<{ businessId: string; riderId: string } | null> {
+export async function findRidersByPhone(
+  phone: string
+): Promise<Array<{ businessId: string; riderId: string }>> {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("riders")
     .select("id, business_id")
-    .eq("phone", phone)
-    .maybeSingle();
+    .eq("phone", phone);
   if (error) throw new Error(error.message);
-  return data ? { businessId: data.business_id, riderId: data.id } : null;
+  return (data ?? []).map((r) => ({ businessId: r.business_id, riderId: r.id }));
 }
 
 export { claimDeliveryByPhone, updateDeliveryStatusByPhone };
