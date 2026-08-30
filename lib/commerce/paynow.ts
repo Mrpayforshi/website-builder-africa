@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { ProxyAgent, type Dispatcher } from "undici";
 
 /**
  * Paynow integration — this is the ONLY payment path per the locked
@@ -6,10 +7,13 @@ import crypto from "crypto";
  * EcoCash API). Do not add a direct EcoCash integration here.
  *
  * OPERATIONAL NOTE (deployment, not a design decision): Paynow IP-whitelists
- * callers of these interface endpoints. On Vercel (no static outbound IP)
- * these fetch() calls will need to go through a fixed-IP relay — a small
- * VPS, or a static-IP egress add-on — sitting between this code and Paynow.
- * Flagging this now so it isn't discovered at go-live.
+ * callers of these interface endpoints. Vercel's own Static IP add-on is
+ * Pro/Enterprise-only and doesn't exist on Hobby, so this needs a
+ * third-party fixed-IP HTTP proxy in front of the two outbound calls below
+ * (QuotaGuard Static, Fixie, OutboundGateway, or a self-hosted relay with a
+ * static IP all work — set PAYNOW_PROXY_URL to whichever one you pick).
+ * Without that env var set, these calls go out on Vercel's normal rotating
+ * IPs and Paynow will reject them in production.
  */
 
 const PAYNOW_MOBILE_URL = "https://www.paynow.co.zw/interface/remotetransaction";
@@ -50,6 +54,35 @@ function getCredentials() {
     throw new Error("PAYNOW_INTEGRATION_ID / PAYNOW_INTEGRATION_KEY are not set.");
   }
   return { id, key };
+}
+
+/**
+ * Lazily builds (and caches) a ProxyAgent from PAYNOW_PROXY_URL. Returns
+ * undefined when the env var isn't set, in which case fetchViaProxy falls
+ * back to normal direct egress — i.e. today's behavior, unchanged.
+ */
+let cachedDispatcher: Dispatcher | undefined;
+function getProxyDispatcher(): Dispatcher | undefined {
+  const proxyUrl = process.env.PAYNOW_PROXY_URL;
+  if (!proxyUrl) return undefined;
+  if (!cachedDispatcher) {
+    cachedDispatcher = new ProxyAgent(proxyUrl);
+  }
+  return cachedDispatcher;
+}
+
+/**
+ * Wraps fetch() to route through the fixed-IP proxy when configured. The
+ * `dispatcher` option is a Node/undici extension to fetch's RequestInit,
+ * not part of the DOM lib's fetch types — cast through an intersection type
+ * rather than `any` so this stays type-checked everywhere except the one
+ * property TypeScript's bundled DOM types don't know about.
+ */
+async function fetchViaProxy(url: string, init: RequestInit): Promise<Response> {
+  const dispatcher = getProxyDispatcher();
+  if (!dispatcher) return fetch(url, init);
+  const initWithDispatcher: RequestInit & { dispatcher: Dispatcher } = { ...init, dispatcher };
+  return fetch(url, initWithDispatcher as RequestInit);
 }
 
 /**
@@ -108,7 +141,7 @@ export async function initiateEcocashPayment(
   };
   fields.hash = computeHash(fields, key);
 
-  const res = await fetch(PAYNOW_MOBILE_URL, {
+  const res = await fetchViaProxy(PAYNOW_MOBILE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(fields).toString(),
@@ -132,7 +165,7 @@ export async function initiateEcocashPayment(
 export async function pollTransactionStatus(
   pollUrl: string
 ): Promise<{ status: string; amount?: string; paynowReference?: string }> {
-  const res = await fetch(pollUrl, { method: "POST" });
+  const res = await fetchViaProxy(pollUrl, { method: "POST" });
   const parsed = parsePaynowResponse(await res.text());
   return {
     status: parsed.status ?? "unknown",
@@ -145,6 +178,9 @@ export async function pollTransactionStatus(
  * Verifies + parses an inbound status-update POST from Paynow's resulturl
  * webhook. Returns null if the hash doesn't check out — treat that as an
  * untrusted/forged request and reject it (don't touch the DB).
+ *
+ * No proxy involved here — this is Paynow calling US, not us calling them,
+ * so outbound IP whitelisting is irrelevant to this function.
  */
 export function parseStatusUpdate(rawBody: string): PaynowStatusUpdate | null {
   const { key } = getCredentials();
