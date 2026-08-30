@@ -93,6 +93,43 @@
   color: var(--color-accent);
 }
 
+/* Shared WhatsApp CTA button — used by ProductGrid, Menu, ServicesList.
+   Only rendered when the whatsapp feature toggle has a number configured
+   (see lib/commerce/whatsapp-links.ts); no empty-state styling is needed
+   since the element simply isn't in the DOM when there's no number. */
+.site .whatsapp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: #25d366;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  line-height: 1.3;
+}
+
+.site .whatsapp-cta:hover,
+.site .whatsapp-cta:focus-visible {
+  background: #1ebe57;
+}
+
+.site .product-grid__item .whatsapp-cta {
+  margin: var(--space-2) var(--space-2) 0;
+}
+
+.site .menu__item .whatsapp-cta {
+  flex-basis: 100%;
+  margin-top: var(--space-1);
+}
+
+.site .services-list__item .whatsapp-cta {
+  flex-basis: 100%;
+}
+
 /* ==========================================================================
    Hero
    ========================================================================== */
