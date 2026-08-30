@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteConfig } from "@/lib/ai/config-store";
 import { getTemplateById } from "@/lib/templates/template-store";
+import { getWhatsappCtaConfig } from "@/lib/commerce/whatsapp-links";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import "@/styles/site.css";
 
@@ -37,6 +38,8 @@ export default async function SitePage({ params }: SitePageProps) {
   const template = await getTemplateById(config.template_id);
   if (!template) notFound();
 
+  const whatsapp = await getWhatsappCtaConfig(params.businessId);
+
   const colorScheme = (config.color_scheme ?? {}) as {
     primary?: string;
     secondary?: string;
@@ -55,7 +58,11 @@ export default async function SitePage({ params }: SitePageProps) {
         } as React.CSSProperties
       }
     >
-      <TemplateRenderer structure={template.structure} contentBlocks={config.content_blocks} />
+      <TemplateRenderer
+        structure={template.structure}
+        contentBlocks={config.content_blocks}
+        whatsappNumber={whatsapp.enabled ? whatsapp.number : null}
+      />
     </div>
   );
 }
