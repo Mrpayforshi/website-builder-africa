@@ -5,13 +5,14 @@ import {
   verifyWebhookSubscription,
   sendTextMessage,
 } from "@/lib/delivery/whatsapp";
-import { findRiderByPhone } from "@/lib/delivery/riders";
+import { findRidersByPhone } from "@/lib/delivery/riders";
 import {
   claimDeliveryByPhone,
   updateDeliveryStatusByPhone,
-  findActiveClaimedDelivery,
+  findActiveClaimedDeliveries,
   findBroadcastDeliveryByShortCode,
 } from "@/lib/delivery/dispatch";
+import { deliveryShortCode } from "@/lib/delivery/types";
 
 /** Meta's subscription verification handshake. */
 export async function GET(req: Request) {
@@ -26,9 +27,12 @@ export async function GET(req: Request) {
 /**
  * Rider-facing WhatsApp bot flow — simple keyword matching per the v1 spec
  * (no live GPS, status-based tracking only). One shared platform WhatsApp
- * number handles every tenant's riders, so a rider is resolved by phone
- * number alone (see findRiderByPhone's one-rider-one-business assumption,
- * a known open item, not addressed here).
+ * number handles every tenant's riders. A phone can ride for more than one
+ * business (riders_business_phone_unique is scoped per business, not
+ * globally), so every lookup here considers ALL of a phone's rider
+ * identities rather than assuming one, and falls back to asking for the
+ * delivery's short code only in the rare case that's actually ambiguous
+ * (e.g. two active deliveries across two businesses at once).
  */
 export async function POST(req: Request) {
   const body = await req.json();
@@ -40,9 +44,9 @@ export async function POST(req: Request) {
   }
 
   const riderPhone = normalizeIncomingPhone(message.from);
-  const rider = await findRiderByPhone(riderPhone);
+  const riders = await findRidersByPhone(riderPhone);
 
-  if (!rider) {
+  if (!riders.length) {
     await sendTextMessage(
       riderPhone,
       "This number isn't registered as a rider for any business on this platform."
@@ -55,7 +59,17 @@ export async function POST(req: Request) {
 
   if (claimMatch) {
     const shortCode = claimMatch[1];
-    const delivery = await findBroadcastDeliveryByShortCode(rider.businessId, shortCode);
+
+    // Short codes are per-business (see findBroadcastDeliveryByShortCode),
+    // so check each business this phone rides for until one matches —
+    // a cross-business code collision is astronomically unlikely, and even
+    // if it happened claim_delivery still re-validates against a specific
+    // delivery id, not the code.
+    let delivery: { id: string } | null = null;
+    for (const r of riders) {
+      delivery = await findBroadcastDeliveryByShortCode(r.businessId, shortCode);
+      if (delivery) break;
+    }
 
     if (!delivery) {
       await sendTextMessage(
@@ -75,15 +89,41 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  if (/picked\s*up|delivered|cancel/i.test(text)) {
-    const active = await findActiveClaimedDelivery(riderPhone);
-    if (!active) {
+  const verbMatch = text.match(/picked\s*up|delivered|cancel/i);
+  if (verbMatch) {
+    const active = await findActiveClaimedDeliveries(riderPhone);
+
+    if (!active.length) {
       await sendTextMessage(riderPhone, "You don't have an active delivery to update.");
       return NextResponse.json({ ok: true });
     }
 
-    const newStatus = /picked/i.test(text) ? "picked_up" : /deliv/i.test(text) ? "delivered" : "cancelled";
-    const result = await updateDeliveryStatusByPhone(active.id, riderPhone, newStatus, text);
+    let target = active[0];
+    if (active.length > 1) {
+      // Ambiguous only when the same phone has more than one delivery in
+      // flight at once (almost always across two different businesses).
+      // Look for any of the candidate short codes literally in the message.
+      const matched = active.find((d) => text.toUpperCase().includes(deliveryShortCode(d.id)));
+      if (!matched) {
+        const codes = active.map((d) => deliveryShortCode(d.id)).join(", ");
+        await sendTextMessage(
+          riderPhone,
+          `You have more than one active delivery. Reply with the code too, e.g. "DELIVERED ${deliveryShortCode(
+            active[0].id
+          )}". Your active codes: ${codes}.`
+        );
+        return NextResponse.json({ ok: true });
+      }
+      target = matched;
+    }
+
+    const matchedVerb = verbMatch[0];
+    const newStatus = /picked/i.test(matchedVerb)
+      ? "picked_up"
+      : /deliv/i.test(matchedVerb)
+      ? "delivered"
+      : "cancelled";
+    const result = await updateDeliveryStatusByPhone(target.id, riderPhone, newStatus, text);
     const reply = result.ok
       ? `Got it — marked as ${newStatus.replace("_", " ")}.`
       : `Couldn't update status (${result.reason ?? "unknown error"}).`;
