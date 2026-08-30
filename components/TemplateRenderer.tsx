@@ -23,9 +23,18 @@ const SECTION_COMPONENTS: Record<SectionType, React.ComponentType<any>> = {
 interface TemplateRendererProps {
   structure: TemplateStructure;
   contentBlocks: Record<string, unknown>;
+  /**
+   * WhatsApp order/enquiry number, already resolved from feature_toggles by
+   * the page (see getWhatsappCtaConfig) — null when the toggle is off or no
+   * number is set. Passed as a sibling prop, not folded into contentBlocks,
+   * because whatsapp isn't a valid field on any section per
+   * SECTION_FIELD_SCHEMAS. Only product_grid, menu, and services_list read
+   * it; other sections ignore the extra prop harmlessly.
+   */
+  whatsappNumber?: string | null;
 }
 
-export function TemplateRenderer({ structure, contentBlocks }: TemplateRendererProps) {
+export function TemplateRenderer({ structure, contentBlocks, whatsappNumber = null }: TemplateRendererProps) {
   return (
     <>
       {structure.sections.map((section) => {
@@ -43,7 +52,7 @@ export function TemplateRenderer({ structure, contentBlocks }: TemplateRendererP
         }
 
         const content = (contentBlocks?.[section.id] as Record<string, unknown>) ?? {};
-        return <Component key={section.id} {...content} />;
+        return <Component key={section.id} {...content} whatsappNumber={whatsappNumber} />;
       })}
     </>
   );
