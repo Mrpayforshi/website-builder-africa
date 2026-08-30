@@ -1,3 +1,4 @@
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CreateOrderInput, CreateOrderResult, Order, PaymentStatus } from "@/lib/commerce/types";
 
@@ -80,4 +81,67 @@ export async function getOrderByIdAdmin(orderId: string): Promise<Order | null> 
   const { data, error } = await admin.from("orders").select("*").eq("id", orderId).maybeSingle();
   if (error) throw new Error(error.message);
   return data as Order | null;
+}
+
+export interface AssignOrderStaffInput {
+  orderId: string;
+  businessId: string;
+  /** business_users.id to assign the order to, or null to unassign. */
+  staffId: string | null;
+  /** business_users.id of whoever is making this change — used for updated_by/changed_by. */
+  actorBusinessUserId: string;
+}
+
+/**
+ * Assigns (or unassigns, when staffId is null) an order to a staff member.
+ * Role-based authorization (owner/manager can assign to anyone; staff can
+ * only claim/release their own) is enforced by the caller (the API route) —
+ * this function only enforces that the target staffId, if given, actually
+ * belongs to the same business as the order.
+ *
+ * The orders UPDATE runs on the RLS-scoped client — "members can update
+ * orders" already covers this. The order_status_events insert runs on the
+ * admin client, since that table has no member INSERT policy (see
+ * app/api/delivery/broadcast/route.ts for the same split).
+ */
+export async function assignOrderStaff(input: AssignOrderStaffInput): Promise<Order> {
+  const supabase = await createClient();
+
+  if (input.staffId) {
+    const { data: staffRow, error: staffError } = await supabase
+      .from("business_users")
+      .select("id, business_id")
+      .eq("id", input.staffId)
+      .maybeSingle();
+    if (staffError) throw new Error(staffError.message);
+    if (!staffRow || staffRow.business_id !== input.businessId) {
+      throw new Error("staff_not_member_of_business");
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update({
+      assigned_staff_id: input.staffId,
+      updated_by: input.actorBusinessUserId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", input.orderId)
+    .eq("business_id", input.businessId)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+
+  const admin = createAdminClient();
+  const { error: eventError } = await admin.from("order_status_events").insert({
+    order_id: input.orderId,
+    status: (data as Order).status,
+    changed_by: input.actorBusinessUserId,
+    note: input.staffId ? `assigned to staff ${input.staffId}` : "unassigned",
+  });
+  // Non-fatal: the assignment itself already succeeded above. Losing an
+  // audit-log row shouldn't roll back or fail the visible action.
+  if (eventError) console.error("order_status_events insert failed:", eventError.message);
+
+  return data as Order;
 }
