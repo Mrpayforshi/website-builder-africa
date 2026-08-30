@@ -44,20 +44,27 @@ export async function updateDeliveryStatusByPhone(
   return { ok: data.ok, reason: data.reason };
 }
 
-/** Finds a rider's single currently-claimed (not yet delivered) delivery — used when a reply has no short code. */
-export async function findActiveClaimedDelivery(riderPhone: string): Promise<{ id: string } | null> {
+/**
+ * Finds every currently-claimed (not yet delivered) delivery across all of
+ * a phone number's rider identities. A phone can be a rider at more than
+ * one business (riders_business_phone_unique is per-business, not global),
+ * so this can legitimately return more than one delivery — the caller
+ * (webhook route) disambiguates by short code when that happens.
+ */
+export async function findActiveClaimedDeliveries(
+  riderPhone: string
+): Promise<Array<{ id: string; businessId: string }>> {
   const admin = createAdminClient();
-  const { data: rider } = await admin.from("riders").select("id").eq("phone", riderPhone).maybeSingle();
-  if (!rider) return null;
+  const { data: riders } = await admin.from("riders").select("id, business_id").eq("phone", riderPhone);
+  if (!riders?.length) return [];
 
-  const { data: delivery } = await admin
+  const { data: deliveries } = await admin
     .from("deliveries")
-    .select("id")
-    .eq("claimed_by", rider.id)
-    .in("status", ["claimed", "picked_up"])
-    .maybeSingle();
+    .select("id, business_id")
+    .in("claimed_by", riders.map((r) => r.id))
+    .in("status", ["claimed", "picked_up"]);
 
-  return delivery ?? null;
+  return (deliveries ?? []).map((d) => ({ id: d.id, businessId: d.business_id }));
 }
 
 /**
