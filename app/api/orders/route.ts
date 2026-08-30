@@ -1,8 +1,46 @@
 import { NextResponse } from "next/server";
-import { createOrder, saveOrderPollUrl } from "@/lib/commerce/orders";
+import { createClient } from "@/lib/supabase/server";
+import { checkBusinessMembership } from "@/lib/ai/config-store";
+import { createOrder, listOrdersForBusiness, saveOrderPollUrl } from "@/lib/commerce/orders";
 import { buildLaybySchedule } from "@/lib/commerce/layby";
 import { initiateEcocashPayment } from "@/lib/commerce/paynow";
-import type { LaybyCadence } from "@/lib/commerce/types";
+import type { LaybyCadence, OrderStatus } from "@/lib/commerce/types";
+
+/**
+ * Staff-facing order list — auth required, membership-gated. Supports
+ * ?status= and ?assignedStaffId= (a business_users.id, or the literal
+ * "unassigned") to power a dashboard order/assignment view.
+ */
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const businessId = searchParams.get("businessId");
+  if (!businessId) return NextResponse.json({ error: "businessId_required" }, { status: 400 });
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+
+  const membership = await checkBusinessMembership(user.id, businessId);
+  if (!membership) return NextResponse.json({ error: "not_authorized_for_business" }, { status: 403 });
+
+  const status = searchParams.get("status") as OrderStatus | null;
+  const assignedStaffId = searchParams.get("assignedStaffId");
+
+  try {
+    const orders = await listOrdersForBusiness(businessId, {
+      status: status ?? undefined,
+      assignedStaffId: assignedStaffId ?? undefined,
+    });
+    return NextResponse.json({ orders });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "list_orders_failed" },
+      { status: 500 }
+    );
+  }
+}
 
 /**
  * Public checkout endpoint — no auth required, the customer is not a
