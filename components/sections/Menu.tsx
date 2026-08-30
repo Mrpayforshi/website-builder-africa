@@ -1,3 +1,5 @@
+import { buildWhatsappOrderLink } from "@/lib/commerce/whatsapp-links";
+
 interface MenuItem {
   name: string;
   price?: number | string;
@@ -11,9 +13,10 @@ interface MenuCategory {
 
 interface MenuProps {
   categories?: MenuCategory[];
+  whatsappNumber?: string | null;
 }
 
-export function Menu({ categories = [] }: MenuProps) {
+export function Menu({ categories = [], whatsappNumber }: MenuProps) {
   if (categories.length === 0) {
     return <section className="menu menu--empty">Menu coming soon.</section>;
   }
@@ -28,6 +31,16 @@ export function Menu({ categories = [] }: MenuProps) {
               <span className="menu__item-name">{item.name}</span>
               {item.price && <span className="price">{item.price}</span>}
               {item.description && <p>{item.description}</p>}
+              {whatsappNumber && (
+                
+                  className="whatsapp-cta"
+                  href={buildWhatsappOrderLink(whatsappNumber, item.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Order via WhatsApp
+                </a>
+              )}
             </div>
           ))}
         </div>
