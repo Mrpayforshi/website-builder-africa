@@ -536,3 +536,234 @@
   font-style: italic;
   font-weight: 400;
 }
+
+/* ==========================================================================
+   CATEGORY: Food
+   Warm, appetite-driving. Terracotta/gold gradient hero, rounded-pill menu
+   category headers, friendly rounded corners throughout.
+   ========================================================================== */
+[data-category="food"] {
+  --font-heading: "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-body: "Segoe UI", system-ui, sans-serif;
+  --radius-sm: 999px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --site-bg: #fff8ef;
+  --site-surface: #ffffff;
+  --site-hero-bg: linear-gradient(135deg, #f6b04a, #e2652b);
+}
+
+[data-category="food"] {
+  background: var(--site-bg);
+}
+
+[data-category="food"] .hero {
+  background: var(--site-hero-bg);
+  padding: var(--space-5) var(--space-4);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+[data-category="food"] .hero h1 {
+  font-weight: 800;
+  color: #2b1608;
+}
+
+[data-category="food"] .hero p {
+  color: #46280f;
+  font-weight: 600;
+}
+
+[data-category="food"] .hero img {
+  border-radius: var(--radius-md);
+}
+
+[data-category="food"] .menu__category h3 {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border-bottom: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+[data-category="food"] .menu__item {
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+[data-category="food"] .menu__item-name {
+  font-weight: 700;
+}
+
+[data-category="food"] .price {
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   CATEGORY: Professional
+   Crisp, corporate, trustworthy. Cool blue, sharp minimal corners, clear
+   card-based structure for credentials and services.
+   ========================================================================== */
+[data-category="professional"] {
+  --font-heading: "Segoe UI", Arial, sans-serif;
+  --font-body: Arial, "Segoe UI", sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --site-bg: #eef4fa;
+  --site-surface: #ffffff;
+  --site-hero-bg: #dce8f5;
+}
+
+[data-category="professional"] {
+  background: var(--site-bg);
+}
+
+[data-category="professional"] .hero {
+  background: var(--site-hero-bg);
+  padding: var(--space-5) var(--space-4);
+  border-radius: 0;
+}
+
+[data-category="professional"] .hero h1 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-category="professional"] .hero img {
+  border-radius: var(--radius-sm);
+}
+
+[data-category="professional"] .about {
+  background: var(--site-surface);
+  margin: 0 var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-category="professional"] .services-list__item {
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+[data-category="professional"] .services-list__item h3 {
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   CATEGORY: NGO / Community
+   Warm and trustworthy. Sage green + cream, rounded program cards with a
+   left accent stripe, mission-forward hero.
+   ========================================================================== */
+[data-category="ngo_community"] {
+  --font-heading: "Segoe UI", Verdana, sans-serif;
+  --font-body: Verdana, "Segoe UI", sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --site-bg: #faf6ec;
+  --site-surface: #ffffff;
+  --site-hero-bg: linear-gradient(160deg, #3f6b4a, #6f9c78);
+}
+
+[data-category="ngo_community"] {
+  background: var(--site-bg);
+}
+
+[data-category="ngo_community"] .hero {
+  background: var(--site-hero-bg);
+  padding: var(--space-5) var(--space-4);
+}
+
+[data-category="ngo_community"] .hero h1 {
+  color: #fff;
+  font-weight: 700;
+}
+
+[data-category="ngo_community"] .hero p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-category="ngo_community"] .hero img {
+  border-radius: var(--radius-md);
+}
+
+[data-category="ngo_community"] .programs__item {
+  background: var(--site-surface);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-accent);
+  box-shadow: none;
+}
+
+[data-category="ngo_community"] .programs__item h3 {
+  font-weight: 700;
+}
+
+[data-category="ngo_community"] .about {
+  background: var(--site-surface);
+  margin: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+/* ==========================================================================
+   CATEGORY: Events / Portfolio
+   Dark and dramatic. Near-black background, bold serif type, high-contrast
+   edge-to-edge gallery.
+   NOTE: text color is hardcoded (not var(--color-primary)) — see chat flag.
+   A dark-owner-color assumption is baked into this category's contrast.
+   ========================================================================== */
+[data-category="events_portfolio"] {
+  --font-heading: Georgia, "Times New Roman", serif;
+  --font-body: "Segoe UI", system-ui, sans-serif;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --site-bg: #121014;
+  --site-surface: #1d1a20;
+  --site-hero-bg: #17151a;
+}
+
+[data-category="events_portfolio"] {
+  background: var(--site-bg);
+  color: #f2f0f4;
+}
+
+[data-category="events_portfolio"] .hero {
+  background: var(--site-hero-bg);
+  padding: var(--space-6) var(--space-4);
+}
+
+[data-category="events_portfolio"] .hero h1 {
+  font-weight: 700;
+  font-style: italic;
+  color: #fff;
+}
+
+[data-category="events_portfolio"] .hero p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-category="events_portfolio"] .hero img {
+  border-radius: var(--radius-sm);
+}
+
+[data-category="events_portfolio"] .gallery {
+  gap: 2px;
+  padding: 2px;
+}
+
+[data-category="events_portfolio"] .gallery figure {
+  border-radius: 0;
+}
+
+[data-category="events_portfolio"] .contact,
+[data-category="events_portfolio"] .contact__address,
+[data-category="events_portfolio"] .contact__phone,
+[data-category="events_portfolio"] .contact__email {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-category="events_portfolio"] .contact__hours {
+  color: rgba(255, 255, 255, 0.6);
+}
