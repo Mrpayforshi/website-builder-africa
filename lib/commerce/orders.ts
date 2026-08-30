@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { CreateOrderInput, CreateOrderResult, Order, PaymentStatus } from "@/lib/commerce/types";
+import type {
+  CreateOrderInput,
+  CreateOrderResult,
+  Order,
+  OrderStatus,
+  PaymentStatus,
+} from "@/lib/commerce/types";
 
 /**
  * Creates an order (and, for layby orders, its layby_plan) via the
@@ -144,4 +150,39 @@ export async function assignOrderStaff(input: AssignOrderStaffInput): Promise<Or
   if (eventError) console.error("order_status_events insert failed:", eventError.message);
 
   return data as Order;
+}
+
+export interface ListOrdersFilter {
+  status?: OrderStatus;
+  /** Pass a business_users.id to filter to that staff member's orders, or "unassigned" for unclaimed ones. */
+  assignedStaffId?: string | "unassigned";
+}
+
+/**
+ * Lists orders for a business, newest first. RLS-scoped — "members can view
+ * orders" already covers this, same as everywhere else staff read order data.
+ */
+export async function listOrdersForBusiness(
+  businessId: string,
+  filter?: ListOrdersFilter
+): Promise<Order[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("orders")
+    .select("*")
+    .eq("business_id", businessId)
+    .order("created_at", { ascending: false });
+
+  if (filter?.status) {
+    query = query.eq("status", filter.status);
+  }
+  if (filter?.assignedStaffId === "unassigned") {
+    query = query.is("assigned_staff_id", null);
+  } else if (filter?.assignedStaffId) {
+    query = query.eq("assigned_staff_id", filter.assignedStaffId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Order[];
 }
