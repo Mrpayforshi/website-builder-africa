@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { SiteConfig, SiteConfigStatus, ConfigSource, FeatureKey } from "@/types/database";
 
 export interface BusinessMembership {
+  id: string;
   business_id: string;
   user_id: string;
   role: string;
@@ -11,6 +12,12 @@ export interface BusinessMembership {
  * Load-bearing authorization check. `apply_site_config_patch` is SECURITY
  * DEFINER and bypasses RLS — this must run before any call that reaches it.
  * Never skip this.
+ *
+ * `id` (the business_users row id) is included because several FKs —
+ * orders.assigned_staff_id, orders.updated_by, order_status_events.changed_by —
+ * reference business_users(id), not auth.users(id). Callers that need to
+ * attribute a write to "this staff member" must use membership.id, not
+ * userId.
  */
 export async function checkBusinessMembership(
   userId: string,
@@ -19,7 +26,7 @@ export async function checkBusinessMembership(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("business_users")
-    .select("business_id, user_id, role")
+    .select("id, business_id, user_id, role")
     .eq("business_id", businessId)
     .eq("user_id", userId)
     .maybeSingle();
