@@ -1,3 +1,5 @@
+import { buildWhatsappOrderLink } from "@/lib/commerce/whatsapp-links";
+
 interface Product {
   name: string;
   price: number | string;
@@ -8,9 +10,10 @@ interface Product {
 
 interface ProductGridProps {
   items?: Product[];
+  whatsappNumber?: string | null;
 }
 
-export function ProductGrid({ items = [] }: ProductGridProps) {
+export function ProductGrid({ items = [], whatsappNumber }: ProductGridProps) {
   if (items.length === 0) {
     return <section className="product-grid product-grid--empty">No products added yet.</section>;
   }
@@ -23,6 +26,16 @@ export function ProductGrid({ items = [] }: ProductGridProps) {
           <h3>{item.name}</h3>
           {item.description && <p>{item.description}</p>}
           <span className="price">{item.price}</span>
+          {whatsappNumber && (
+            
+              className="whatsapp-cta"
+              href={buildWhatsappOrderLink(whatsappNumber, item.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Order via WhatsApp
+            </a>
+          )}
         </article>
       ))}
     </section>
