@@ -3,12 +3,14 @@ interface AboutProps {
   body?: string;
   image?: string;
   credentials?: string[];
+  /** Image omitted entirely in lite mode. */
+  liteMode?: boolean;
 }
 
-export function About({ headline, body, image, credentials = [] }: AboutProps) {
+export function About({ headline, body, image, credentials = [], liteMode = false }: AboutProps) {
   return (
     <section className="about">
-      {image && <img src={image} alt={headline ?? "About us"} />}
+      {image && !liteMode && <img src={image} alt={headline ?? "About us"} loading="lazy" decoding="async" />}
       {headline && <h2>{headline}</h2>}
       {body && <p>{body}</p>}
       {credentials.length > 0 && (
