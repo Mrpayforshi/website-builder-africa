@@ -6,9 +6,11 @@ interface Program {
 
 interface ProgramsProps {
   items?: Program[];
+  /** Program images omitted entirely in lite mode. */
+  liteMode?: boolean;
 }
 
-export function Programs({ items = [] }: ProgramsProps) {
+export function Programs({ items = [], liteMode = false }: ProgramsProps) {
   if (items.length === 0) {
     return <section className="programs programs--empty">Programs coming soon.</section>;
   }
@@ -17,7 +19,7 @@ export function Programs({ items = [] }: ProgramsProps) {
     <section className="programs">
       {items.map((program) => (
         <article key={program.name} className="programs__item">
-          {program.image && <img src={program.image} alt={program.name} />}
+          {program.image && !liteMode && <img src={program.image} alt={program.name} loading="lazy" decoding="async" />}
           <h3>{program.name}</h3>
           {program.description && <p>{program.description}</p>}
         </article>
