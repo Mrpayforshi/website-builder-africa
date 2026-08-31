@@ -27,7 +27,7 @@ export function ProductGrid({ items = [], whatsappNumber }: ProductGridProps) {
           {item.description && <p>{item.description}</p>}
           <span className="price">{item.price}</span>
           {whatsappNumber && (
-            
+            <a
               className="whatsapp-cta"
               href={buildWhatsappOrderLink(whatsappNumber, item.name)}
               target="_blank"

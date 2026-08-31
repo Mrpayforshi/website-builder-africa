@@ -24,7 +24,7 @@ export function ServicesList({ items = [], whatsappNumber }: ServicesListProps) 
           {service.description && <p>{service.description}</p>}
           {service.price && <span className="price">{service.price}</span>}
           {whatsappNumber && (
-            
+            <a
               className="whatsapp-cta"
               href={buildWhatsappEnquiryLink(whatsappNumber, service.name)}
               target="_blank"

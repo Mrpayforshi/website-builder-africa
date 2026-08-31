@@ -32,7 +32,7 @@ export function Menu({ categories = [], whatsappNumber }: MenuProps) {
               {item.price && <span className="price">{item.price}</span>}
               {item.description && <p>{item.description}</p>}
               {whatsappNumber && (
-                
+                <a
                   className="whatsapp-cta"
                   href={buildWhatsappOrderLink(whatsappNumber, item.name)}
                   target="_blank"
