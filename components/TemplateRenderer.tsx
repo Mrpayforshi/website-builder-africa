@@ -32,9 +32,21 @@ interface TemplateRendererProps {
    * it; other sections ignore the extra prop harmlessly.
    */
   whatsappNumber?: string | null;
+  /**
+   * When true, sections skip rendering non-essential images/embeds
+   * entirely (see lib/market-fit/bandwidth.ts) instead of the CSS-only
+   * hide used elsewhere. Sections that don't render media ignore this
+   * prop harmlessly, same as whatsappNumber.
+   */
+  liteMode?: boolean;
 }
 
-export function TemplateRenderer({ structure, contentBlocks, whatsappNumber = null }: TemplateRendererProps) {
+export function TemplateRenderer({
+  structure,
+  contentBlocks,
+  whatsappNumber = null,
+  liteMode = false,
+}: TemplateRendererProps) {
   return (
     <>
       {structure.sections.map((section) => {
@@ -52,7 +64,7 @@ export function TemplateRenderer({ structure, contentBlocks, whatsappNumber = nu
         }
 
         const content = (contentBlocks?.[section.id] as Record<string, unknown>) ?? {};
-        return <Component key={section.id} {...content} whatsappNumber={whatsappNumber} />;
+        return <Component key={section.id} {...content} whatsappNumber={whatsappNumber} liteMode={liteMode} />;
       })}
     </>
   );
