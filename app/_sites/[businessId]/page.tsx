@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteConfig } from "@/lib/ai/config-store";
 import { getTemplateById } from "@/lib/templates/template-store";
 import { getWhatsappCtaConfig } from "@/lib/commerce/whatsapp-links";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
+import { readLiteModeCookie, shouldRenderLiteMode, LITE_MODE_COOKIE } from "@/lib/market-fit/bandwidth";
 import "@/styles/site.css";
 
 interface SitePageProps {
@@ -40,6 +42,16 @@ export default async function SitePage({ params }: SitePageProps) {
 
   const whatsapp = await getWhatsappCtaConfig(params.businessId);
 
+  // Same computation as app/layout.tsx (cookie override, else Save-Data
+  // header) — recomputed here rather than passed down as a prop, since
+  // layouts can't inject props into the page they wrap in the App Router.
+  // This is what actually skips rendering heavy tags below; the layout's
+  // LiteModeStyles CSS is only a fallback for routes that don't do this.
+  const cookieStore = await cookies();
+  const headerStore = await headers();
+  const liteModePreference = readLiteModeCookie(cookieStore.get(LITE_MODE_COOKIE)?.value);
+  const liteMode = shouldRenderLiteMode(liteModePreference, headerStore.get("save-data"));
+
   const colorScheme = (config.color_scheme ?? {}) as {
     primary?: string;
     secondary?: string;
@@ -62,6 +74,7 @@ export default async function SitePage({ params }: SitePageProps) {
         structure={template.structure}
         contentBlocks={config.content_blocks}
         whatsappNumber={whatsapp.enabled ? whatsapp.number : null}
+        liteMode={liteMode}
       />
     </div>
   );
