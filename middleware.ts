@@ -29,7 +29,12 @@ export async function middleware(req: NextRequest) {
     (rootDomain !== null && (hostname === rootDomain || hostname === `www.${rootDomain}`));
 
   if (isPlatformHost) {
-    return NextResponse.next();
+    // Forward the request pathname to Server Components (e.g. the root
+    // layout) that need to branch on route without a client-side hook —
+    // specifically so lite mode can be scoped away from /dashboard.
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-pathname", url.pathname);
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const admin = createAdminClient();
