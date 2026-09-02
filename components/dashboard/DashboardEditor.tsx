@@ -130,7 +130,12 @@ export function DashboardEditor({
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem", fontFamily: "sans-serif" }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <h1 style={{ fontSize: "1.4rem" }}>Site Editor</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <h1 style={{ fontSize: "1.4rem" }}>Site Editor</h1>
+          <a href={`/dashboard/${businessId}/orders`} style={{ fontSize: "0.9rem" }}>
+            Orders →
+          </a>
+        </div>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           <span style={{ fontSize: "0.85rem", color: config.status === "published" ? "green" : "#888" }}>
             {config.status}
