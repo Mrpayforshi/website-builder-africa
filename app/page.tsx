@@ -108,6 +108,98 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section className={styles.infra}>
+          <h2>Built to run, not just to launch</h2>
+          <p className={styles.infraIntro}>
+            Website Builder Africa runs on the same infrastructure serious
+            products run on — so the site you describe in a chat can handle
+            real customers, real orders, and real payments from day one.
+          </p>
+
+          <div className={styles.infraFeature}>
+            <h3>Infrastructure, handled</h3>
+            <p>
+              Hosting, SSL, and your database are set up automatically.
+              WhatsApp ordering and EcoCash checkout are wired in from the
+              first message — your code and your customer data stay yours.
+            </p>
+          </div>
+
+          <div className={styles.device}>
+            <div className={styles.deviceFrameWrap}>
+              <div className={styles.deviceFrame}>
+                <div className={styles.deviceBar}>
+                  <div className={styles.dots}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.urlPill}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
+                      <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    chikwiya.wba.app
+                  </div>
+                  <div className={styles.frameIcons}>
+                    <span />
+                    <span />
+                  </div>
+                </div>
+                <div className={styles.frameBody} />
+              </div>
+            </div>
+
+            <div className={styles.nodes}>
+              <svg width="100%" height="100%" className={styles.connectors}>
+                <line x1="48" y1="139" x2="122" y2="229" />
+                <line x1="140" y1="239" x2="290" y2="239" />
+                <line x1="330" y1="239" x2="470" y2="239" />
+                <line x1="510" y1="229" x2="580" y2="139" />
+              </svg>
+
+              <div className={`${styles.node} ${styles.nodeOuter} ${styles.nSsl}`} title="SSL & security">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="1.8" />
+                </svg>
+              </div>
+
+              <div className={`${styles.node} ${styles.nWa}`} title="WhatsApp ordering">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 3a8 8 0 0 0-6.9 12l-1 4 4.1-1.1A8 8 0 1 0 12 3Z" stroke="currentColor" strokeWidth="1.6" />
+                  <path d="M9 10c.3 2.2 2 3.9 4.2 4.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+              </div>
+
+              <div className={`${styles.node} ${styles.nCloud}`} title="Hosting">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 18a4 4 0 0 1-.4-7.98A5.5 5.5 0 0 1 17.3 9.1 4 4 0 0 1 17 18H7Z" stroke="currentColor" strokeWidth="1.6" />
+                </svg>
+              </div>
+
+              <div className={`${styles.node} ${styles.nEco}`} title="EcoCash checkout">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3.5" y="6" width="17" height="12" rx="2" stroke="currentColor" strokeWidth="1.6" />
+                  <path d="M3.5 10h17" stroke="currentColor" strokeWidth="1.6" />
+                </svg>
+              </div>
+
+              <div className={`${styles.node} ${styles.nodeOuter} ${styles.nData}`} title="Orders & customer data">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="12" cy="6" rx="7" ry="2.6" stroke="currentColor" strokeWidth="1.6" />
+                  <path d="M5 6v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6" stroke="currentColor" strokeWidth="1.6" />
+                  <path d="M5 12v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-6" stroke="currentColor" strokeWidth="1.6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.infraCaption}>
+            SSL · WhatsApp · Hosting · EcoCash · Customer data — all provisioned automatically
+          </div>
+        </section>
       </div>
     </div>
   );
