@@ -36,3 +36,5 @@ export function shouldRenderLiteMode(
 }
 
 export const LITE_MODE_COOKIE = "wba_lite_mode";
+export const LITE_MODE_GALLERY_IMAGE_LIMIT = 6;
+export const LITE_MODE_PRODUCT_IMAGE_LIMIT = 4;
