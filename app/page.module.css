@@ -521,3 +521,112 @@
     display: none;
   }
 }
+
+/* ---------- App stack section ---------- */
+
+.stack {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  padding: 0 0 150px;
+}
+
+.stack h2 {
+  font-size: 40px;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  margin: 0 0 18px;
+  color: var(--lp-ink);
+}
+
+.stackIntro {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--lp-ink-soft);
+  max-width: 46ch;
+  margin: 0 0 44px;
+  font-weight: 500;
+}
+
+.stackGrid {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 44px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--lp-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.stackFade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--lp-bg) 0%, transparent 22%, transparent 78%, var(--lp-bg) 100%);
+  pointer-events: none;
+}
+
+.stackRow {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.stackTile {
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lp-ink-faint);
+  opacity: 0.55;
+}
+
+.stackText {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--lp-ink-faint);
+}
+
+.stackTileHighlight {
+  opacity: 1;
+  background: linear-gradient(160deg, var(--lp-grad-a), var(--lp-grad-b) 55%, var(--lp-grad-c));
+  border-color: transparent;
+  box-shadow: 0 0 34px -4px rgba(155, 78, 255, 0.55);
+}
+
+.stackCaption {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: var(--lp-ink-faint);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .stack h2 {
+    font-size: 32px;
+  }
+
+  .stackGrid {
+    padding: 28px 16px;
+  }
+
+  .stackTile {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+  }
+
+  .stackRow {
+    gap: 8px;
+  }
+}
