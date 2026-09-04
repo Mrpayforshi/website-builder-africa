@@ -23,9 +23,8 @@ export function Contact({ address, phone, email, hours, map_embed, liteMode = fa
           ))}
         </ul>
       )}
-            {map_embed && liteMode && address && (
-        
-          className="contact__map-link"
+      {map_embed && !liteMode && <div className="contact__map" dangerouslySetInnerHTML={{ __html: map_embed }} />}
+      {map_embed && liteMode && address && (
         
           className="contact__map-link"
           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
