@@ -1,3 +1,5 @@
+/* app/page.module.css */
+
 .scene {
   --lp-bg: #08080d;
   --lp-panel: rgba(255, 255, 255, 0.04);
@@ -49,15 +51,23 @@
 /* ---------- Nav ---------- */
 
 .nav {
-  position: relative;
-  z-index: 3;
+  position: sticky;
+  top: 18px;
+  z-index: 50;
 }
 
 .navInner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 26px 0;
+  gap: 24px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: rgba(15, 14, 22, 0.62);
+  border: 1px solid var(--lp-panel-border);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 14px 34px -16px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
 }
 
 .logo {
@@ -248,16 +258,17 @@
 
 .chatCard {
   margin-top: 8px;
-  background: var(--lp-panel);
-  border: 1px solid var(--lp-panel-border);
+  background: #fdfcfb;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 16px;
   padding: 20px 20px 16px;
-  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 70px -20px rgba(78, 107, 255, 0.35),
+    0 16px 40px -18px rgba(255, 78, 199, 0.3);
 }
 
 .chatPlaceholder {
   font-size: 15px;
-  color: var(--lp-ink-faint);
+  color: #6f6f78;
   font-weight: 600;
   margin-bottom: 26px;
 }
@@ -272,8 +283,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: var(--lp-ink-soft);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #3f3f46;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,7 +304,7 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 700;
-  color: var(--lp-ink-soft);
+  color: #3f3f46;
 }
 
 .chatMic {
@@ -303,7 +314,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--lp-ink-soft);
+  color: #55555f;
 }
 
 @media (max-width: 900px) {
