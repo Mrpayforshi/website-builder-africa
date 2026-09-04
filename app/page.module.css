@@ -18,16 +18,16 @@
 
 .glow {
   position: absolute;
-  right: -18%;
-  bottom: -30%;
-  width: 1100px;
-  height: 1100px;
+  right: -12%;
+  top: -14%;
+  width: 1300px;
+  height: 1300px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, var(--lp-grad-a) 0%, transparent 45%),
     radial-gradient(circle at 60% 55%, var(--lp-grad-b) 0%, transparent 50%),
     radial-gradient(circle at 75% 80%, var(--lp-grad-c) 0%, transparent 55%);
-  filter: blur(70px);
-  opacity: 0.85;
+  filter: blur(65px);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -628,5 +628,153 @@
 
   .stackRow {
     gap: 8px;
+  }
+}
+
+/* ---------- Payments section ---------- */
+
+.payments {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  padding: 0 0 130px;
+}
+
+.payments h2 {
+  font-size: 40px;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  margin: 0 0 18px;
+  color: var(--lp-ink);
+}
+
+.paymentsIntro {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--lp-ink-soft);
+  max-width: 46ch;
+  margin: 0 0 44px;
+  font-weight: 500;
+}
+
+.globeCard {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--lp-panel-border);
+  overflow: hidden;
+}
+
+.globeSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.globeWire {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1;
+}
+
+.globeDots {
+  fill: rgba(255, 255, 255, 0.55);
+}
+
+.paymentsCaption {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: var(--lp-ink-faint);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .payments h2 {
+    font-size: 32px;
+  }
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  position: relative;
+  z-index: 2;
+  padding: 60px 24px 0;
+  background: radial-gradient(circle at 20% 20%, var(--lp-grad-a) 0%, transparent 55%),
+    radial-gradient(circle at 55% 50%, var(--lp-grad-b) 0%, transparent 60%),
+    radial-gradient(circle at 85% 80%, var(--lp-grad-c) 0%, transparent 55%);
+}
+
+.footerCard {
+  max-width: 1160px;
+  margin: 0 auto;
+  background: #f6f2ec;
+  border-radius: 28px;
+  padding: 48px 56px 32px;
+  color: #1c1c22;
+}
+
+.footerTop {
+  margin-bottom: 40px;
+}
+
+.footerLogo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 17px;
+  color: #1c1c22;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.footerCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footerCol h4 {
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  color: #1c1c22;
+}
+
+.footerCol a {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #6b6b74;
+}
+
+.footerCol a:hover {
+  color: #1c1c22;
+}
+
+.footerBottom {
+  margin-top: 44px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 12.5px;
+  color: #8a8a91;
+}
+
+@media (max-width: 900px) {
+  .footerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footerCard {
+    padding: 36px 24px 24px;
   }
 }
