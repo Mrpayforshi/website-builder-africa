@@ -9,9 +9,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Website Builder Africa",
+  title: "Rivo",
   description:
-    "AI chat-based website builder for small businesses in Zimbabwe/Africa.",
+    "Rivo — the AI chat-based website builder for small businesses in Zimbabwe/Africa.",
 };
 
 export default function RootLayout({
