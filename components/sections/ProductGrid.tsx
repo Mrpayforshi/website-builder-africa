@@ -3,7 +3,7 @@ import { LITE_MODE_PRODUCT_IMAGE_LIMIT } from "@/lib/market-fit/bandwidth";
 
 interface Product {
   name: string;
-  price: string;
+  price: number | string;
   image?: string;
   description?: string;
   sku?: string;
