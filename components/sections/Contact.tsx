@@ -1,7 +1,6 @@
 interface ContactProps {
   address?: string;
-  phone?: string;
-  email?: string;
+  
   hours?: Record<string, { open: string; close: string }>;
   map_embed?: string;
   /** map_embed (usually a Google Maps iframe) is heavy — omitted in lite mode in favor of a plain text link. */
