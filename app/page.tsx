@@ -25,10 +25,10 @@ export default function Home() {
               <a href="#">WhatsApp &amp; EcoCash</a>
             </nav>
             <div className={styles.navRight}>
-              <a className={styles.navSignin} href="#">
+              <a className={styles.navSignin} href="/login">
                 Log in
               </a>
-              <a className={`${styles.btn} ${styles.btnWhite}`} href="#">
+              <a className={`${styles.btn} ${styles.btnWhite}`} href="/signup">
                 Get started
               </a>
             </div>
@@ -52,7 +52,7 @@ export default function Home() {
                 built in from the first message.
               </p>
               <div className={styles.heroCtas}>
-                <a className={`${styles.btn} ${styles.btnGradient} ${styles.btnLg}`} href="#">Start building for free</a>
+                <a className={`${styles.btn} ${styles.btnGradient} ${styles.btnLg}`} href="/signup">Start building for free</a>
                 <a className={`${styles.btn} ${styles.btnOutline} ${styles.btnLg}`} href="#">Talk to sales</a>
               </div>
               <div className={styles.heroFineprint}>
