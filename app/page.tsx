@@ -86,8 +86,3 @@ export default function Home() {
                         width="6"
                         height="12"
                         rx="3"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                      />
-                      <path
-                        d="M5 11a7
