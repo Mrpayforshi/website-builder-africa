@@ -193,7 +193,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
   gap: 40px;
-  align-items: start;
+  align-items: center;   /* was: align-items: start; */
 }
 
 .eyebrowTag {
