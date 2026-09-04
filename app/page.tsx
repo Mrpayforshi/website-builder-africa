@@ -47,7 +47,7 @@ export default function Home() {
                 We build it.
               </h1>
               <p className={styles.lede}>
-                Rivo is the AI website builder for African entrepreneurs —
+                Rivo is the AI website builder for entrepreneurs —
                 with WhatsApp ordering, EcoCash checkout, and layby payments
                 built in from the first message.
               </p>
