@@ -320,7 +320,135 @@ export default function Home() {
 
           <div className={styles.stackCaption}>WhatsApp and EcoCash, native — everything else connects around them</div>
         </section>
+
+        <section className={styles.payments}>
+          <h2>Payments, processed</h2>
+          <p className={styles.paymentsIntro}>
+            EcoCash, OneMoney, Paynow, and card payments — settled in USD or
+            ZWG, with every transaction reconciled automatically so you
+            always know what came in.
+          </p>
+
+          <div className={styles.globeCard}>
+            <svg viewBox="0 0 320 300" className={styles.globeSvg}>
+              <g className={styles.globeWire}>
+                <ellipse cx="160" cy="54.3" rx="65" ry="41.6" />
+                <ellipse cx="160" cy="94.8" rx="112.6" ry="41.6" />
+                <ellipse cx="160" cy="150" rx="130" ry="41.6" />
+                <ellipse cx="160" cy="205.2" rx="112.6" ry="41.6" />
+                <ellipse cx="160" cy="245.7" rx="65" ry="41.6" />
+                <ellipse cx="160" cy="150" rx="2" ry="110.5" />
+                <ellipse cx="160" cy="150" rx="44" ry="110.5" />
+                <ellipse cx="160" cy="150" rx="87" ry="110.5" />
+                <ellipse cx="160" cy="150" rx="130" ry="110.5" />
+              </g>
+              <g className={styles.globeDots}>
+                <circle cx="222.1" cy="66.6" r="1.6" />
+                <circle cx="140.8" cy="94.0" r="1.6" />
+                <circle cx="97.9" cy="42.0" r="1.6" />
+                <circle cx="179.2" cy="14.6" r="1.6" />
+                <circle cx="267.6" cy="107.0" r="1.6" />
+                <circle cx="201.0" cy="133.5" r="1.6" />
+                <circle cx="103.6" cy="130.8" r="1.6" />
+                <circle cx="48.7" cy="100.9" r="1.6" />
+                <circle cx="77.5" cy="66.4" r="1.6" />
+                <circle cx="168.5" cy="53.3" r="1.6" />
+                <circle cx="253.1" cy="71.3" r="1.6" />
+                <circle cx="284.2" cy="162.3" r="1.6" />
+                <circle cx="220.7" cy="186.8" r="1.6" />
+                <circle cx="121.6" cy="189.7" r="1.6" />
+                <circle cx="45.0" cy="169.4" r="1.6" />
+                <circle cx="35.8" cy="137.7" r="1.6" />
+                <circle cx="99.3" cy="113.2" r="1.6" />
+                <circle cx="198.4" cy="110.3" r="1.6" />
+                <circle cx="275.0" cy="130.6" r="1.6" />
+                <circle cx="267.6" cy="217.5" r="1.6" />
+                <circle cx="201.0" cy="244.0" r="1.6" />
+                <circle cx="103.6" cy="241.3" r="1.6" />
+                <circle cx="48.7" cy="211.4" r="1.6" />
+                <circle cx="77.5" cy="176.9" r="1.6" />
+                <circle cx="168.5" cy="163.8" r="1.6" />
+                <circle cx="253.1" cy="181.8" r="1.6" />
+                <circle cx="222.1" cy="258.0" r="1.6" />
+                <circle cx="140.8" cy="285.4" r="1.6" />
+                <circle cx="97.9" cy="233.4" r="1.6" />
+                <circle cx="179.2" cy="206.0" r="1.6" />
+              </g>
+              <defs>
+                <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="var(--lp-grad-c)" />
+                  <stop offset="100%" stopColor="var(--lp-grad-a)" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M99 120 C 150 60, 230 60, 258 168"
+                fill="none"
+                stroke="url(#routeGrad)"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+              <circle cx="99" cy="120" r="4.5" fill="var(--lp-grad-c)" />
+              <circle cx="258" cy="168" r="4.5" fill="var(--lp-grad-a)" />
+            </svg>
+          </div>
+
+          <div className={styles.paymentsCaption}>
+            EcoCash · OneMoney · Paynow · Visa &amp; Mastercard — reconciled in one dashboard
+          </div>
+        </section>
       </div>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerCard}>
+          <div className={styles.footerTop}>
+            <a className={styles.footerLogo} href="#">
+              <span className={styles.logoMark}>R</span>
+              Rivo
+            </a>
+          </div>
+
+          <div className={styles.footerGrid}>
+            <div className={styles.footerCol}>
+              <h4>Company</h4>
+              <a href="#">About</a>
+              <a href="#">Careers</a>
+              <a href="#">Contact</a>
+              <a href="#">Trust &amp; safety</a>
+            </div>
+            <div className={styles.footerCol}>
+              <h4>Product</h4>
+              <a href="#">Pricing</a>
+              <a href="#">Templates</a>
+              <a href="#">WhatsApp &amp; EcoCash</a>
+              <a href="#">Security</a>
+            </div>
+            <div className={styles.footerCol}>
+              <h4>Resources</h4>
+              <a href="#">Guides</a>
+              <a href="#">Blog</a>
+              <a href="#">Support</a>
+              <a href="#">Sitemap</a>
+            </div>
+            <div className={styles.footerCol}>
+              <h4>Legal</h4>
+              <a href="#">Privacy policy</a>
+              <a href="#">Terms of service</a>
+              <a href="#">Cookie settings</a>
+            </div>
+            <div className={styles.footerCol}>
+              <h4>Community</h4>
+              <a href="#">X / Twitter</a>
+              <a href="#">Instagram</a>
+              <a href="#">WhatsApp channel</a>
+              <a href="#">YouTube</a>
+            </div>
+          </div>
+
+          <div className={styles.footerBottom}>
+            <span>© {new Date().getFullYear()} Rivo. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
