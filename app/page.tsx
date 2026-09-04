@@ -1,4 +1,4 @@
-im styles from "./page.module.css";
+import styles from "./page.module.css";
 
 export default function Home() {
   return (
@@ -52,18 +52,8 @@ export default function Home() {
                 in from the first message.
               </p>
               <div className={styles.heroCtas}>
-                
-                  className={`${styles.btn} ${styles.btnGradient} ${styles.btnLg}`}
-                  href="#"
-                >
-                  Start building for free
-                </a>
-                
-                  className={`${styles.btn} ${styles.btnOutline} ${styles.btnLg}`}
-                  href="#"
-                >
-                  Talk to sales
-                </a>
+                <a className={`${styles.btn} ${styles.btnGradient} ${styles.btnLg}`} href="#">Start building for free</a>
+                <a className={`${styles.btn} ${styles.btnOutline} ${styles.btnLg}`} href="#">Talk to sales</a>
               </div>
               <div className={styles.heroFineprint}>
                 <span>No credit card</span>
@@ -100,25 +90,4 @@ export default function Home() {
                         strokeWidth="1.8"
                       />
                       <path
-                        d="M5 11a7 7 0 0 0 14 0"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M12 18v3"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-}
+                        d="M5 11a7
