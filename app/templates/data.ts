@@ -1,4 +1,5 @@
 import type { TemplateStructure } from "@/lib/templates/section-schemas";
+import { listAllTemplates } from "@/lib/templates/template-store";
 
 export interface TemplateCard {
   id: string;
@@ -9,10 +10,11 @@ export interface TemplateCard {
   features: string[];
 }
 
-// TODO(templates): replace with a real query once templates are seeded —
-// e.g. `await listAllTemplates()` from lib/templates/template-store.ts.
-// Category values match lib/ai/tools.ts / NewProjectForm.tsx exactly.
-export const PLACEHOLDER_TEMPLATES: TemplateCard[] = [
+// Fallback cards for categories/templates that don't have real seeded data
+// yet. As each one gets a real row in `gallery_templates`, the DB version
+// (via getGalleryTemplateCards below) takes over automatically — just
+// remove its entry here once that happens, no other wiring needed.
+export const FALLBACK_TEMPLATES: TemplateCard[] = [
   {
     id: "food-1",
     category: "food",
@@ -121,114 +123,35 @@ export const CATEGORIES: { value: string; label: string }[] = [
   { value: "events_portfolio", label: "Events & Portfolio" },
 ];
 
-// Only these two have a full mock TemplateStructure + content_blocks behind
-// them (see supabase/migrations/20260904120000_seed_food_retail_templates.sql
-// for the real structure this mirrors). Everything else in
-// PLACEHOLDER_TEMPLATES shows a "preview coming soon" state on its detail
-// page until it has real seeded content.
-export const PREVIEWABLE: Record<
-  string,
-  { structure: TemplateStructure; contentBlocks: Record<string, unknown> }
-> = {
-  "food-1": {
-    structure: {
-      sections: [
-        { id: "hero", type: "hero", fields: ["headline", "subheadline", "image"], required: true },
-        { id: "menu", type: "menu", fields: ["categories"], required: true },
-        { id: "gallery", type: "gallery", fields: ["images"], required: false },
-        { id: "contact", type: "contact", fields: ["address", "phone", "email", "hours", "map_embed"], required: true },
-      ],
-    },
-    contentBlocks: {
-      hero: {
-        headline: "Sadza Kitchen",
-        subheadline: "Home-style Zimbabwean meals, ready for pickup or delivery across Harare.",
-        image: "https://placehold.co/640x480/e2652b/fff?text=Sadza+Kitchen",
-      },
-      menu: {
-        categories: [
-          {
-            name: "Mains",
-            items: [
-              { name: "Sadza & Beef Stew", price: "$6", description: "Slow-cooked beef in a rich tomato gravy, served with sadza and greens." },
-              { name: "Chicken Peri-Peri", price: "$7", description: "Grilled chicken quarter with peri-peri sauce and rice." },
-              { name: "Vegetable Curry", price: "$5", description: "Seasonal vegetables in a mild curry, served with rice." },
-            ],
-          },
-          {
-            name: "Sides",
-            items: [
-              { name: "Muriwo unedovi", price: "$2", description: "Leafy greens in peanut butter sauce." },
-              { name: "Sadza (extra)", price: "$1" },
-            ],
-          },
-        ],
-      },
-      gallery: {
-        images: [
-          { url: "https://placehold.co/300x300/f6b04a/2b1608?text=Sunday+lunch", caption: "Sunday lunch plate" },
-          { url: "https://placehold.co/300x300/e2652b/fff?text=Our+kitchen", caption: "Our kitchen" },
-          { url: "https://placehold.co/300x300/f6b04a/2b1608?text=Peri-peri", caption: "Chicken peri-peri" },
-          { url: "https://placehold.co/300x300/e2652b/fff?text=Fresh+sides", caption: "Fresh sides daily" },
-        ],
-      },
-      contact: {
-        address: "14 Robson Manyika Ave, Harare",
-        phone: "+263 77 123 4567",
-        email: "hello@sadzakitchen.rivo.app",
-        hours: {
-          mon: { open: "08:00", close: "20:00" },
-          tue: { open: "08:00", close: "20:00" },
-          wed: { open: "08:00", close: "20:00" },
-          thu: { open: "08:00", close: "20:00" },
-          fri: { open: "08:00", close: "21:00" },
-          sat: { open: "09:00", close: "21:00" },
-          sun: { open: "10:00", close: "18:00" },
-        },
-      },
-    },
-  },
-  "retail-1": {
-    structure: {
-      sections: [
-        { id: "hero", type: "hero", fields: ["headline", "subheadline", "image"], required: true },
-        { id: "products", type: "product_grid", fields: ["items"], required: true },
-        { id: "about", type: "about", fields: ["headline", "body", "image", "credentials"], required: false },
-        { id: "contact", type: "contact", fields: ["address", "phone", "email", "hours", "map_embed"], required: true },
-      ],
-    },
-    contentBlocks: {
-      hero: {
-        headline: "Chikwiya Grocers",
-        subheadline: "Fresh produce, pantry staples, and household essentials — delivered across Chikwiya and beyond.",
-        image: "https://placehold.co/640x480/f0921a/14110c?text=Chikwiya+Grocers",
-      },
-      products: {
-        items: [
-          { name: "10kg Mealie Meal", price: "$8.50", description: "Roller meal, locally milled.", sku: "GR-001", image: "https://placehold.co/300x300/fff8ec/14110c?text=Mealie+Meal" },
-          { name: "2L Cooking Oil", price: "$4.00", sku: "GR-002", image: "https://placehold.co/300x300/fff8ec/14110c?text=Cooking+Oil" },
-          { name: "1kg Sugar", price: "$1.80", sku: "GR-003", image: "https://placehold.co/300x300/fff8ec/14110c?text=Sugar" },
-          { name: "Washing Powder 2kg", price: "$3.20", sku: "GR-004", image: "https://placehold.co/300x300/fff8ec/14110c?text=Washing+Powder" },
-        ],
-      },
-      about: {
-        headline: "Family-run since 2014",
-        body: "Chikwiya Grocers has served the neighbourhood for over a decade — same fair prices, same friendly service.",
-        credentials: ["Layby available on bulk orders", "EcoCash & cash accepted", "Free delivery over $30"],
-      },
-      contact: {
-        address: "22 Chikwiya Rd, Harare",
-        phone: "+263 77 987 6543",
-        email: "orders@chikwiyagrocers.rivo.app",
-        hours: {
-          mon: { open: "08:00", close: "18:00" },
-          tue: { open: "08:00", close: "18:00" },
-          wed: { open: "08:00", close: "18:00" },
-          thu: { open: "08:00", close: "18:00" },
-          fri: { open: "08:00", close: "18:00" },
-          sat: { open: "08:00", close: "16:00" },
-        },
-      },
-    },
-  },
-};
+// Gallery list source of truth: real DB rows override fallback cards by id;
+// any fallback id not yet in the DB is shown as-is. Once all twelve have
+// real rows, FALLBACK_TEMPLATES can be deleted entirely.
+export async function getGalleryTemplateCards(): Promise<TemplateCard[]> {
+  const dbTemplates = await listAllTemplates();
+
+  const dbById = new Map(
+    dbTemplates.map((t) => [
+      t.id,
+      {
+        id: t.id,
+        category: t.category,
+        categoryLabel: t.categoryLabel,
+        name: t.name,
+        description: t.description,
+        features: t.features,
+      } satisfies TemplateCard,
+    ])
+  );
+
+  const merged = FALLBACK_TEMPLATES.map((fallback) => dbById.get(fallback.id) ?? fallback);
+
+  // Include any DB templates that aren't in the fallback list at all
+  // (e.g. once real services/professional/ngo/events templates are added).
+  for (const [id, card] of dbById) {
+    if (!merged.some((c) => c.id === id)) {
+      merged.push(card);
+    }
+  }
+
+  return merged;
+}
