@@ -1,6 +1,4 @@
-import type { TemplateStructure } from "@/lib/templates/section-schemas";
-
-export interface TemplateCard {
+ace TemplateCard {
   id: string;
   category: string;
   categoryLabel: string;
