@@ -1,15 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-const CATEGORIES = [
-  "retail",
-  "services",
-  "food",
-  "professional",
-  "ngo_community",
-  "events_portfolio",
-];
 
 const FEATURE_KEYS = [
   "whatsapp",
@@ -23,23 +14,16 @@ const FEATURE_KEYS = [
   "invoicing",
 ];
 
-function slugify(name: string): string {
-  const base = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 40);
-  return base || "business";
-}
-
 function randomSuffix(): string {
-  return Math.random().toString(36).slice(2, 6);
+  return Math.random().toString(36).slice(2, 8);
 }
 
 /**
- * Creates a business + owner membership + empty site config + default
- * feature toggles as one logical unit.
+ * Creates a blank business + owner membership + empty site config + default
+ * feature toggles. No name/category collected here — that's entirely the AI
+ * intake chat's job now (see lib/ai/tool-executor.ts handleSetBusinessInfo,
+ * which is also what assigns a template once a category is known). This
+ * route just stakes out a row for the chat to fill in.
  *
  * Uses the admin client for the writes deliberately: `businesses` has no
  * owner-level SELECT policy (only `is_business_member`, which reads
@@ -48,18 +32,7 @@ function randomSuffix(): string {
  * RETURNING read. Identity is still verified via the cookie-scoped RLS
  * client before any privileged write happens.
  */
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const category = typeof body?.category === "string" ? body.category : "";
-
-  if (!name) {
-    return NextResponse.json({ error: "Business name is required" }, { status: 400 });
-  }
-  if (!CATEGORIES.includes(category)) {
-    return NextResponse.json({ error: "Invalid category" }, { status: 400 });
-  }
-
+export async function POST() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -71,22 +44,14 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  const { data: templates } = await admin
-    .from("templates")
-    .select("id")
-    .eq("category", category)
-    .limit(1);
-  const templateId = templates?.[0]?.id ?? null;
-
-  const baseSlug = slugify(name);
-  let slug = baseSlug;
+  let slug = `project-${randomSuffix()}`;
   let business: { id: string; slug: string } | null = null;
   let lastError: { message: string; code?: string } | null = null;
 
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await admin
       .from("businesses")
-      .insert({ owner_user_id: user.id, name, category, slug, status: "draft" })
+      .insert({ owner_user_id: user.id, name: "Untitled project", slug, status: "draft" })
       .select("id, slug")
       .single();
 
@@ -96,12 +61,12 @@ export async function POST(req: NextRequest) {
     }
     lastError = error;
     if (error.code !== "23505") break; // not a unique-slug violation, don't retry
-    slug = `${baseSlug}-${randomSuffix()}`;
+    slug = `project-${randomSuffix()}`;
   }
 
   if (!business) {
     return NextResponse.json(
-      { error: lastError?.message ?? "Could not create business" },
+      { error: lastError?.message ?? "Could not create project" },
       { status: 500 }
     );
   }
@@ -116,7 +81,7 @@ export async function POST(req: NextRequest) {
 
   await admin.from("site_configs").insert({
     business_id: business.id,
-    template_id: templateId,
+    template_id: null,
     content_blocks: {},
     color_scheme: {},
     status: "draft",
