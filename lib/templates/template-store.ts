@@ -1,5 +1,44 @@
+import { createClient } from "@/lib/supabase/server";
 import type { TemplateStructure } from "@/lib/templates/section-schemas";
-import { listAllTemplates } from "@/lib/templates/template-store";
+
+// --- Real template CRUD (Workstream C's `templates` table) ---------------
+// This is what the AI tool layer (tool-executor.ts) and the site renderer
+// read from. One row per category in v1 (see templates.category enum).
+
+export interface Template {
+  id: string;
+  category: string;
+  name: string;
+  structure: TemplateStructure;
+}
+
+export async function getTemplateById(id: string): Promise<Template | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("templates")
+    .select("id, category, name, structure")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as Template;
+}
+
+export async function listTemplatesByCategory(category: string): Promise<Template[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("templates")
+    .select("id, category, name, structure")
+    .eq("category", category);
+
+  if (error || !data) return [];
+  return data as Template[];
+}
+
+// --- Marketing gallery (separate `gallery_templates` table) --------------
+// Browsable preview cards shown pre-signup. Distinct concern from the real
+// templates above — different table, different shape (category_label,
+// description, features[] instead of a structure the AI writes against).
 
 export interface TemplateCard {
   id: string;
@@ -12,8 +51,8 @@ export interface TemplateCard {
 
 // Fallback cards for categories/templates that don't have real seeded data
 // yet. As each one gets a real row in `gallery_templates`, the DB version
-// (via getGalleryTemplateCards below) takes over automatically — just
-// remove its entry here once that happens, no other wiring needed.
+// (via listAllTemplates below) takes over automatically — just remove its
+// entry here once that happens, no other wiring needed.
 export const FALLBACK_TEMPLATES: TemplateCard[] = [
   {
     id: "food-1",
@@ -123,25 +162,31 @@ export const CATEGORIES: { value: string; label: string }[] = [
   { value: "events_portfolio", label: "Events & Portfolio" },
 ];
 
+async function listAllTemplates(): Promise<TemplateCard[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("gallery_templates")
+    .select("id, category, category_label, name, description, features");
+
+  if (error || !data) return [];
+
+  return data.map((row) => ({
+    id: row.id,
+    category: row.category,
+    categoryLabel: row.category_label,
+    name: row.name,
+    description: row.description,
+    features: row.features ?? [],
+  }));
+}
+
 // Gallery list source of truth: real DB rows override fallback cards by id;
 // any fallback id not yet in the DB is shown as-is. Once all twelve have
 // real rows, FALLBACK_TEMPLATES can be deleted entirely.
 export async function getGalleryTemplateCards(): Promise<TemplateCard[]> {
   const dbTemplates = await listAllTemplates();
 
-  const dbById = new Map(
-    dbTemplates.map((t) => [
-      t.id,
-      {
-        id: t.id,
-        category: t.category,
-        categoryLabel: t.categoryLabel,
-        name: t.name,
-        description: t.description,
-        features: t.features,
-      } satisfies TemplateCard,
-    ])
-  );
+  const dbById = new Map(dbTemplates.map((t) => [t.id, t]));
 
   const merged = FALLBACK_TEMPLATES.map((fallback) => dbById.get(fallback.id) ?? fallback);
 
