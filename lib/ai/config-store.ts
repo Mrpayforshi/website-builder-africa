@@ -65,6 +65,13 @@ export interface SiteConfigPatchInput {
   businessName?: string;
   businessCategory?: string;
   businessStatus?: string;
+  /**
+   * Only ever takes effect the first time it's set — the RPC coalesces
+   * against the existing value, so it's safe to pass on every
+   * set_business_info call without risk of clobbering a template chosen
+   * earlier in the conversation.
+   */
+  templateId?: string;
 }
 
 export interface PatchResult {
@@ -105,6 +112,7 @@ export async function applySiteConfigPatch(input: SiteConfigPatchInput): Promise
     p_business_category: input.businessCategory ?? null,
     p_business_status: input.businessStatus ?? null,
     p_feature_toggles: input.featureTogglesPatch ?? null,
+    p_template_id: input.templateId ?? null,
   });
 
   if (error) {
