@@ -4,7 +4,7 @@ import {
   applyPatchWithRetry,
   type SiteConfigPatchInput,
 } from "@/lib/ai/config-store";
-import { getTemplateById } from "@/lib/templates/template-store";
+import { getTemplateById, listTemplatesByCategory } from "@/lib/templates/template-store";
 import { validateAgainstStructure, SECTION_FIELD_SCHEMAS } from "@/lib/templates/section-schemas";
 import type { AiToolName } from "@/lib/ai/tools";
 import type { SiteConfig, FeatureKey } from "@/types/database";
@@ -84,11 +84,26 @@ async function handleSetBusinessInfo(
   };
 
   try {
+    // Resolved once up front rather than inside the patch closure — it's a
+    // read against `templates`, not `latest` (the site config), and only
+    // matters the first time (the RPC coalesces template_id, so passing it
+    // on every call is harmless once one is already assigned). v1 has
+    // exactly one template per category, so this is the whole of
+    // "AI-powered" template selection for now: the AI's job is choosing
+    // the right category from the conversation, and that choice is what
+    // picks the template. If templates.ts ever grows multiple templates
+    // per category, this is the place to add a real choice — e.g. an
+    // explicit choose_template tool, or picking among candidates here
+    // based on the conversation so far.
+    const candidateTemplates = await listTemplatesByCategory(category);
+    const candidateTemplateId = candidateTemplates[0]?.id;
+
     const result = await patchWithMerge(ctx.businessId, (latest) => {
       const currentContact = (latest.content_blocks?.contact as Record<string, unknown>) ?? {};
       return {
         businessName: name,
         businessCategory: category,
+        templateId: latest.template_id ? undefined : candidateTemplateId,
         contentBlocksPatch: {
           contact: {
             ...currentContact,
