@@ -126,10 +126,7 @@ export const CATEGORIES: { value: string; label: string }[] = [
 // for the real structure this mirrors). Everything else in
 // PLACEHOLDER_TEMPLATES shows a "preview coming soon" state on its detail
 // page until it has real seeded content.
-export const PREVIEWABLE: Record
-  string,
-  { structure: TemplateStructure; contentBlocks: Record<string, unknown> }
-> = {
+
   "food-1": {
     structure: {
       sections: [
