@@ -76,6 +76,9 @@ export default async function DashboardPage() {
           <Link className={styles.navItem} href="/templates">
             Templates
           </Link>
+          <Link className={styles.navItem} href="/dashboard/connectors">
+            Connectors
+          </Link>
         </nav>
 
         <div className={styles.sidebarSection}>
