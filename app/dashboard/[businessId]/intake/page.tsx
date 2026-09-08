@@ -3,7 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 import { checkBusinessMembership, getSiteConfig } from "@/lib/ai/config-store";
 import { IntakeChat } from "./IntakeChat";
 
-export default async function IntakePage({ params }: { params: { businessId: string } }) {
+export default async function IntakePage({
+  params,
+  searchParams,
+}: {
+  params: { businessId: string };
+  searchParams: { first?: string };
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -34,5 +40,11 @@ export default async function IntakePage({ params }: { params: { businessId: str
     redirect(`/dashboard/${params.businessId}`);
   }
 
-  return <IntakeChat businessId={params.businessId} businessName={business.name} />;
+  return (
+    <IntakeChat
+      businessId={params.businessId}
+      businessName={business.name}
+      initialMessage={searchParams.first}
+    />
+  );
 }
