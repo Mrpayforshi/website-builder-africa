@@ -16,26 +16,26 @@ interface ToolCallLog {
 interface IntakeChatProps {
   businessId: string;
   businessName: string;
+  initialMessage?: string;
 }
 
 const GREETING =
   "Tell me about your business — what do you sell or do, and who are your customers? I'll set up your site as we talk, starting with picking the right template for you.";
 
-export function IntakeChat({ businessId, businessName }: IntakeChatProps) {
+export function IntakeChat({ businessId, businessName, initialMessage }: IntakeChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([{ role: "assistant", content: GREETING }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [templateReady, setTemplateReady] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const autoSent = useRef(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const text = input.trim();
+  async function send(text: string) {
     if (!text || loading) return;
 
     const nextMessages = [...messages, { role: "user" as const, content: text }];
@@ -72,6 +72,19 @@ export function IntakeChat({ businessId, businessName }: IntakeChatProps) {
     } finally {
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    if (autoSent.current) return;
+    if (!initialMessage || !initialMessage.trim()) return;
+    autoSent.current = true;
+    send(initialMessage.trim());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialMessage]);
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    send(input.trim());
   }
 
   return (
