@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import { FALLBACK_TEMPLATES } from "../data";
-import { getTemplateById } from "@/lib/templates/template-store";
+import { getGalleryTemplateWithContent } from "@/lib/templates/template-store";
 import styles from "./detail.module.css";
 import "@/styles/site.css";
 
@@ -11,34 +11,16 @@ interface DetailPageProps {
   params: { id: string };
 }
 
-interface TemplateMeta {
-  id: string;
-  category: string;
-  categoryLabel: string;
-  name: string;
-  description: string;
-  features: string[];
-}
-
 export async function generateMetadata({ params }: DetailPageProps): Promise<Metadata> {
-  const dbTemplate = await getTemplateById(params.id);
+  const dbTemplate = await getGalleryTemplateWithContent(params.id);
   const name = dbTemplate?.name ?? FALLBACK_TEMPLATES.find((t) => t.id === params.id)?.name;
   return { title: name ? `${name} — Rivo templates` : "Template not found" };
 }
 
 export default async function TemplateDetailPage({ params }: DetailPageProps) {
-  const dbTemplate = await getTemplateById(params.id);
+  const dbTemplate = await getGalleryTemplateWithContent(params.id);
 
-  const meta: TemplateMeta | undefined = dbTemplate
-    ? {
-        id: dbTemplate.id,
-        category: dbTemplate.category,
-        categoryLabel: dbTemplate.categoryLabel,
-        name: dbTemplate.name,
-        description: dbTemplate.description,
-        features: dbTemplate.features,
-      }
-    : FALLBACK_TEMPLATES.find((t) => t.id === params.id);
+  const meta = dbTemplate ?? FALLBACK_TEMPLATES.find((t) => t.id === params.id);
 
   if (!meta) notFound();
 
