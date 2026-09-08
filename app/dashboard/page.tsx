@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NewProjectForm } from "./NewProjectForm";
@@ -13,6 +14,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   events_portfolio: "Events & Portfolio",
 };
 
+const CATEGORY_COLORS: Record<string, string> = {
+  retail: "linear-gradient(135deg, #4e6bff, #2d3fa8)",
+  services: "linear-gradient(135deg, #9b4eff, #5c2ba8)",
+  food: "linear-gradient(135deg, #ff4ec7, #a82b7a)",
+  professional: "linear-gradient(135deg, #4e6bff, #9b4eff)",
+  ngo_community: "linear-gradient(135deg, #2ba88a, #1a6b58)",
+  events_portfolio: "linear-gradient(135deg, #ff9d4e, #a85b2b)",
+};
+
 interface ProjectRow {
   id: string;
   name: string;
@@ -20,6 +30,10 @@ interface ProjectRow {
   status: string;
   category: string | null;
   created_at: string;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export default async function DashboardPage() {
@@ -42,6 +56,8 @@ export default async function DashboardPage() {
     .filter((b): b is ProjectRow => Boolean(b))
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
+  const recents = projects.slice(0, 5);
+
   const displayName =
     (user.user_metadata?.full_name as string | undefined)?.split(" ")[0] ||
     user.email?.split("@")[0] ||
@@ -50,13 +66,31 @@ export default async function DashboardPage() {
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <a className={styles.logo} href="/">
+        <Link className={styles.logo} href="/">
           <span className={styles.logoMark}>R</span>
           Rivo
-        </a>
+        </Link>
+
         <nav className={styles.nav}>
-          <span className={`${styles.navItem} ${styles.navItemActive}`}>Projects</span>
+          <span className={`${styles.navItem} ${styles.navItemActive}`}>Dashboard</span>
+          <Link className={styles.navItem} href="/templates">
+            Templates
+          </Link>
         </nav>
+
+        <div className={styles.sidebarSection}>
+          <p className={styles.sidebarSectionLabel}>Recents</p>
+          {recents.length === 0 ? (
+            <p className={styles.recentEmpty}>No projects yet</p>
+          ) : (
+            recents.map((p) => (
+              <Link key={p.id} className={styles.recentItem} href={`/dashboard/${p.id}`}>
+                {p.name}
+              </Link>
+            ))
+          )}
+        </div>
+
         <div className={styles.sidebarFooter}>
           <span className={styles.userEmail}>{user.email}</span>
           <SignOutButton />
@@ -64,29 +98,46 @@ export default async function DashboardPage() {
       </aside>
 
       <main className={styles.main}>
-        <header className={styles.header}>
-          <h1>Good to see you, {displayName}</h1>
-          <p>What would you like to build today?</p>
-        </header>
+        <div className={styles.hero}>
+          <h1>What should we build, {displayName}?</h1>
+          <NewProjectForm />
+        </div>
 
-        <NewProjectForm />
+        <section className={styles.panel}>
+          <div className={styles.tabs}>
+            <div className={styles.tabsLeft}>
+              <span className={`${styles.tab} ${styles.tabActive}`}>My projects</span>
+              <Link className={styles.tab} href="/templates">
+                Templates
+              </Link>
+            </div>
+            <Link className={styles.browseAll} href="/templates">
+              Browse all →
+            </Link>
+          </div>
 
-        <section className={styles.projects}>
-          <h2>Your projects</h2>
           {projects.length === 0 ? (
-            <p className={styles.empty}>No projects yet — start your first one above.</p>
+            <p className={styles.empty}>No projects yet — describe your business above to start your first one.</p>
           ) : (
             <div className={styles.grid}>
               {projects.map((p) => (
-                <a key={p.id} href={`/dashboard/${p.id}`} className={styles.card}>
-                  <div className={styles.cardTop}>
+                <Link key={p.id} href={`/dashboard/${p.id}`} className={styles.card}>
+                  <div
+                    className={styles.thumb}
+                    style={{ background: (p.category && CATEGORY_COLORS[p.category]) || "linear-gradient(135deg, #4e6bff, #9b4eff)" }}
+                  >
+                    {p.name.charAt(0).toUpperCase()}
                     <span className={styles.cardStatus} data-status={p.status}>
                       {p.status}
                     </span>
                   </div>
-                  <h3>{p.name}</h3>
-                  <p>{(p.category && CATEGORY_LABELS[p.category]) || "Uncategorized"}</p>
-                </a>
+                  <div className={styles.cardBody}>
+                    <h3>{p.name}</h3>
+                    <p>
+                      {(p.category && CATEGORY_LABELS[p.category]) || "Uncategorized"} · {formatDate(p.created_at)}
+                    </p>
+                  </div>
+                </Link>
               ))}
             </div>
           )}
