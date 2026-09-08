@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -9,15 +10,15 @@ export default function Home() {
       <div className={styles.wrap}>
         <header className={styles.nav}>
           <div className={styles.navInner}>
-            <a className={styles.logo} href="#">
+            <Link className={styles.logo} href="/">
               <span className={styles.logoMark}>R</span>
               Rivo
-            </a>
+            </Link>
             <nav className={styles.navLinks}>
               <a href="#">
                 Product <span className={styles.chev}>▾</span>
               </a>
-              <a href="#">Templates</a>
+              <Link href="/templates">Templates</Link>
               <a href="#">Pricing</a>
               <a href="#">
                 Resources <span className={styles.chev}>▾</span>
@@ -401,10 +402,10 @@ export default function Home() {
       <footer className={styles.footer}>
         <div className={styles.footerCard}>
           <div className={styles.footerTop}>
-            <a className={styles.footerLogo} href="#">
+            <Link className={styles.footerLogo} href="/">
               <span className={styles.logoMark}>R</span>
               Rivo
-            </a>
+            </Link>
           </div>
 
           <div className={styles.footerGrid}>
@@ -418,7 +419,7 @@ export default function Home() {
             <div className={styles.footerCol}>
               <h4>Product</h4>
               <a href="#">Pricing</a>
-              <a href="#">Templates</a>
+              <Link href="/templates">Templates</Link>
               <a href="#">WhatsApp &amp; EcoCash</a>
               <a href="#">Security</a>
             </div>
