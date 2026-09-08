@@ -180,6 +180,54 @@ async function listAllTemplates(): Promise<TemplateCard[]> {
   }));
 }
 
+// --- Gallery detail (single template, with structure + content) ----------
+// Used by the /templates/[id] detail page for the live preview. Distinct
+// from getTemplateById above: this reads gallery_templates (marketing
+// preview data) + gallery_content_blocks, not the real `templates` table
+// the AI/renderer layer writes against.
+
+export interface GalleryTemplateDetail extends TemplateCard {
+  structure: TemplateStructure;
+  contentBlocks: Record<string, unknown>;
+}
+
+export async function getGalleryTemplateWithContent(
+  id: string
+): Promise<GalleryTemplateDetail | null> {
+  const supabase = await createClient();
+
+  const { data: template, error } = await supabase
+    .from("gallery_templates")
+    .select("id, category, category_label, name, description, features, structure")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !template) return null;
+
+  const { data: blocks, error: blocksError } = await supabase
+    .from("gallery_content_blocks")
+    .select("section_id, content")
+    .eq("template_id", id);
+
+  if (blocksError) return null;
+
+  const contentBlocks: Record<string, unknown> = {};
+  for (const block of blocks ?? []) {
+    contentBlocks[block.section_id] = block.content;
+  }
+
+  return {
+    id: template.id,
+    category: template.category,
+    categoryLabel: template.category_label,
+    name: template.name,
+    description: template.description,
+    features: template.features ?? [],
+    structure: template.structure as TemplateStructure,
+    contentBlocks,
+  };
+}
+
 // Gallery list source of truth: real DB rows override fallback cards by id;
 // any fallback id not yet in the DB is shown as-is. Once all twelve have
 // real rows, FALLBACK_TEMPLATES can be deleted entirely.
