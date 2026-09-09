@@ -6,6 +6,7 @@ export type ConfigSource = "ai_chat" | "dashboard" | "system";
 
 export type FeatureKey =
   | "whatsapp"
+  | "whatsapp_flow_ordering"
   | "delivery"
   | "ecocash"
   | "layby"
