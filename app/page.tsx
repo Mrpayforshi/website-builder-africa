@@ -15,15 +15,11 @@ export default function Home() {
               Rivo
             </Link>
             <nav className={styles.navLinks}>
-              <a href="#">
-                Product <span className={styles.chev}>▾</span>
-              </a>
+              <a href="#product">Product</a>
               <Link href="/templates">Templates</Link>
               <a href="#">Pricing</a>
-              <a href="#">
-                Resources <span className={styles.chev}>▾</span>
-              </a>
-              <a href="#">WhatsApp &amp; EcoCash</a>
+              <a href="#">Resources</a>
+              <a href="#payments">WhatsApp &amp; EcoCash</a>
             </nav>
             <div className={styles.navRight}>
               <a className={styles.navSignin} href="/login">
@@ -110,7 +106,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className={styles.infra}>
+        <section id="product" className={styles.infra}>
           <h2>Built to run, not just to launch</h2>
           <p className={styles.infraIntro}>
             Rivo runs on the same infrastructure serious products run on —
@@ -322,7 +318,7 @@ export default function Home() {
           <div className={styles.stackCaption}>WhatsApp and EcoCash, native — everything else connects around them</div>
         </section>
 
-        <section className={styles.payments}>
+        <section id="payments" className={styles.payments}>
           <h2>Payments, processed</h2>
           <p className={styles.paymentsIntro}>
             EcoCash, OneMoney, Paynow, and card payments — settled in USD or
@@ -420,7 +416,7 @@ export default function Home() {
               <h4>Product</h4>
               <a href="#">Pricing</a>
               <Link href="/templates">Templates</Link>
-              <a href="#">WhatsApp &amp; EcoCash</a>
+              <a href="#payments">WhatsApp &amp; EcoCash</a>
               <a href="#">Security</a>
             </div>
             <div className={styles.footerCol}>
