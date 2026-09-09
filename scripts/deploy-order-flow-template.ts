@@ -66,7 +66,7 @@ async function main() {
     wabaId: channel.wabaId,
     name: "Rivo Order Flow — Master Template",
     category: "OTHER",
-    endpointUri: `${rootDomain}/api/whatsapp/flows/${referenceChannelId}`,
+    endpointUri: `https://${rootDomain}/api/whatsapp/flows/${referenceChannelId}`,
   });
   console.log(`Created flow ${flow.id}. Uploading order-flow.json...`);
 
