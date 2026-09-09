@@ -10,37 +10,55 @@ import { deployOrderFlowToTenant, generateChannelApiKey, registerFlowPublicKey }
  * webhook for the rider dispatch bot. This one carries account/channel
  * lifecycle events across every tenant's onboarding.
  *
- * The exact "channel is ready" event name is inconsistent across
- * 360dialog's docs at time of writing (channel_running,
- * channel_status_running, and channel_live all appear on different
- * pages). Treated as equivalent here — narrow this once a real sandbox
- * payload confirms which one actually fires.
+ * CONFIRMED against 360dialog's docs (docs.360dialog.com/partner/onboarding/
+ * webhook-events-and-setup/webhook-events-partner-and-messaging-api, and
+ * .../waba-creation/webhooks): the lifecycle is a sequence of DISTINCT
+ * events — client_created -> channel_created -> channel_ready ->
+ * channel_running -> channel_live — not interchangeable names for the
+ * same event (this file previously treated channel_running and
+ * channel_live as equivalent, which was wrong). Their own docs state
+ * plainly: "When the number is fully live, you will receive the Channel
+ * Live Webhook Event. You should be able to generate an API Key..." —
+ * channel_live is the only event this handler should act on.
+ *
+ * Payload shape is also confirmed nested under `data`, not flat:
+ *   { id, event, data: { id, client_id, account_mode, status,
+ *     setup_info: { phone_number, phone_name }, waba_account: { id } } }
+ * (previous version read flat body.channel / body.waba_account_id /
+ * body.phone_number, none of which exist in the real payload).
+ *
+ * STILL UNVERIFIED: the exact response shape of generateChannelApiKey's
+ * underlying endpoint (see dialog360.ts) — that one genuinely differs
+ * across 360dialog's own doc examples and hasn't been confirmed against
+ * a live sandbox call.
  */
-const CHANNEL_READY_EVENTS = new Set(["channel_running", "channel_status_running", "channel_live"]);
-
 interface Dialog360WebhookEvent {
+  id?: string;
   event?: string;
-  type?: string;
-  client_id?: string;
-  channel?: string; // channel_id, per docs' "identify which client created this channel in the client_id and client fields"
-  waba_account_id?: string;
-  phone_number?: string;
+  data?: {
+    id?: string; // channel_id
+    client_id?: string;
+    account_mode?: string;
+    status?: string;
+    setup_info?: { phone_number?: string; phone_name?: string };
+    waba_account?: { id?: string };
+  };
 }
 
 export async function POST(req: Request) {
   const body = (await req.json()) as Dialog360WebhookEvent;
-  const eventName = body.event ?? body.type ?? "";
 
-  if (!CHANNEL_READY_EVENTS.has(eventName)) {
-    // client_created, channel_created, phone_number_quality_changed, etc. — nothing to act on yet.
+  if (body.event !== "channel_live") {
+    // client_created, channel_created, channel_ready, channel_running,
+    // phone_number_quality_changed, etc. — nothing to act on yet.
     return NextResponse.json({ ok: true });
   }
 
-  const channelId = body.channel;
-  const wabaId = body.waba_account_id;
-  const phoneNumber = body.phone_number;
+  const channelId = body.data?.id;
+  const wabaId = body.data?.waba_account?.id;
+  const phoneNumber = body.data?.setup_info?.phone_number;
   if (!channelId || !wabaId || !phoneNumber) {
-    console.error("dialog360-webhook: channel-ready event missing required fields", body);
+    console.error("dialog360-webhook: channel_live event missing required fields", body);
     return NextResponse.json({ ok: true }); // ack anyway — 360dialog retries on non-200
   }
 
@@ -70,14 +88,11 @@ export async function POST(req: Request) {
 
   // Tenant-scoped by channelId in the path — see
   // app/api/whatsapp/flows/[channelId]/route.ts for why the data-exchange
-  // endpoint can't be a single shared URL. NEXT_PUBLIC_ROOT_DOMAIN is the
-  // same var flagged unverified in project notes (Vercel env state
-  // unverifiable until the MCP connector is back) — confirm it resolves
-  // correctly before this deploy step is trusted.
+  // endpoint can't be a single shared URL.
   const flowEndpointUri = `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/api/whatsapp/flows/${channelId}`;
   const flowId = await deployOrderFlowToTenant({
     wabaId,
-    businessName: channel.businessId, // TODO: swap for the actual business name once passed through — see next batch
+    businessName: channel.businessId, // TODO: swap for the actual business name once passed through
     endpointUri: flowEndpointUri,
   });
   await setFlowDeployment({ businessId: channel.businessId, flowId, flowStatus: "published" });
