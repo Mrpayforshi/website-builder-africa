@@ -9,15 +9,15 @@
  *    with a specific TENANT'S channel API key (D360-API-KEY header),
  *    used to actually send messages on that tenant's number.
  *
- * NOTE ON UNVERIFIED SHAPES: the Partner webhook event names
- * (`channel_created` / `channel_running` / `channel_live`) and the
- * exact response shape of the "create channel API key" endpoint are
- * inconsistent across 360dialog's own docs pages at the time this was
- * written. Both are marked below — confirm against real payloads from
- * the 360dialog Partner Sandbox before this goes live, per the repo's
- * "verify against live state before trusting it" rule.
+ * NOTE ON UNVERIFIED SHAPES: the Partner webhook "channel ready" event
+ * name is now confirmed (channel_live — see
+ * app/api/whatsapp/dialog360-webhook/route.ts for the full lifecycle and
+ * payload shape). Still unverified: the exact response shape of the
+ * "create channel API key" endpoint below (generateChannelApiKey) —
+ * confirm against a real 360dialog Partner Sandbox call before this goes
+ * live, per the repo's "verify against live state before trusting it"
+ * rule.
  */
-
 const PARTNER_BASE_URL = "https://hub.360dialog.io/api/v2";
 const MESSAGING_BASE_URL = "https://waba-v2.360dialog.io";
 
