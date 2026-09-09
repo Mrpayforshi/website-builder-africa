@@ -1,0 +1,586 @@
+{
+  "version": "6.3",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "MENU": [
+      "CHECKOUT"
+    ],
+    "CHECKOUT": [
+      "SUCCESS"
+    ],
+    "SUCCESS": []
+  },
+  "screens": [
+    {
+      "id": "MENU",
+      "title": "Order Food",
+      "data": {
+        "qty_options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "item_1_id": {
+          "type": "string"
+        },
+        "item_1_label": {
+          "type": "string"
+        },
+        "item_1_visible": {
+          "type": "boolean"
+        },
+        "item_2_id": {
+          "type": "string"
+        },
+        "item_2_label": {
+          "type": "string"
+        },
+        "item_2_visible": {
+          "type": "boolean"
+        },
+        "item_3_id": {
+          "type": "string"
+        },
+        "item_3_label": {
+          "type": "string"
+        },
+        "item_3_visible": {
+          "type": "boolean"
+        },
+        "item_4_id": {
+          "type": "string"
+        },
+        "item_4_label": {
+          "type": "string"
+        },
+        "item_4_visible": {
+          "type": "boolean"
+        },
+        "item_5_id": {
+          "type": "string"
+        },
+        "item_5_label": {
+          "type": "string"
+        },
+        "item_5_visible": {
+          "type": "boolean"
+        },
+        "item_6_id": {
+          "type": "string"
+        },
+        "item_6_label": {
+          "type": "string"
+        },
+        "item_6_visible": {
+          "type": "boolean"
+        },
+        "item_7_id": {
+          "type": "string"
+        },
+        "item_7_label": {
+          "type": "string"
+        },
+        "item_7_visible": {
+          "type": "boolean"
+        },
+        "item_8_id": {
+          "type": "string"
+        },
+        "item_8_label": {
+          "type": "string"
+        },
+        "item_8_visible": {
+          "type": "boolean"
+        },
+        "item_9_id": {
+          "type": "string"
+        },
+        "item_9_label": {
+          "type": "string"
+        },
+        "item_9_visible": {
+          "type": "boolean"
+        },
+        "item_10_id": {
+          "type": "string"
+        },
+        "item_10_label": {
+          "type": "string"
+        },
+        "item_10_visible": {
+          "type": "boolean"
+        },
+        "item_11_id": {
+          "type": "string"
+        },
+        "item_11_label": {
+          "type": "string"
+        },
+        "item_11_visible": {
+          "type": "boolean"
+        },
+        "item_12_id": {
+          "type": "string"
+        },
+        "item_12_label": {
+          "type": "string"
+        },
+        "item_12_visible": {
+          "type": "boolean"
+        },
+        "item_13_id": {
+          "type": "string"
+        },
+        "item_13_label": {
+          "type": "string"
+        },
+        "item_13_visible": {
+          "type": "boolean"
+        },
+        "item_14_id": {
+          "type": "string"
+        },
+        "item_14_label": {
+          "type": "string"
+        },
+        "item_14_visible": {
+          "type": "boolean"
+        },
+        "item_15_id": {
+          "type": "string"
+        },
+        "item_15_label": {
+          "type": "string"
+        },
+        "item_15_visible": {
+          "type": "boolean"
+        },
+        "item_16_id": {
+          "type": "string"
+        },
+        "item_16_label": {
+          "type": "string"
+        },
+        "item_16_visible": {
+          "type": "boolean"
+        },
+        "item_17_id": {
+          "type": "string"
+        },
+        "item_17_label": {
+          "type": "string"
+        },
+        "item_17_visible": {
+          "type": "boolean"
+        },
+        "item_18_id": {
+          "type": "string"
+        },
+        "item_18_label": {
+          "type": "string"
+        },
+        "item_18_visible": {
+          "type": "boolean"
+        },
+        "item_19_id": {
+          "type": "string"
+        },
+        "item_19_label": {
+          "type": "string"
+        },
+        "item_19_visible": {
+          "type": "boolean"
+        },
+        "item_20_id": {
+          "type": "string"
+        },
+        "item_20_label": {
+          "type": "string"
+        },
+        "item_20_visible": {
+          "type": "boolean"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "menu_form",
+            "children": [
+              {
+                "type": "TextHeading",
+                "text": "Build your order"
+              },
+              {
+                "type": "TextBody",
+                "text": "Pick a quantity for anything you'd like. Leave the rest at 0."
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_1",
+                "label": "${data.item_1_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_1_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_2",
+                "label": "${data.item_2_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_2_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_3",
+                "label": "${data.item_3_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_3_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_4",
+                "label": "${data.item_4_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_4_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_5",
+                "label": "${data.item_5_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_5_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_6",
+                "label": "${data.item_6_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_6_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_7",
+                "label": "${data.item_7_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_7_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_8",
+                "label": "${data.item_8_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_8_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_9",
+                "label": "${data.item_9_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_9_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_10",
+                "label": "${data.item_10_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_10_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_11",
+                "label": "${data.item_11_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_11_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_12",
+                "label": "${data.item_12_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_12_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_13",
+                "label": "${data.item_13_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_13_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_14",
+                "label": "${data.item_14_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_14_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_15",
+                "label": "${data.item_15_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_15_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_16",
+                "label": "${data.item_16_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_16_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_17",
+                "label": "${data.item_17_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_17_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_18",
+                "label": "${data.item_18_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_18_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_19",
+                "label": "${data.item_19_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_19_visible}",
+                "required": false
+              },
+              {
+                "type": "Dropdown",
+                "name": "qty_20",
+                "label": "${data.item_20_label}",
+                "data-source": "${data.qty_options}",
+                "visible": "${data.item_20_visible}",
+                "required": false
+              },
+              {
+                "type": "Footer",
+                "label": "Review Order",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "qty_1": "${form.qty_1}",
+                    "qty_2": "${form.qty_2}",
+                    "qty_3": "${form.qty_3}",
+                    "qty_4": "${form.qty_4}",
+                    "qty_5": "${form.qty_5}",
+                    "qty_6": "${form.qty_6}",
+                    "qty_7": "${form.qty_7}",
+                    "qty_8": "${form.qty_8}",
+                    "qty_9": "${form.qty_9}",
+                    "qty_10": "${form.qty_10}",
+                    "qty_11": "${form.qty_11}",
+                    "qty_12": "${form.qty_12}",
+                    "qty_13": "${form.qty_13}",
+                    "qty_14": "${form.qty_14}",
+                    "qty_15": "${form.qty_15}",
+                    "qty_16": "${form.qty_16}",
+                    "qty_17": "${form.qty_17}",
+                    "qty_18": "${form.qty_18}",
+                    "qty_19": "${form.qty_19}",
+                    "qty_20": "${form.qty_20}",
+                    "item_1_id": "${data.item_1_id}",
+                    "item_2_id": "${data.item_2_id}",
+                    "item_3_id": "${data.item_3_id}",
+                    "item_4_id": "${data.item_4_id}",
+                    "item_5_id": "${data.item_5_id}",
+                    "item_6_id": "${data.item_6_id}",
+                    "item_7_id": "${data.item_7_id}",
+                    "item_8_id": "${data.item_8_id}",
+                    "item_9_id": "${data.item_9_id}",
+                    "item_10_id": "${data.item_10_id}",
+                    "item_11_id": "${data.item_11_id}",
+                    "item_12_id": "${data.item_12_id}",
+                    "item_13_id": "${data.item_13_id}",
+                    "item_14_id": "${data.item_14_id}",
+                    "item_15_id": "${data.item_15_id}",
+                    "item_16_id": "${data.item_16_id}",
+                    "item_17_id": "${data.item_17_id}",
+                    "item_18_id": "${data.item_18_id}",
+                    "item_19_id": "${data.item_19_id}",
+                    "item_20_id": "${data.item_20_id}",
+                    "item_1_visible": "${data.item_1_visible}",
+                    "item_2_visible": "${data.item_2_visible}",
+                    "item_3_visible": "${data.item_3_visible}",
+                    "item_4_visible": "${data.item_4_visible}",
+                    "item_5_visible": "${data.item_5_visible}",
+                    "item_6_visible": "${data.item_6_visible}",
+                    "item_7_visible": "${data.item_7_visible}",
+                    "item_8_visible": "${data.item_8_visible}",
+                    "item_9_visible": "${data.item_9_visible}",
+                    "item_10_visible": "${data.item_10_visible}",
+                    "item_11_visible": "${data.item_11_visible}",
+                    "item_12_visible": "${data.item_12_visible}",
+                    "item_13_visible": "${data.item_13_visible}",
+                    "item_14_visible": "${data.item_14_visible}",
+                    "item_15_visible": "${data.item_15_visible}",
+                    "item_16_visible": "${data.item_16_visible}",
+                    "item_17_visible": "${data.item_17_visible}",
+                    "item_18_visible": "${data.item_18_visible}",
+                    "item_19_visible": "${data.item_19_visible}",
+                    "item_20_visible": "${data.item_20_visible}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "CHECKOUT",
+      "title": "Review & Checkout",
+      "terminal": false,
+      "data": {
+        "order_summary_text": {
+          "type": "string"
+        },
+        "total_text": {
+          "type": "string"
+        },
+        "cart_json": {
+          "type": "string"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "checkout_form",
+            "children": [
+              {
+                "type": "TextHeading",
+                "text": "Your order"
+              },
+              {
+                "type": "TextBody",
+                "text": "${data.order_summary_text}"
+              },
+              {
+                "type": "TextSubheading",
+                "text": "${data.total_text}"
+              },
+              {
+                "type": "TextInput",
+                "name": "customer_name",
+                "label": "Your name",
+                "input-type": "text",
+                "required": true
+              },
+              {
+                "type": "TextInput",
+                "name": "customer_phone",
+                "label": "Phone number",
+                "input-type": "phone",
+                "required": true
+              },
+              {
+                "type": "RadioButtonsGroup",
+                "name": "fulfillment_type",
+                "label": "Pickup or delivery?",
+                "required": true,
+                "data-source": [
+                  {
+                    "id": "pickup",
+                    "title": "Pickup"
+                  },
+                  {
+                    "id": "delivery",
+                    "title": "Delivery"
+                  }
+                ]
+              },
+              {
+                "type": "TextInput",
+                "name": "delivery_address",
+                "label": "Delivery address",
+                "input-type": "text",
+                "required": false,
+                "visible": "${form.fulfillment_type} == \"delivery\""
+              },
+              {
+                "type": "Footer",
+                "label": "Place Order",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "cart_json": "${data.cart_json}",
+                    "customer_name": "${form.customer_name}",
+                    "customer_phone": "${form.customer_phone}",
+                    "fulfillment_type": "${form.fulfillment_type}",
+                    "delivery_address": "${form.delivery_address}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SUCCESS",
+      "title": "Order Placed",
+      "terminal": true,
+      "success": true,
+      "data": {
+        "confirmation_text": {
+          "type": "string"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Thanks \u2014 your order is in! \ud83c\udf89"
+          },
+          {
+            "type": "TextBody",
+            "text": "${data.confirmation_text}"
+          },
+          {
+            "type": "Footer",
+            "label": "Done",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {}
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
