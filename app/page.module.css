@@ -710,6 +710,53 @@
   }
 }
 
+/* ---------- Placeholder sections (Pricing / Resources) ---------- */
+
+.placeholder {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  padding: 0 0 90px;
+}
+
+.placeholderBadge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lp-ink-soft);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 7px 13px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.placeholder h2 {
+  font-size: 40px;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  margin: 0 0 18px;
+  color: var(--lp-ink);
+}
+
+.placeholderIntro {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--lp-ink-soft);
+  max-width: 46ch;
+  margin: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .placeholder h2 {
+    font-size: 32px;
+  }
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
