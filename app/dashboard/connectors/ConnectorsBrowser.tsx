@@ -31,13 +31,25 @@ function Icon(path: JSX.Element) {
 const CONNECTORS: ConnectorDef[] = [
   {
     key: "whatsapp",
-    name: "WhatsApp ordering",
-    description: "Customers browse, order, and get updates over WhatsApp chat.",
+    name: "WhatsApp ordering (deep link)",
+    description: "Free — a wa.me button that opens WhatsApp with a pre-filled order message.",
     category: "ordering",
     icon: Icon(
       <>
         <path d="M12 3a8 8 0 0 0-6.9 12l-1 4 4.1-1.1A8 8 0 1 0 12 3Z" stroke="currentColor" strokeWidth="1.6" />
         <path d="M9 10c.3 2.2 2 3.9 4.2 4.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </>
+    ),
+  },
+  {
+    key: "whatsapp_flow_ordering",
+    name: "WhatsApp Flow ordering",
+    description: "Paid add-on — customers browse your live catalog and check out inside WhatsApp, no website visit needed.",
+    category: "ordering",
+    icon: Icon(
+      <>
+        <path d="M12 3a8 8 0 0 0-6.9 12l-1 4 4.1-1.1A8 8 0 1 0 12 3Z" stroke="currentColor" strokeWidth="1.6" />
+        <path d="M9 13.5h6M9 10h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
       </>
     ),
   },
@@ -225,152 +237,4 @@ export function ConnectorsBrowser({ projects: initialProjects, toggleMap: initia
     const q = search.trim().toLowerCase();
     return ALL_CONNECTORS.filter((c) => {
       const matchesCategory =
-        category === "all" ? true : category === "soon" ? Boolean(c.comingSoon) : c.category === category && !c.comingSoon;
-      const matchesSearch = !q || c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q);
-      return matchesCategory && matchesSearch;
-    });
-  }, [search, category]);
-
-  async function setToggle(project: ConnectorProject, featureKey: string, nextEnabled: boolean) {
-    const pendingId = `${project.id}:${featureKey}`;
-    setPending(pendingId);
-    setErrors((prev) => ({ ...prev, [pendingId]: "" }));
-    const existingConfig = toggleMap[project.id]?.[featureKey]?.config ?? {};
-
-    try {
-      const res = await fetch(`/api/site-config/${project.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          expectedVersion: project.version,
-          featureTogglesPatch: [{ feature_key: featureKey, enabled: nextEnabled, config: existingConfig }],
-        }),
-      });
-      const data = await res.json().catch(() => null);
-
-      if (res.status === 409) {
-        setErrors((prev) => ({ ...prev, [pendingId]: "This project changed elsewhere — reload and try again." }));
-        return;
-      }
-      if (!res.ok) {
-        setErrors((prev) => ({ ...prev, [pendingId]: data?.error ?? "Couldn't update — try again." }));
-        return;
-      }
-
-      setProjects((prev) => prev.map((p) => (p.id === project.id ? { ...p, version: data.newVersion } : p)));
-      setToggleMap((prev) => ({
-        ...prev,
-        [project.id]: { ...prev[project.id], [featureKey]: { enabled: nextEnabled, config: existingConfig } },
-      }));
-    } catch {
-      setErrors((prev) => ({ ...prev, [pendingId]: "Network error — try again." }));
-    } finally {
-      setPending(null);
-    }
-  }
-
-  return (
-    <main className={styles.main}>
-      <header className={styles.header}>
-        <div>
-          <h1>Connectors</h1>
-          <p>Turn features on for any of {displayName}&apos;s projects.</p>
-        </div>
-        <input
-          className={styles.search}
-          placeholder="Search connectors…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </header>
-
-      <div className={styles.layout}>
-        <nav className={styles.categories}>
-          {CATEGORIES.map((c) => {
-            const count =
-              c.id === "all"
-                ? ALL_CONNECTORS.length
-                : c.id === "soon"
-                ? COMING_SOON.length
-                : CONNECTORS.filter((x) => x.category === c.id).length;
-            return (
-              <button
-                key={c.id}
-                type="button"
-                className={`${styles.categoryItem} ${category === c.id ? styles.categoryItemActive : ""}`}
-                onClick={() => setCategory(c.id)}
-              >
-                <span>{c.label}</span>
-                <span className={styles.categoryCount}>{count}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className={styles.grid}>
-          {filtered.length === 0 && <p className={styles.empty}>No connectors match &ldquo;{search}&rdquo;.</p>}
-
-          {filtered.map((c) => {
-            const count = c.comingSoon ? 0 : enabledCount(c.key);
-            const isExpanded = expanded === c.key;
-            return (
-              <div key={c.key} style={{ display: "contents" }}>
-                <button
-                  type="button"
-                  className={`${styles.card} ${c.comingSoon ? styles.cardSoon : ""} ${isExpanded ? styles.cardExpanded : ""}`}
-                  onClick={() => !c.comingSoon && setExpanded(isExpanded ? null : c.key)}
-                  disabled={c.comingSoon}
-                >
-                  <div className={styles.cardTop}>
-                    <span className={styles.cardIcon}>{c.icon}</span>
-                    {c.comingSoon ? (
-                      <span className={`${styles.cardBadge} ${styles.cardBadgeSoon}`}>Coming soon</span>
-                    ) : (
-                      count > 0 && <span className={styles.cardBadge}>{count} enabled</span>
-                    )}
-                  </div>
-                  <h3>{c.name}</h3>
-                  <p>{c.description}</p>
-                </button>
-
-                {isExpanded && !c.comingSoon && (
-                  <div className={styles.panel}>
-                    {projects.length === 0 ? (
-                      <p className={styles.panelEmpty}>
-                        You don&apos;t have any projects yet — <a href="/dashboard">start one from the dashboard</a> to
-                        connect {c.name.toLowerCase()}.
-                      </p>
-                    ) : (
-                      projects.map((p) => {
-                        const on = Boolean(toggleMap[p.id]?.[c.key]?.enabled);
-                        const pendingId = `${p.id}:${c.key}`;
-                        const isPending = pending === pendingId;
-                        return (
-                          <div key={p.id} className={styles.projectRow}>
-                            <div>
-                              <span className={styles.projectName}>{p.name}</span>
-                              {errors[pendingId] && <div className={styles.projectError}>{errors[pendingId]}</div>}
-                            </div>
-                            <button
-                              type="button"
-                              className={`${styles.switch} ${on ? styles.switchOn : ""}`}
-                              onClick={() => setToggle(p, c.key, !on)}
-                              disabled={isPending}
-                              aria-label={`Toggle ${c.name} for ${p.name}`}
-                            >
-                              <span className={styles.switchKnob} />
-                            </button>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </main>
-  );
-}
+        category === "all" ? true : category === "soon" ? Boolean(c.comingSoon) : c.category === category &&
