@@ -17,8 +17,8 @@ export default function Home() {
             <nav className={styles.navLinks}>
               <a href="#product">Product</a>
               <Link href="/templates">Templates</Link>
-              <a href="#">Pricing</a>
-              <a href="#">Resources</a>
+              <a href="#pricing">Pricing</a>
+              <a href="#resources">Resources</a>
               <a href="#payments">WhatsApp &amp; EcoCash</a>
             </nav>
             <div className={styles.navRight}>
@@ -393,6 +393,25 @@ export default function Home() {
             EcoCash · OneMoney · Paynow · Visa &amp; Mastercard — reconciled in one dashboard
           </div>
         </section>
+
+        <section id="pricing" className={styles.placeholder}>
+          <span className={styles.placeholderBadge}>Coming soon</span>
+          <h2>Pricing</h2>
+          <p className={styles.placeholderIntro}>
+            Plan details are being finalized — Rivo will always have a free base
+            site, with premium connectors like WhatsApp Flow ordering, EcoCash,
+            layby, and delivery available as paid add-ons.
+          </p>
+        </section>
+
+        <section id="resources" className={styles.placeholder}>
+          <span className={styles.placeholderBadge}>Coming soon</span>
+          <h2>Resources</h2>
+          <p className={styles.placeholderIntro}>
+            Guides, docs, and support content are on the way. In the meantime,
+            reach out directly and we&apos;ll help you get set up.
+          </p>
+        </section>
       </div>
 
       <footer className={styles.footer}>
@@ -414,7 +433,7 @@ export default function Home() {
             </div>
             <div className={styles.footerCol}>
               <h4>Product</h4>
-              <a href="#">Pricing</a>
+              <a href="#pricing">Pricing</a>
               <Link href="/templates">Templates</Link>
               <a href="#payments">WhatsApp &amp; EcoCash</a>
               <a href="#">Security</a>
