@@ -7,7 +7,8 @@ export interface FeatureToggleState {
 }
 
 const FEATURE_LABELS: Record<string, string> = {
-  whatsapp: "WhatsApp ordering",
+  whatsapp: "WhatsApp ordering (deep link)",
+  whatsapp_flow_ordering: "WhatsApp Flow ordering",
   ecocash: "EcoCash checkout",
   layby: "Layby (installment) plans",
   delivery: "Rider delivery",
@@ -20,6 +21,7 @@ const FEATURE_LABELS: Record<string, string> = {
 
 const FEATURE_ORDER = [
   "whatsapp",
+  "whatsapp_flow_ordering",
   "ecocash",
   "layby",
   "delivery",
@@ -55,6 +57,13 @@ export function FeatureTogglesPanel({ toggles, onChange }: FeatureTogglesPanelPr
               />
               {FEATURE_LABELS[key] ?? key}
             </label>
+
+            {key === "whatsapp_flow_ordering" && toggle.enabled && (
+              <div style={{ marginLeft: "1.6rem", marginTop: "0.4rem", fontSize: "0.8rem", color: "#666" }}>
+                Paid add-on — requires a connected WhatsApp Business Account. Set up under
+                Connectors → WhatsApp Flow ordering.
+              </div>
+            )}
 
             {key === "layby" && toggle.enabled && (
               <div style={{ marginLeft: "1.6rem", marginTop: "0.4rem" }}>
