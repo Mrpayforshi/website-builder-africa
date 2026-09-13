@@ -4,11 +4,12 @@ import { checkBusinessMembership, getSiteConfig } from "@/lib/ai/config-store";
 import { SectionForm } from "@/components/dashboard/SectionForm";
 import type { TemplateStructure } from "@/lib/templates/section-schemas";
 
-export default async function SectionEditPage({
-  params,
-}: {
-  params: { businessId: string; sectionId: string };
-}) {
+export default async function SectionEditPage(
+  props: {
+    params: Promise<{ businessId: string; sectionId: string }>;
+  }
+) {
+  const params = await props.params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
