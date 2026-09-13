@@ -123,7 +123,8 @@ function formatOrderSummary(cart: CartLine[]): { summaryText: string; totalText:
   };
 }
 
-export async function POST(req: Request, { params }: { params: { channelId: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ channelId: string }> }) {
+  const params = await props.params;
   const body = (await req.json()) as EncryptedFlowRequestBody;
 
   const channel = await getChannelByChannelId(params.channelId);
