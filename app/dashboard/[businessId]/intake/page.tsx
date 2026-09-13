@@ -3,13 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { checkBusinessMembership, getSiteConfig } from "@/lib/ai/config-store";
 import { IntakeChat } from "./IntakeChat";
 
-export default async function IntakePage({
-  params,
-  searchParams,
-}: {
-  params: { businessId: string };
-  searchParams: { first?: string };
-}) {
+export default async function IntakePage(
+  props: {
+    params: Promise<{ businessId: string }>;
+    searchParams: Promise<{ first?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const supabase = await createClient();
   const {
     data: { user },
