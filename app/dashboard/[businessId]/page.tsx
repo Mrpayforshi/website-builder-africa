@@ -5,7 +5,8 @@ import { getTemplateById } from "@/lib/templates/template-store";
 import { DashboardEditor } from "@/components/dashboard/DashboardEditor";
 import type { FeatureToggleState } from "@/components/dashboard/FeatureTogglesPanel";
 
-export default async function DashboardPage({ params }: { params: { businessId: string } }) {
+export default async function DashboardPage(props: { params: Promise<{ businessId: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
   const {
     data: { user },
