@@ -8,16 +8,18 @@ import styles from "./detail.module.css";
 import "@/styles/site.css";
 
 interface DetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({ params }: DetailPageProps): Promise<Metadata> {
+export async function generateMetadata(props: DetailPageProps): Promise<Metadata> {
+  const params = await props.params;
   const dbTemplate = await getGalleryTemplateWithContent(params.id);
   const name = dbTemplate?.name ?? FALLBACK_TEMPLATES.find((t) => t.id === params.id)?.name;
   return { title: name ? `${name} — Rivo templates` : "Template not found" };
 }
 
-export default async function TemplateDetailPage({ params }: DetailPageProps) {
+export default async function TemplateDetailPage(props: DetailPageProps) {
+  const params = await props.params;
   const dbTemplate = await getGalleryTemplateWithContent(params.id);
 
   const meta = dbTemplate ?? FALLBACK_TEMPLATES.find((t) => t.id === params.id);
