@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { applySiteConfigPatch, checkBusinessMembership, getSiteConfig } from "@/lib/ai/config-store";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET(req: NextRequest, { params }: { params: { businessId: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ businessId: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -22,7 +23,8 @@ export async function GET(req: NextRequest, { params }: { params: { businessId: 
  * both go through apply_site_config_patch and can't silently clobber
  * each other.
  */
-export async function PATCH(req: NextRequest, { params }: { params: { businessId: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ businessId: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
