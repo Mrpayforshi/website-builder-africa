@@ -10,7 +10,8 @@ import type { RiderStatus } from "@/lib/delivery/types";
  * policy, which checks the rider row's actual business_id against the
  * caller's session regardless of what's claimed here.
  */
-export async function PATCH(req: Request, { params }: { params: { riderId: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ riderId: string }> }) {
+  const params = await props.params;
   const { businessId, status } = (await req.json()) as { businessId: string; status: RiderStatus };
   if (!businessId || !status) {
     return NextResponse.json({ error: "businessId_and_status_required" }, { status: 400 });
