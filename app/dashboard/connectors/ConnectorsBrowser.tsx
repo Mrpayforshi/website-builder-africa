@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./connectors.module.css";
 
 export interface ConnectorProject {
@@ -237,4 +239,183 @@ export function ConnectorsBrowser({ projects: initialProjects, toggleMap: initia
     const q = search.trim().toLowerCase();
     return ALL_CONNECTORS.filter((c) => {
       const matchesCategory =
-        category === "all" ? true : category === "soon" ? Boolean(c.comingSoon) : c.category === category &&
+        category === "all"
+          ? true
+          : category === "soon"
+          ? Boolean(c.comingSoon)
+          : c.category === category && !c.comingSoon;
+      const matchesSearch = !q || c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q);
+      return matchesCategory && matchesSearch;
+    });
+  }, [search, category]);
+
+  const categoryCount = (id: string) =>
+    id === "all"
+      ? CONNECTORS.length
+      : id === "soon"
+      ? COMING_SOON.length
+      : CONNECTORS.filter((c) => c.category === id).length;
+
+  async function handleToggle(connectorKey: string, businessId: string, nextEnabled: boolean) {
+    const pendingKey = `${connectorKey}:${businessId}`;
+    setPending(pendingKey);
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[pendingKey];
+      return next;
+    });
+
+    const existingConfig = toggleMap[businessId]?.[connectorKey]?.config ?? {};
+
+    // Optimistic update.
+    setToggleMap((prev) => ({
+      ...prev,
+      [businessId]: {
+        ...prev[businessId],
+        [connectorKey]: { enabled: nextEnabled, config: existingConfig },
+      },
+    }));
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("feature_toggles")
+        .upsert(
+          { business_id: businessId, feature_key: connectorKey, enabled: nextEnabled, config: existingConfig },
+          { onConflict: "business_id,feature_key" }
+        );
+
+      if (error) throw error;
+    } catch (err) {
+      // Roll back the optimistic update and surface the error on this row.
+      setToggleMap((prev) => ({
+        ...prev,
+        [businessId]: {
+          ...prev[businessId],
+          [connectorKey]: { enabled: !nextEnabled, config: existingConfig },
+        },
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        [pendingKey]: err instanceof Error ? err.message : "Failed to update — try again.",
+      }));
+    } finally {
+      setPending((current) => (current === pendingKey ? null : current));
+    }
+  }
+
+  return (
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <div>
+          <h1>Connectors</h1>
+          <p>Hi {displayName} — turn features on or off per business.</p>
+        </div>
+        <input
+          className={styles.search}
+          type="text"
+          placeholder="Search connectors…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className={styles.layout}>
+        <nav className={styles.categories}>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              className={`${styles.categoryItem} ${category === c.id ? styles.categoryItemActive : ""}`}
+              onClick={() => setCategory(c.id)}
+            >
+              <span>{c.label}</span>
+              <span className={styles.categoryCount}>{categoryCount(c.id)}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className={styles.grid}>
+          {filtered.length === 0 && <p className={styles.empty}>No connectors match your search.</p>}
+
+          {filtered.map((connector) => {
+            const isExpanded = expanded === connector.key;
+            const count = enabledCount(connector.key);
+
+            return (
+              <React.Fragment key={connector.key}>
+                <button
+                  type="button"
+                  className={`${styles.card} ${connector.comingSoon ? styles.cardSoon : ""} ${
+                    isExpanded ? styles.cardExpanded : ""
+                  }`}
+                  onClick={() => {
+                    if (connector.comingSoon) return;
+                    setExpanded((current) => (current === connector.key ? null : connector.key));
+                  }}
+                  disabled={connector.comingSoon}
+                >
+                  <div className={styles.cardTop}>
+                    <div className={styles.cardIcon}>{connector.icon}</div>
+                    {connector.comingSoon ? (
+                      <span className={`${styles.cardBadge} ${styles.cardBadgeSoon}`}>Coming soon</span>
+                    ) : count > 0 ? (
+                      <span className={styles.cardBadge}>
+                        {count} of {projects.length}
+                      </span>
+                    ) : null}
+                  </div>
+                  <h3>{connector.name}</h3>
+                  <p>{connector.description}</p>
+                </button>
+
+                {isExpanded && !connector.comingSoon && (
+                  <div className={styles.panel}>
+                    {projects.length === 0 ? (
+                      <p className={styles.panelEmpty}>
+                        You don&apos;t have any businesses yet — <Link href="/dashboard">create one</Link> to enable
+                        connectors.
+                      </p>
+                    ) : (
+                      projects.map((project) => {
+                        const enabled = Boolean(toggleMap[project.id]?.[connector.key]?.enabled);
+                        const pendingKey = `${connector.key}:${project.id}`;
+                        const isPending = pending === pendingKey;
+                        const rowError = errors[pendingKey];
+
+                        return (
+                          <div key={project.id} className={styles.projectRow}>
+                            <div>
+                              <div className={styles.projectName}>{project.name}</div>
+                              {rowError && <div className={styles.projectError}>{rowError}</div>}
+                              {connector.key === "whatsapp_flow_ordering" && enabled && !rowError && (
+                                <div className={styles.projectError} style={{ color: "inherit", opacity: 0.7 }}>
+                                  Requires connecting a WhatsApp Business Account — see the setup prompt on this
+                                  business&apos;s dashboard.
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              className={`${styles.switch} ${enabled ? styles.switchOn : ""}`}
+                              onClick={() => handleToggle(connector.key, project.id, !enabled)}
+                              disabled={isPending}
+                              aria-pressed={enabled}
+                              aria-label={`Toggle ${connector.name} for ${project.name}`}
+                            >
+                              <span className={styles.switchKnob} />
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+    </main>
+  );
+}
