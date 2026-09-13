@@ -5,11 +5,12 @@ import { listOrdersForBusiness } from "@/lib/commerce/orders";
 import { listStaffForBusiness } from "@/lib/staff/roster";
 import { OrdersAssignmentPanel } from "@/components/dashboard/OrdersAssignmentPanel";
 
-export default async function DashboardOrdersPage({
-  params,
-}: {
-  params: { businessId: string };
-}) {
+export default async function DashboardOrdersPage(
+  props: {
+    params: Promise<{ businessId: string }>;
+  }
+) {
+  const params = await props.params;
   const supabase = await createClient();
   const {
     data: { user },
