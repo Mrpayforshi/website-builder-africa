@@ -11,7 +11,8 @@ import { initiateEcocashPayment } from "@/lib/commerce/paynow";
  * membership check, done here via RLS SELECT on layby_plans (that policy
  * already scopes to is_business_member).
  */
-export async function POST(req: Request, { params }: { params: { planId: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ planId: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
   const {
     data: { user },
