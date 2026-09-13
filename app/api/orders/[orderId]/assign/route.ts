@@ -15,10 +15,8 @@ import { assignOrderStaff } from "@/lib/commerce/orders";
  *
  * Body: { staffId: string | null }
  */
-export async function PATCH(
-  req: Request,
-  { params }: { params: { orderId: string } }
-) {
+export async function PATCH(req: Request, props: { params: Promise<{ orderId: string }> }) {
+  const params = await props.params;
   const { orderId } = params;
   if (!orderId) return NextResponse.json({ error: "orderId_required" }, { status: 400 });
 
