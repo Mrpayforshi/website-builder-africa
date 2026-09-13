@@ -10,7 +10,7 @@ import { readLiteModeCookie, shouldRenderLiteMode, LITE_MODE_COOKIE } from "@/li
 import "@/styles/site.css";
 
 interface SitePageProps {
-  params: { businessId: string };
+  params: Promise<{ businessId: string }>;
 }
 
 async function getPublishedBusiness(businessId: string) {
@@ -25,12 +25,14 @@ async function getPublishedBusiness(businessId: string) {
   return data;
 }
 
-export async function generateMetadata({ params }: SitePageProps): Promise<Metadata> {
+export async function generateMetadata(props: SitePageProps): Promise<Metadata> {
+  const params = await props.params;
   const business = await getPublishedBusiness(params.businessId);
   return { title: business?.name ?? "Website Builder Africa" };
 }
 
-export default async function SitePage({ params }: SitePageProps) {
+export default async function SitePage(props: SitePageProps) {
+  const params = await props.params;
   const business = await getPublishedBusiness(params.businessId);
   if (!business) notFound();
 
