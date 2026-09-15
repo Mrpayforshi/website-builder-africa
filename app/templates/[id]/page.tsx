@@ -55,6 +55,7 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
             <div
               className="site"
               data-category={dbTemplate.category}
+              data-template={dbTemplate.id}
               style={
                 {
                   "--color-primary": "#1c1c22",
