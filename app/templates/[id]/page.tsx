@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import { FALLBACK_TEMPLATES } from "../data";
 import { getGalleryTemplateWithContent } from "@/lib/templates/template-store";
+import { RetailTwoTemplate } from "./RetailTwoTemplate";
 import styles from "./detail.module.css";
 import "@/styles/site.css";
 
@@ -52,23 +53,38 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
         {dbTemplate ? (
           <div className={styles.phoneFrame}>
             <div className={styles.urlBar}>{meta.id}.rivo.app</div>
-            <div
-              className="site"
-              data-category={dbTemplate.category}
-              data-template={dbTemplate.id}
-              style={
-                {
-                  "--color-primary": "#1c1c22",
-                  "--color-secondary": "#6b6b74",
-                  "--color-accent": "#e2652b",
-                } as React.CSSProperties
-              }
-            >
-              <TemplateRenderer
-                structure={dbTemplate.structure}
-                contentBlocks={dbTemplate.contentBlocks}
+            {dbTemplate.id === "retail-2" ? (
+              // Bespoke, content-driven renderer matching the uploaded
+              // design exactly — see RetailTwoTemplate.tsx. Still reads
+              // the same hero/products/about/contact content blocks as
+              // every other template, so it stays editable through the
+              // normal content pipeline.
+              <RetailTwoTemplate
+                brandName={dbTemplate.name}
+                hero={dbTemplate.contentBlocks.hero as never}
+                products={dbTemplate.contentBlocks.products as never}
+                about={dbTemplate.contentBlocks.about as never}
+                contact={dbTemplate.contentBlocks.contact as never}
               />
-            </div>
+            ) : (
+              <div
+                className="site"
+                data-category={dbTemplate.category}
+                data-template={dbTemplate.id}
+                style={
+                  {
+                    "--color-primary": "#1c1c22",
+                    "--color-secondary": "#6b6b74",
+                    "--color-accent": "#e2652b",
+                  } as React.CSSProperties
+                }
+              >
+                <TemplateRenderer
+                  structure={dbTemplate.structure}
+                  contentBlocks={dbTemplate.contentBlocks}
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.comingSoon}>
