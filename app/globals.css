@@ -27,3 +27,16 @@ a {
   outline: 2px solid #4c6fff;
   outline-offset: 3px;
 }
+
+/* Cross-document View Transitions: lets the browser morph shared
+   elements (template thumbnail → preview frame, title, badge) across a
+   real page navigation instead of a hard cut. Chromium-only today;
+   browsers without support just navigate normally, no fallback needed. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
