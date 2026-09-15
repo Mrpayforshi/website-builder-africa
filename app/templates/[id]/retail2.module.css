@@ -6,6 +6,15 @@
   --line: #e8e2da;
   --radius: 4px;
   --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Establishes an inline-size containment context so the @container
+     rules and cqi units below respond to THIS box's rendered width (e.g.
+     the ~420px gallery-preview phone frame), not the browser window's
+     width. Plain @media/vw would size this for the real viewport even
+     though it's visually squeezed into a much narrower box, which is
+     what caused the oversized hero text and colliding nav on first pass. */
+  container-type: inline-size;
+  container-name: retail2;
 }
 
 .root,
@@ -27,7 +36,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 48px;
+  padding: 18px 24px;
   background: #fff;
   border-bottom: 1px solid var(--line);
   position: sticky;
@@ -35,15 +44,19 @@
   z-index: 50;
 }
 .logo {
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: 0.5px;
   font-weight: 500;
   text-decoration: none;
   color: var(--ink);
+  white-space: nowrap;
 }
 .navLinks {
-  display: flex;
-  gap: 36px;
+  /* Hidden by default (mobile-first, matches the rest of Rivo's
+     templates); revealed once the container is wide enough — see the
+     @container rule below. */
+  display: none;
+  gap: 28px;
   list-style: none;
 }
 .navLinks a {
@@ -53,14 +66,16 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   transition: color 0.2s;
+  white-space: nowrap;
 }
 .navLinks a:hover {
   color: var(--ink);
 }
 .navIcons {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: center;
+  flex-shrink: 0;
 }
 .navIcons a {
   color: var(--ink);
@@ -71,47 +86,47 @@
 /* ---------- HERO ---------- */
 .hero {
   position: relative;
-  min-height: 60vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background: linear-gradient(90deg, rgba(60, 45, 35, 0.45) 0%, rgba(60, 45, 35, 0.15) 60%, rgba(60, 45, 35, 0.05) 100%),
     linear-gradient(160deg, #b9977a 0%, #8f6f52 40%, #d8c3a5 100%);
-  padding: 48px 6vw;
+  padding: 56px 5cqi 64px;
 }
 .hero h1 {
   color: #fff;
   font-weight: 300;
-  font-size: clamp(40px, 8vw, 96px);
-  letter-spacing: 1px;
+  font-size: clamp(2rem, 11cqi, 4rem);
+  line-height: 1.05;
+  letter-spacing: 0.5px;
 }
 .hero p {
   color: rgba(255, 255, 255, 0.92);
-  font-size: 1.05rem;
-  max-width: 40ch;
-  margin-top: 12px;
+  font-size: 1rem;
+  max-width: 38ch;
+  margin-top: 14px;
 }
 
 /* ---------- PRODUCT GRID ---------- */
 .products {
-  padding: 96px 6vw;
+  padding: 56px 5cqi;
   background: var(--bg);
 }
 .productsInner {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 48px;
+  grid-template-columns: 1fr;
+  gap: 32px;
   align-items: start;
 }
 .products h2 {
   font-weight: 300;
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(1.5rem, 6cqi, 2rem);
   line-height: 1.25;
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 .card {
   cursor: default;
@@ -134,12 +149,12 @@
   transform: translateY(-4px);
 }
 .card p {
-  margin-top: 14px;
-  font-size: 15px;
+  margin-top: 12px;
+  font-size: 14px;
 }
 .card .price {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
   margin-top: 3px;
 }
 .whatsappCta {
@@ -159,41 +174,41 @@
 .about {
   background: linear-gradient(150deg, #a98f72, #7a6248);
   color: #fff;
-  padding: 96px 6vw;
+  padding: 56px 5cqi;
 }
 .about h2 {
   font-weight: 300;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: clamp(1.5rem, 6cqi, 2rem);
 }
 .about p {
-  margin-top: 16px;
+  margin-top: 14px;
   color: rgba(255, 255, 255, 0.9);
-  max-width: 60ch;
-  font-size: 1.05rem;
+  max-width: 55ch;
+  font-size: 1rem;
 }
 .credentials {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 28px;
+  gap: 10px;
+  margin-top: 24px;
   list-style: none;
 }
 .credentials li {
-  padding: 8px 16px;
+  padding: 7px 14px;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.3px;
 }
 
 /* ---------- CONTACT STRIP ---------- */
 .contactStrip {
-  padding: 48px 6vw;
+  padding: 32px 5cqi;
   background: var(--bg);
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
-  font-size: 14px;
+  gap: 24px;
+  font-size: 13px;
   color: var(--muted);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
@@ -201,7 +216,7 @@
 .contactStrip strong {
   color: var(--ink);
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 1px;
   text-transform: uppercase;
   margin-bottom: 4px;
@@ -211,7 +226,7 @@
 /* ---------- NEWSLETTER ---------- */
 .newsletter {
   position: relative;
-  padding: 120px 6vw;
+  padding: 72px 5cqi;
   text-align: center;
   color: #fff;
   background: linear-gradient(rgba(40, 28, 18, 0.55), rgba(40, 28, 18, 0.55)),
@@ -219,35 +234,37 @@
 }
 .newsletter h2 {
   font-weight: 300;
-  font-size: clamp(30px, 4vw, 44px);
+  font-size: clamp(1.5rem, 6cqi, 2.25rem);
 }
 .newsletter p {
-  margin: 12px 0 32px;
+  margin: 10px 0 24px;
   font-weight: 300;
-  font-size: 15px;
+  font-size: 14px;
   opacity: 0.9;
 }
 .signup {
   display: flex;
-  max-width: 460px;
+  max-width: 420px;
   margin: 0 auto;
 }
 .signup input {
   flex: 1;
-  padding: 16px 18px;
+  min-width: 0;
+  padding: 14px 16px;
   border: none;
   outline: none;
   font-size: 14px;
 }
 .signup button {
-  padding: 16px 28px;
+  padding: 14px 20px;
   border: none;
   background: var(--accent);
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 1px;
   cursor: pointer;
   transition: background 0.2s;
+  white-space: nowrap;
 }
 .signup button:hover {
   background: #c9642a;
@@ -256,36 +273,57 @@
 /* ---------- FOOTER ---------- */
 .siteFooter {
   display: flex;
-  justify-content: space-between;
-  padding: 28px 48px;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  padding: 20px 24px;
   background: #fff;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 900px) {
-  .nav {
-    padding: 18px 24px;
-  }
-  .navLinks {
-    display: none;
-  }
-  .productsInner {
-    grid-template-columns: 1fr;
-  }
+/* ---------- WIDER LAYOUTS ---------- */
+/* Fires once THIS component's own rendered width passes the breakpoint,
+   regardless of the actual browser window — correct both inside the
+   narrow gallery-preview frame and on a full-width live site. */
+@container retail2 (min-width: 560px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .siteFooter {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
-@media (max-width: 560px) {
-  .grid {
-    grid-template-columns: 1fr;
+
+@container retail2 (min-width: 640px) {
+  .nav {
+    padding: 22px 32px;
+  }
+  .logo {
+    font-size: 20px;
+  }
+  .navLinks {
+    display: flex;
+  }
+  .siteFooter {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    padding: 24px 32px;
+  }
+}
+
+@container retail2 (min-width: 900px) {
+  .hero {
+    padding: 80px 4cqi 96px;
+  }
+  .products,
+  .about,
+  .newsletter,
+  .contactStrip {
+    padding-left: 4cqi;
+    padding-right: 4cqi;
+  }
+  .productsInner {
+    grid-template-columns: 1fr 2fr;
+    gap: 48px;
   }
 }
