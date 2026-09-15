@@ -10,6 +10,7 @@ import { AboutForm } from "@/components/dashboard/forms/AboutForm";
 import { ProgramsForm } from "@/components/dashboard/forms/ProgramsForm";
 import { GalleryForm } from "@/components/dashboard/forms/GalleryForm";
 import { ContactForm } from "@/components/dashboard/forms/ContactForm";
+import { FaqForm } from "@/components/dashboard/forms/FaqForm";
 
 // Dispatcher — same pattern as TemplateRenderer's SECTION_COMPONENTS map.
 const SECTION_FORM_COMPONENTS: Record<SectionType, React.ComponentType<SectionFormProps>> = {
@@ -21,6 +22,7 @@ const SECTION_FORM_COMPONENTS: Record<SectionType, React.ComponentType<SectionFo
   programs: ProgramsForm,
   gallery: GalleryForm,
   contact: ContactForm,
+  faq: FaqForm,
 };
 
 export function SectionForm(props: SectionFormProps) {
