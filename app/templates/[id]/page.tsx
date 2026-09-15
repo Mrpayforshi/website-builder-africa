@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import { FALLBACK_TEMPLATES } from "../data";
 import { getGalleryTemplateWithContent } from "@/lib/templates/template-store";
-import { RetailTwoTemplate } from "./RetailTwoTemplate";
 import styles from "./detail.module.css";
 import "@/styles/site.css";
 
@@ -30,18 +28,14 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
 
   return (
     <div className={styles.scene}>
-      <div className={dbTemplate?.id === "retail-2" ? `${styles.wrap} ${styles.wrapWide}` : styles.wrap}>
+      <div className={styles.wrap}>
         <Link href="/templates" className={styles.back}>
           ← All templates
         </Link>
         <header className={styles.head}>
           <div>
-            <ViewTransition name={`tpl-badge-${meta.id}`}>
-              <span className={styles.badge}>{meta.categoryLabel}</span>
-            </ViewTransition>
-            <ViewTransition name={`tpl-title-${meta.id}`}>
-              <h1>{meta.name}</h1>
-            </ViewTransition>
+            <span className={styles.badge}>{meta.categoryLabel}</span>
+            <h1>{meta.name}</h1>
             <p>{meta.description}</p>
             {meta.features.length > 0 && (
               <div className={styles.feats}>
@@ -56,38 +50,31 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
           </Link>
         </header>
         {dbTemplate ? (
-          <ViewTransition name={`tpl-thumb-${dbTemplate.id}`}>
-            <div className={dbTemplate.id === "retail-2" ? styles.desktopFrame : styles.phoneFrame}>
-              <div className={styles.urlBar}>{meta.id}.rivo.app</div>
-              {dbTemplate.id === "retail-2" ? (
-                <RetailTwoTemplate
-                  brandName={dbTemplate.name}
-                  hero={dbTemplate.contentBlocks.hero as never}
-                  products={dbTemplate.contentBlocks.products as never}
-                  about={dbTemplate.contentBlocks.about as never}
-                  contact={dbTemplate.contentBlocks.contact as never}
-                />
-              ) : (
-                <div
-                  className="site"
-                  data-category={dbTemplate.category}
-                  data-template={dbTemplate.id}
-                  style={
-                    {
-                      "--color-primary": "#1c1c22",
-                      "--color-secondary": "#6b6b74",
-                      "--color-accent": "#e2652b",
-                    } as React.CSSProperties
-                  }
-                >
-                  <TemplateRenderer
-                    structure={dbTemplate.structure}
-                    contentBlocks={dbTemplate.contentBlocks}
-                  />
-                </div>
-              )}
+          <div className={styles.browserFrame}>
+            <div className={styles.urlBar}>
+              <span className={styles.urlDots}>
+                <span /><span /><span />
+              </span>
+              {meta.id}.rivo.app
             </div>
-          </ViewTransition>
+            <div
+              className="site"
+              data-category={dbTemplate.category}
+              data-template={dbTemplate.id}
+              style={
+                {
+                  "--color-primary": "#1c1c22",
+                  "--color-secondary": "#6b6b74",
+                  "--color-accent": "#e2652b",
+                } as React.CSSProperties
+              }
+            >
+              <TemplateRenderer
+                structure={dbTemplate.structure}
+                contentBlocks={dbTemplate.contentBlocks}
+              />
+            </div>
+          </div>
         ) : (
           <div className={styles.comingSoon}>
             <p>Full preview coming soon — this template doesn&apos;t have seeded content yet.</p>
