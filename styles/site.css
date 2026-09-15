@@ -1,922 +1,140 @@
 /* ==========================================================================
-   Website Builder Africa — site stylesheet
-   Scope: everything lives under .site to avoid leaking into dashboard/
-   marketing pages. Category personality (palette, type, layout flavor)
-   is layered on top via [data-category="..."] overrides in separate files —
-   this file only defines shared structure + sane defaults.
+   FAQ (shared, any category can use it)
    ========================================================================== */
+.site .faq {
+  padding: var(--space-5) var(--space-4);
+}
 
-.site {
-  /* ---- Design tokens (defaults; [data-category] blocks override most of
-     these — --color-* already come from the owner's site_configs.color_scheme
-     as inline vars set in page.tsx, so they're not redefined here) ---- */
-  --font-heading: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+.site .faq__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
 
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 1rem;
-  --space-4: 1.5rem;
-  --space-5: 2.5rem;
-  --space-6: 4rem;
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06);
-
-  --container-max: 640px; /* mobile-first; most traffic is phone-width */
-
-  font-family: var(--font-body);
-  color: var(--color-primary);
+.site .faq__item {
   background: #fff;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
-/* ---- Reset, scoped to .site so it never touches dashboard/marketing ---- */
-.site,
-.site * {
-  box-sizing: border-box;
-}
-
-.site h1,
-.site h2,
-.site h3,
-.site p,
-.site ul,
-.site figure {
-  margin: 0;
-}
-
-.site ul {
-  list-style: none;
-  padding: 0;
-}
-
-.site img {
-  max-width: 100%;
-  display: block;
-  height: auto;
-  object-fit: cover;
-}
-
-.site h1,
-.site h2,
-.site h3 {
-  font-family: var(--font-heading);
-  line-height: 1.15;
-}
-
-/* ---- Accessibility baseline ---- */
-.site a:focus-visible,
-.site button:focus-visible,
-.site [tabindex]:focus-visible {
-  outline: 3px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Shared price styling — reused by ProductGrid, Menu, ServicesList */
-.site .price {
-  font-weight: 700;
-  color: var(--color-accent);
-}
-
-/* Shared WhatsApp CTA button — used by ProductGrid, Menu, ServicesList.
-   Only rendered when the whatsapp feature toggle has a number configured
-   (see lib/commerce/whatsapp-links.ts); no empty-state styling is needed
-   since the element simply isn't in the DOM when there's no number. */
-.site .whatsapp-cta {
-  display: inline-flex;
+.site .faq__question {
+  width: 100%;
+  display: flex;
   align-items: center;
-  gap: var(--space-1);
-  margin-top: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
-  background: #25d366;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-decoration: none;
-  line-height: 1.3;
-}
-
-.site .whatsapp-cta:hover,
-.site .whatsapp-cta:focus-visible {
-  background: #1ebe57;
-}
-
-.site .product-grid__item .whatsapp-cta {
-  margin: var(--space-2) var(--space-2) 0;
-}
-
-.site .menu__item .whatsapp-cta {
-  flex-basis: 100%;
-  margin-top: var(--space-1);
-}
-
-.site .services-list__item .whatsapp-cta {
-  flex-basis: 100%;
-}
-
-/* ==========================================================================
-   Hero
-   ========================================================================== */
-.site .hero {
-  padding: var(--space-5) var(--space-4);
-  text-align: left;
-}
-
-.site .hero img {
-  width: 100%;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-3);
-  aspect-ratio: 4 / 3;
-}
-
-.site .hero h1 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-  margin-bottom: var(--space-2);
-}
-
-.site .hero p {
-  font-size: 1.05rem;
-  color: var(--color-secondary);
-  max-width: 40ch;
-}
-
-/* ==========================================================================
-   Product grid (Retail)
-   ========================================================================== */
-.site .product-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-4);
-}
-
-@media (min-width: 640px) {
-  .site .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
-}
-
-.site .product-grid__item {
-  background: #fff;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  padding-bottom: var(--space-3);
-}
-
-.site .product-grid__item img {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  margin-bottom: var(--space-2);
-}
-
-.site .product-grid__item h3 {
-  font-size: 0.95rem;
-  padding: 0 var(--space-2);
-  margin-bottom: var(--space-1);
-}
-
-.site .product-grid__item p {
-  font-size: 0.85rem;
-  color: var(--color-secondary);
-  padding: 0 var(--space-2);
-  margin-bottom: var(--space-1);
-}
-
-.site .product-grid__item .price {
-  display: block;
-  padding: 0 var(--space-2);
-}
-
-.site .product-grid--empty {
-  padding: var(--space-5) var(--space-4);
-  text-align: center;
-  color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   Menu (Food)
-   ========================================================================== */
-.site .menu {
-  padding: var(--space-4);
-}
-
-.site .menu__category {
-  margin-bottom: var(--space-5);
-}
-
-.site .menu__category h3 {
-  font-size: 1.1rem;
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-1);
-  border-bottom: 2px solid var(--color-accent);
-  display: inline-block;
-}
-
-.site .menu__item {
-  display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.site .menu__item-name {
-  font-weight: 600;
-}
-
-.site .menu__item p {
-  flex-basis: 100%;
-  font-size: 0.85rem;
-  color: var(--color-secondary);
-  margin-top: var(--space-1);
-}
-
-.site .menu--empty {
-  padding: var(--space-5) var(--space-4);
-  text-align: center;
-  color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   Services list (Services)
-   ========================================================================== */
-.site .services-list {
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
   gap: var(--space-3);
-}
-
-.site .services-list__item {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  padding: var(--space-3);
-  background: #fff;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-}
-
-.site .services-list__item h3 {
-  font-size: 1rem;
-  flex: 1 1 60%;
-}
-
-.site .services-list__item p {
-  flex-basis: 100%;
-  font-size: 0.85rem;
-  color: var(--color-secondary);
-  margin-top: var(--space-1);
-}
-
-.site .services-list--empty {
-  padding: var(--space-5) var(--space-4);
-  text-align: center;
-  color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   About (Professional)
-   ========================================================================== */
-.site .about {
-  padding: var(--space-5) var(--space-4);
-}
-
-.site .about img {
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-3);
-  aspect-ratio: 16 / 10;
-}
-
-.site .about h2 {
-  font-size: 1.5rem;
-  margin-bottom: var(--space-2);
-}
-
-.site .about p {
-  color: var(--color-secondary);
-  margin-bottom: var(--space-3);
-}
-
-.site .about__credentials {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.site .about__credentials li {
-  padding-left: var(--space-3);
-  position: relative;
-}
-
-.site .about__credentials li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: var(--color-accent);
-  font-weight: 700;
-}
-
-/* ==========================================================================
-   Programs (NGO/Community)
-   ========================================================================== */
-.site .programs {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-  padding: var(--space-4);
-}
-
-@media (min-width: 640px) {
-  .site .programs {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-}
-
-.site .programs__item {
-  background: #fff;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  padding-bottom: var(--space-3);
-}
-
-.site .programs__item img {
-  aspect-ratio: 16 / 10;
-  width: 100%;
-  margin-bottom: var(--space-2);
-}
-
-.site .programs__item h3 {
-  font-size: 1rem;
-  padding: 0 var(--space-3);
-  margin-bottom: var(--space-1);
-}
-
-.site .programs__item p {
-  font-size: 0.85rem;
-  color: var(--color-secondary);
-  padding: 0 var(--space-3);
-}
-
-.site .programs--empty {
-  padding: var(--space-5) var(--space-4);
-  text-align: center;
-  color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   Gallery (Events/Portfolio)
-   ========================================================================== */
-.site .gallery {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-2);
-  padding: var(--space-4);
-}
-
-.site .gallery figure {
-  position: relative;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.site .gallery img {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-}
-
-.site .gallery figcaption {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: var(--space-2);
-  font-size: 0.75rem;
-  color: #fff;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-}
-
-.site .gallery--empty {
-  display: block;
-  padding: var(--space-5) var(--space-4);
-  text-align: center;
-  color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   Contact
-   ========================================================================== */
-.site .contact {
-  padding: var(--space-5) var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.site .contact__address,
-.site .contact__phone,
-.site .contact__email {
-  font-size: 0.95rem;
-}
-
-.site .contact__hours {
-  margin-top: var(--space-2);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  font-size: 0.9rem;
-  color: var(--color-secondary);
-}
-
-.site .contact__map {
-  margin-top: var(--space-3);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.site .contact__map iframe {
-  width: 100%;
-  border: 0;
-  aspect-ratio: 16 / 9;
-}
-
-/* ==========================================================================
-   CATEGORY: Retail
-   Bold, high-contrast, functional. Amber/black, dense grid, sharp corners.
-   Owner's --color-primary/secondary/accent still drive text/price/CTA color —
-   these tokens control the category's structural personality instead.
-   ========================================================================== */
-[data-category="retail"] {
-  --font-heading: "Arial Black", "Helvetica Neue", Arial, sans-serif;
-  --font-body: Arial, Helvetica, sans-serif;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --site-bg: #fff8ec;
-  --site-surface: #ffffff;
-  --site-hero-bg: linear-gradient(135deg, #f5b31c, #f0921a);
-}
-
-[data-category="retail"] {
-  background: var(--site-bg);
-}
-
-[data-category="retail"] .hero {
-  background: var(--site-hero-bg);
-  padding: var(--space-4);
-  border-radius: 0;
-}
-
-[data-category="retail"] .hero h1 {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  color: #14110c;
-}
-
-[data-category="retail"] .hero p {
-  color: #3a2f1a;
-  font-weight: 600;
-}
-
-[data-category="retail"] .hero img {
-  border-radius: var(--radius-md);
-}
-
-[data-category="retail"] .product-grid__item {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: none;
-}
-
-[data-category="retail"] .product-grid__item h3 {
-  font-weight: 700;
-  text-transform: none;
-}
-
-[data-category="retail"] .price {
-  font-weight: 800;
-}
-
-[data-category="retail"] .menu__category h3,
-[data-category="retail"] .services-list__item {
-  border-radius: var(--radius-sm);
-}
-
-/* ==========================================================================
-   CATEGORY: Services
-   Elegant, editorial. Blush/berry, soft rounded corners, generous whitespace.
-   ========================================================================== */
-[data-category="services"] {
-  --font-heading: Georgia, "Times New Roman", serif;
-  --font-body: "Segoe UI", system-ui, sans-serif;
-  --radius-sm: 10px;
-  --radius-md: 18px;
-  --radius-lg: 28px;
-  --site-bg: #fff5f7;
-  --site-surface: #ffffff;
-  --site-hero-bg: #fbe1e7;
-}
-
-[data-category="services"] {
-  background: var(--site-bg);
-}
-
-[data-category="services"] .hero {
-  background: var(--site-hero-bg);
-  padding: var(--space-6) var(--space-4);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-
-[data-category="services"] .hero h1 {
-  font-style: italic;
-  font-weight: 400;
-  font-size: clamp(2rem, 6vw, 2.75rem);
-}
-
-[data-category="services"] .hero img {
-  border-radius: var(--radius-lg);
-}
-
-[data-category="services"] .services-list__item {
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-}
-
-[data-category="services"] .services-list__item h3 {
-  font-family: var(--font-heading);
-  font-size: 1.1rem;
-}
-
-[data-category="services"] .about {
-  text-align: left;
-}
-
-[data-category="services"] .about h2 {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-weight: 400;
-}
-
-/* ==========================================================================
-   CATEGORY: Food
-   Warm, appetite-driving. Terracotta/gold gradient hero, rounded-pill menu
-   category headers, friendly rounded corners throughout.
-   ========================================================================== */
-[data-category="food"] {
-  --font-heading: "Trebuchet MS", "Segoe UI", sans-serif;
-  --font-body: "Segoe UI", system-ui, sans-serif;
-  --radius-sm: 999px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --site-bg: #fff8ef;
-  --site-surface: #ffffff;
-  --site-hero-bg: linear-gradient(135deg, #f6b04a, #e2652b);
-}
-
-[data-category="food"] {
-  background: var(--site-bg);
-}
-
-[data-category="food"] .hero {
-  background: var(--site-hero-bg);
-  padding: var(--space-5) var(--space-4);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-
-[data-category="food"] .hero h1 {
-  font-weight: 800;
-  color: #2b1608;
-}
-
-[data-category="food"] .hero p {
-  color: #46280f;
-  font-weight: 600;
-}
-
-[data-category="food"] .hero img {
-  border-radius: var(--radius-md);
-}
-
-[data-category="food"] .menu__category h3 {
-  display: inline-block;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
-  border-bottom: none;
-  background: var(--color-accent);
-  color: #fff;
-  font-weight: 700;
-}
-
-[data-category="food"] .menu__item {
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
-}
-
-[data-category="food"] .menu__item-name {
-  font-weight: 700;
-}
-
-[data-category="food"] .price {
-  font-weight: 800;
-}
-
-/* ==========================================================================
-   CATEGORY: Professional
-   Crisp, corporate, trustworthy. Cool blue, sharp minimal corners, clear
-   card-based structure for credentials and services.
-   ========================================================================== */
-[data-category="professional"] {
-  --font-heading: "Segoe UI", Arial, sans-serif;
-  --font-body: Arial, "Segoe UI", sans-serif;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --site-bg: #eef4fa;
-  --site-surface: #ffffff;
-  --site-hero-bg: #dce8f5;
-}
-
-[data-category="professional"] {
-  background: var(--site-bg);
-}
-
-[data-category="professional"] .hero {
-  background: var(--site-hero-bg);
-  padding: var(--space-5) var(--space-4);
-  border-radius: 0;
-}
-
-[data-category="professional"] .hero h1 {
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-[data-category="professional"] .hero img {
-  border-radius: var(--radius-sm);
-}
-
-[data-category="professional"] .about {
-  background: var(--site-surface);
-  margin: 0 var(--space-4);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-}
-
-[data-category="professional"] .services-list__item {
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: none;
-}
-
-[data-category="professional"] .services-list__item h3 {
-  font-weight: 600;
-}
-
-/* ==========================================================================
-   CATEGORY: NGO / Community
-   Warm and trustworthy. Sage green + cream, rounded program cards with a
-   left accent stripe, mission-forward hero.
-   ========================================================================== */
-[data-category="ngo_community"] {
-  --font-heading: "Segoe UI", Verdana, sans-serif;
-  --font-body: Verdana, "Segoe UI", sans-serif;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --site-bg: #faf6ec;
-  --site-surface: #ffffff;
-  --site-hero-bg: linear-gradient(160deg, #3f6b4a, #6f9c78);
-}
-
-[data-category="ngo_community"] {
-  background: var(--site-bg);
-}
-
-[data-category="ngo_community"] .hero {
-  background: var(--site-hero-bg);
-  padding: var(--space-5) var(--space-4);
-}
-
-[data-category="ngo_community"] .hero h1 {
-  color: #fff;
-  font-weight: 700;
-}
-
-[data-category="ngo_community"] .hero p {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-[data-category="ngo_community"] .hero img {
-  border-radius: var(--radius-md);
-}
-
-[data-category="ngo_community"] .programs__item {
-  background: var(--site-surface);
-  border-radius: var(--radius-md);
-  border-left: 4px solid var(--color-accent);
-  box-shadow: none;
-}
-
-[data-category="ngo_community"] .programs__item h3 {
-  font-weight: 700;
-}
-
-[data-category="ngo_community"] .about {
-  background: var(--site-surface);
-  margin: 0 var(--space-4);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-}
-
-/* ==========================================================================
-   CATEGORY: Events / Portfolio
-   Dark and dramatic. Near-black background, bold serif type, high-contrast
-   edge-to-edge gallery.
-   NOTE: text color is hardcoded (not var(--color-primary)) — see chat flag.
-   A dark-owner-color assumption is baked into this category's contrast.
-   ========================================================================== */
-[data-category="events_portfolio"] {
-  --font-heading: Georgia, "Times New Roman", serif;
-  --font-body: "Segoe UI", system-ui, sans-serif;
-  --radius-sm: 2px;
-  --radius-md: 6px;
-  --site-bg: #121014;
-  --site-surface: #1d1a20;
-  --site-hero-bg: #17151a;
-}
-
-[data-category="events_portfolio"] {
-  background: var(--site-bg);
-  color: #f2f0f4;
-}
-
-[data-category="events_portfolio"] .hero {
-  background: var(--site-hero-bg);
-  padding: var(--space-6) var(--space-4);
-}
-
-[data-category="events_portfolio"] .hero h1 {
-  font-weight: 700;
-  font-style: italic;
-  color: #fff;
-}
-
-[data-category="events_portfolio"] .hero p {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-[data-category="events_portfolio"] .hero img {
-  border-radius: var(--radius-sm);
-}
-
-[data-category="events_portfolio"] .gallery {
-  gap: 2px;
-  padding: 2px;
-}
-
-[data-category="events_portfolio"] .gallery figure {
-  border-radius: 0;
-}
-
-[data-category="events_portfolio"] .contact,
-[data-category="events_portfolio"] .contact__address,
-[data-category="events_portfolio"] .contact__phone,
-[data-category="events_portfolio"] .contact__email {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-[data-category="events_portfolio"] .contact__hours {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* ==========================================================================
-   TEMPLATE OVERRIDE: retail-2 (Harare Fashion House)
-   Editorial/artisan aesthetic — warm cream, ink, terracotta accent, sharp
-   minimal corners, Helvetica. Layered on top of [data-category="retail"]
-   above via the more specific [data-template] selector (same specificity
-   tier, later in source order), so only retail-2 picks this up — retail-1
-   (Chikwiya Grocers) keeps the amber/black category look untouched.
-   ========================================================================== */
-[data-template="retail-2"] {
-  --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --site-bg: #faf6f1;
-  --site-surface: #ffffff;
-}
-
-[data-template="retail-2"] {
-  background: var(--site-bg);
-}
-
-[data-template="retail-2"] .hero {
-  background:
-    linear-gradient(90deg, rgba(60, 45, 35, 0.45) 0%, rgba(60, 45, 35, 0.15) 60%, rgba(60, 45, 35, 0.05) 100%),
-    linear-gradient(160deg, #b9977a 0%, #8f6f52 40%, #d8c3a5 100%);
-  padding: var(--space-6) var(--space-4);
-  border-radius: 0;
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-[data-template="retail-2"] .hero h1 {
-  color: #fff;
-  font-weight: 300;
-  letter-spacing: 0.5px;
-  font-size: clamp(2.25rem, 10vw, 3.5rem);
-}
-
-[data-template="retail-2"] .hero p {
-  color: rgba(255, 255, 255, 0.92);
-  font-weight: 400;
-  margin-top: var(--space-2);
-}
-
-/* retail-2's hero content has no image field, so no img rule is needed
-   here — if one is ever added back, style it as a background layer via
-   a wrapper rather than a boxed <img>, to keep the full-bleed look. */
-
-[data-template="retail-2"] .product-grid__item {
-  background: var(--site-surface);
+  background: none;
   border: none;
-  box-shadow: none;
-  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
 }
 
-[data-template="retail-2"] .product-grid__item img {
-  border-radius: var(--radius-sm);
-  aspect-ratio: 4 / 5;
+.site .faq__toggle {
+  color: var(--color-accent);
+  font-size: 1.3rem;
+  line-height: 1;
+  flex: none;
+  transition: transform 0.25s ease;
 }
 
-[data-template="retail-2"] .product-grid__item h3 {
-  font-weight: 400;
-  font-size: 0.95rem;
-  color: #1c1917;
+.site .faq__item--open .faq__toggle {
+  transform: rotate(45deg);
 }
 
-[data-template="retail-2"] .price {
-  color: #6b6660;
-  font-weight: 400;
+.site .faq__answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 var(--space-3);
+  color: var(--color-secondary);
+  font-size: 0.9rem;
 }
 
-[data-template="retail-2"] .whatsapp-cta {
-  border-radius: var(--radius-sm);
+.site .faq__item--open .faq__answer {
+  max-height: 240px;
+  padding: 0 var(--space-3) var(--space-3);
 }
 
-[data-template="retail-2"] .about {
-  background: linear-gradient(150deg, #a98f72, #7a6248);
+.site .faq--empty {
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+  color: var(--color-secondary);
+}
+
+/* ==========================================================================
+   TEMPLATE OVERRIDE: professional-2 (Nyoni Accounting)
+   Scoped to this specific template only via [data-template] — does not
+   affect professional-1 (Chirara Law Chambers) or any other professional
+   template. Teal/light palette, pill CTAs, card-based services, rounded
+   FAQ — modeled on the sourced Pulsecheck reference design.
+   ========================================================================== */
+[data-template="professional-2"] {
+  --font-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --site-bg: #f6f7f9;
+  --site-surface: #ffffff;
+  --site-hero-bg: linear-gradient(rgba(10, 14, 20, 0.72), rgba(10, 14, 20, 0.78));
+}
+
+[data-template="professional-2"] {
+  background: var(--site-bg);
+}
+
+[data-template="professional-2"] .hero {
+  background: var(--site-hero-bg);
   color: #fff;
   padding: var(--space-6) var(--space-4);
-  border-radius: var(--radius-sm);
-  margin: var(--space-4);
+  border-radius: 0;
 }
 
-[data-template="retail-2"] .about img {
-  border-radius: var(--radius-sm);
+[data-template="professional-2"] .hero h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
-[data-template="retail-2"] .about h2 {
-  font-weight: 300;
-  font-size: clamp(1.5rem, 4vw, 2rem);
+[data-template="professional-2"] .hero p {
+  color: rgba(255, 255, 255, 0.88);
 }
 
-[data-template="retail-2"] .about p {
-  color: rgba(255, 255, 255, 0.9);
+[data-template="professional-2"] .hero img {
+  border-radius: var(--radius-md);
 }
 
-[data-template="retail-2"] .about__credentials li {
-  color: rgba(255, 255, 255, 0.95);
+[data-template="professional-2"] .about {
+  background: var(--site-surface);
+  margin: 0 var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
 }
 
-[data-template="retail-2"] .about__credentials li::before {
-  color: #e07a3f;
+[data-template="professional-2"] .services-list__item {
+  border-radius: var(--radius-md);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-[data-template="retail-2"] .contact__address,
-[data-template="retail-2"] .contact__phone,
-[data-template="retail-2"] .contact__email {
-  color: #1c1917;
+[data-template="professional-2"] .services-list__item:hover {
+  transform: translateY(-2px);
 }
 
-[data-template="retail-2"] .contact__hours {
-  color: #6b6660;
+[data-template="professional-2"] .services-list__item h3 {
+  font-weight: 700;
+}
+
+[data-template="professional-2"] .faq__item {
+  border-radius: 14px;
+}
+
+[data-template="professional-2"] .whatsapp-cta {
+  border-radius: 999px;
 }
