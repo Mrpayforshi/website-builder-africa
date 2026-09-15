@@ -118,11 +118,21 @@ export function TemplatesGallery({
           <div className={styles.grid}>
             {filtered.map((tpl) => (
               <a key={tpl.id} className={styles.card} href={`/templates/${tpl.id}`}>
-                <div className={`${styles.thumb} ${styles[THUMB_CLASS[tpl.category]]}`} />
+                <div
+                  className={`${styles.thumb} ${styles[THUMB_CLASS[tpl.category]]}`}
+                  style={{ viewTransitionName: `tpl-thumb-${tpl.id}` } as React.CSSProperties}
+                />
                 <div className={styles.cardBody}>
                   <div className={styles.cardTop}>
-                    <h3>{tpl.name}</h3>
-                    <span className={styles.badge}>{tpl.categoryLabel}</span>
+                    <h3 style={{ viewTransitionName: `tpl-title-${tpl.id}` } as React.CSSProperties}>
+                      {tpl.name}
+                    </h3>
+                    <span
+                      className={styles.badge}
+                      style={{ viewTransitionName: `tpl-badge-${tpl.id}` } as React.CSSProperties}
+                    >
+                      {tpl.categoryLabel}
+                    </span>
                   </div>
                   <p>{tpl.description}</p>
                   {tpl.features.length > 0 && (
