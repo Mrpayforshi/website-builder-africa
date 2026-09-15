@@ -29,7 +29,7 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
 
   return (
     <div className={styles.scene}>
-      <div className={styles.wrap}>
+      <div className={dbTemplate?.id === "retail-2" ? `${styles.wrap} ${styles.wrapWide}` : styles.wrap}>
         <Link href="/templates" className={styles.back}>
           ← All templates
         </Link>
@@ -51,7 +51,7 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
           </Link>
         </header>
         {dbTemplate ? (
-          <div className={styles.phoneFrame}>
+          <div className={dbTemplate.id === "retail-2" ? styles.desktopFrame : styles.phoneFrame}>
             <div className={styles.urlBar}>{meta.id}.rivo.app</div>
             {dbTemplate.id === "retail-2" ? (
               // Bespoke, content-driven renderer matching the uploaded
