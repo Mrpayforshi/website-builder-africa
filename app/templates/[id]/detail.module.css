@@ -1,329 +1,108 @@
-.root {
-  --bg: #faf6f1;
-  --ink: #1c1917;
-  --muted: #6b6660;
-  --accent: #e07a3f;
-  --line: #e8e2da;
-  --radius: 4px;
-  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-  /* Establishes an inline-size containment context so the @container
-     rules and cqi units below respond to THIS box's rendered width (e.g.
-     the ~420px gallery-preview phone frame), not the browser window's
-     width. Plain @media/vw would size this for the real viewport even
-     though it's visually squeezed into a much narrower box, which is
-     what caused the oversized hero text and colliding nav on first pass. */
-  container-type: inline-size;
-  container-name: retail2;
+.scene {
+  min-height: 100vh;
+  background: #08080d;
+  color: #f5f5f7;
+  padding: 40px 40px 100px;
 }
 
-.root,
-.root * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+.wrap { max-width: 900px; margin: 0 auto; }
+.wrapWide { max-width: 1180px; margin: 0 auto; }
 
-.root {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ---------- NAV ---------- */
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 24px;
-  background: #fff;
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-.logo {
-  font-size: 18px;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-  text-decoration: none;
-  color: var(--ink);
-  white-space: nowrap;
-}
-.navLinks {
-  /* Hidden by default (mobile-first, matches the rest of Rivo's
-     templates); revealed once the container is wide enough — see the
-     @container rule below. */
-  display: none;
-  gap: 28px;
-  list-style: none;
-}
-.navLinks a {
-  text-decoration: none;
-  color: var(--muted);
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: color 0.2s;
-  white-space: nowrap;
-}
-.navLinks a:hover {
-  color: var(--ink);
-}
-.navIcons {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-shrink: 0;
-}
-.navIcons a {
-  color: var(--ink);
-  text-decoration: none;
-  font-size: 16px;
-}
-
-/* ---------- HERO ---------- */
-.hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: linear-gradient(90deg, rgba(60, 45, 35, 0.45) 0%, rgba(60, 45, 35, 0.15) 60%, rgba(60, 45, 35, 0.05) 100%),
-    linear-gradient(160deg, #b9977a 0%, #8f6f52 40%, #d8c3a5 100%);
-  padding: 56px 5cqi 64px;
-}
-.hero h1 {
-  color: #fff;
-  font-weight: 300;
-  font-size: clamp(2rem, 11cqi, 4rem);
-  line-height: 1.05;
-  letter-spacing: 0.5px;
-}
-.hero p {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 1rem;
-  max-width: 38ch;
-  margin-top: 14px;
-}
-
-/* ---------- PRODUCT GRID ---------- */
-.products {
-  padding: 56px 5cqi;
-  background: var(--bg);
-}
-.productsInner {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-  align-items: start;
-}
-.products h2 {
-  font-weight: 300;
-  font-size: clamp(1.5rem, 6cqi, 2rem);
-  line-height: 1.25;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-.card {
-  cursor: default;
-}
-.cardImg {
-  aspect-ratio: 4 / 5;
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease;
-}
-.cardImg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.card:hover .cardImg {
-  transform: translateY(-4px);
-}
-.card p {
-  margin-top: 12px;
+.back {
+  display: inline-block;
   font-size: 14px;
+  font-weight: 600;
+  color: #9c9ca8;
+  text-decoration: none;
+  margin-bottom: 28px;
 }
-.card .price {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 3px;
+.back:hover { color: #f5f5f7; }
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
 }
-.whatsappCta {
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #9c9ca8;
+  margin-bottom: 12px;
+}
+
+.head h1 { font-size: 32px; font-weight: 800; margin: 0 0 10px; letter-spacing: -0.02em; }
+.head p { font-size: 15.5px; color: #9c9ca8; max-width: 52ch; margin: 0; line-height: 1.6; }
+
+.feats { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+.featDot {
+  font-size: 11px; font-weight: 700; color: #9c9ca8;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+  padding: 4px 10px; border-radius: 999px;
+}
+
+.cta {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  margin-top: 10px;
-  padding: 6px 14px;
-  border-radius: var(--radius);
-  background: #25d366;
-  color: #fff;
-  font-size: 0.8rem;
+  justify-content: center;
   font-weight: 700;
+  font-size: 14.5px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4e6bff, #9b4eff);
+  color: #fff;
   text-decoration: none;
 }
+.cta:hover { filter: brightness(1.08); }
 
-/* ---------- ABOUT / STORY BAND ---------- */
-.about {
-  background: linear-gradient(150deg, #a98f72, #7a6248);
-  color: #fff;
-  padding: 56px 5cqi;
-}
-.about h2 {
-  font-weight: 300;
-  font-size: clamp(1.5rem, 6cqi, 2rem);
-}
-.about p {
-  margin-top: 14px;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 55ch;
-  font-size: 1rem;
-}
-.credentials {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
-  list-style: none;
-}
-.credentials li {
-  padding: 7px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  font-size: 12px;
-  letter-spacing: 0.3px;
-}
-
-/* ---------- CONTACT STRIP ---------- */
-.contactStrip {
-  padding: 32px 5cqi;
-  background: var(--bg);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  font-size: 13px;
-  color: var(--muted);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.contactStrip strong {
-  color: var(--ink);
-  display: block;
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-  font-weight: 500;
-}
-
-/* ---------- NEWSLETTER ---------- */
-.newsletter {
-  position: relative;
-  padding: 72px 5cqi;
-  text-align: center;
-  color: #fff;
-  background: linear-gradient(rgba(40, 28, 18, 0.55), rgba(40, 28, 18, 0.55)),
-    repeating-linear-gradient(35deg, #b08a5e 0 14px, #9c7648 14px 28px);
-}
-.newsletter h2 {
-  font-weight: 300;
-  font-size: clamp(1.5rem, 6cqi, 2.25rem);
-}
-.newsletter p {
-  margin: 10px 0 24px;
-  font-weight: 300;
-  font-size: 14px;
-  opacity: 0.9;
-}
-.signup {
-  display: flex;
+.phoneFrame {
   max-width: 420px;
   margin: 0 auto;
-}
-.signup input {
-  flex: 1;
-  min-width: 0;
-  padding: 14px 16px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-}
-.signup button {
-  padding: 14px 20px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-  font-size: 13px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: background 0.2s;
-  white-space: nowrap;
-}
-.signup button:hover {
-  background: #c9642a;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
 }
 
-/* ---------- FOOTER ---------- */
-.siteFooter {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: center;
-  padding: 20px 24px;
-  background: #fff;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+/* Wide/desktop variant — for templates whose design is meant to be seen
+   at desktop width rather than Rivo's usual mobile-first phone mockup
+   (most templates target phone-width traffic; this one's source design
+   was built desktop-first). Same chrome, just a wider box and squarer
+   corners like a browser window instead of a phone. */
+.desktopFrame {
+  max-width: 1100px;
+  margin: 0 auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+}
+.urlBar {
+  background: #f0f0f0;
+  padding: 10px 16px;
   font-size: 12px;
+  color: #666;
+  font-family: monospace;
 }
 
-/* ---------- WIDER LAYOUTS ---------- */
-/* Fires once THIS component's own rendered width passes the breakpoint,
-   regardless of the actual browser window — correct both inside the
-   narrow gallery-preview frame and on a full-width live site. */
-@container retail2 (min-width: 560px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@container retail2 (min-width: 640px) {
-  .nav {
-    padding: 22px 32px;
-  }
-  .logo {
-    font-size: 20px;
-  }
-  .navLinks {
-    display: flex;
-  }
-  .siteFooter {
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-    padding: 24px 32px;
-  }
-}
-
-@container retail2 (min-width: 900px) {
-  .hero {
-    padding: 80px 4cqi 96px;
-  }
-  .products,
-  .about,
-  .newsletter,
-  .contactStrip {
-    padding-left: 4cqi;
-    padding-right: 4cqi;
-  }
-  .productsInner {
-    grid-template-columns: 1fr 2fr;
-    gap: 48px;
-  }
+.comingSoon {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  text-align: center;
+  border-radius: 20px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  color: #6c6c78;
+  font-size: 14px;
+  font-weight: 600;
 }
