@@ -804,3 +804,114 @@
 [data-category="events_portfolio"] .contact__hours {
   color: rgba(255, 255, 255, 0.6);
 }
+
+/* ==========================================================================
+   TEMPLATE OVERRIDE: retail-2 (Harare Fashion House)
+   Editorial/artisan aesthetic — warm cream, ink, terracotta accent, sharp
+   minimal corners, Helvetica. Layered on top of [data-category="retail"]
+   above via the more specific [data-template] selector (same specificity
+   tier, later in source order), so only retail-2 picks this up — retail-1
+   (Chikwiya Grocers) keeps the amber/black category look untouched.
+   ========================================================================== */
+[data-template="retail-2"] {
+  --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --site-bg: #faf6f1;
+  --site-surface: #ffffff;
+}
+
+[data-template="retail-2"] {
+  background: var(--site-bg);
+}
+
+[data-template="retail-2"] .hero {
+  background:
+    linear-gradient(90deg, rgba(60, 45, 35, 0.45) 0%, rgba(60, 45, 35, 0.15) 60%, rgba(60, 45, 35, 0.05) 100%),
+    linear-gradient(160deg, #b9977a 0%, #8f6f52 40%, #d8c3a5 100%);
+  padding: var(--space-6) var(--space-4);
+  border-radius: 0;
+}
+
+[data-template="retail-2"] .hero h1 {
+  color: #fff;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  font-size: clamp(2rem, 8vw, 2.75rem);
+}
+
+[data-template="retail-2"] .hero p {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 400;
+}
+
+[data-template="retail-2"] .hero img {
+  border-radius: var(--radius-sm);
+}
+
+[data-template="retail-2"] .product-grid__item {
+  background: var(--site-surface);
+  border: none;
+  box-shadow: none;
+  border-radius: var(--radius-sm);
+}
+
+[data-template="retail-2"] .product-grid__item img {
+  border-radius: var(--radius-sm);
+  aspect-ratio: 4 / 5;
+}
+
+[data-template="retail-2"] .product-grid__item h3 {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #1c1917;
+}
+
+[data-template="retail-2"] .price {
+  color: #6b6660;
+  font-weight: 400;
+}
+
+[data-template="retail-2"] .whatsapp-cta {
+  border-radius: var(--radius-sm);
+}
+
+[data-template="retail-2"] .about {
+  background: linear-gradient(150deg, #a98f72, #7a6248);
+  color: #fff;
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-sm);
+  margin: var(--space-4);
+}
+
+[data-template="retail-2"] .about img {
+  border-radius: var(--radius-sm);
+}
+
+[data-template="retail-2"] .about h2 {
+  font-weight: 300;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+[data-template="retail-2"] .about p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-template="retail-2"] .about__credentials li {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-template="retail-2"] .about__credentials li::before {
+  color: #e07a3f;
+}
+
+[data-template="retail-2"] .contact__address,
+[data-template="retail-2"] .contact__phone,
+[data-template="retail-2"] .contact__email {
+  color: #1c1917;
+}
+
+[data-template="retail-2"] .contact__hours {
+  color: #6b6660;
+}
