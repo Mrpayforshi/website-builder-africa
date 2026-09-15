@@ -11,7 +11,8 @@ export type SectionType =
   | "about"
   | "programs"
   | "gallery"
-  | "contact";
+  | "contact"
+  | "faq";
 
 export interface TemplateSectionDef {
   id: string;
@@ -35,6 +36,7 @@ export const SECTION_FIELD_SCHEMAS: Record<SectionType, string[]> = {
   programs: ["items"], // items[]: { name, description, image }
   gallery: ["images"], // images[]: { url, caption }
   contact: ["address", "phone", "email", "hours", "map_embed"],
+  faq: ["items"], // items[]: { question, answer }
 };
 
 export function isKnownSectionType(type: string): type is SectionType {
