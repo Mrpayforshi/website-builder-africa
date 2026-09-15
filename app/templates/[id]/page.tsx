@@ -35,8 +35,15 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
         </Link>
         <header className={styles.head}>
           <div>
-            <span className={styles.badge}>{meta.categoryLabel}</span>
-            <h1>{meta.name}</h1>
+            <span
+              className={styles.badge}
+              style={{ viewTransitionName: `tpl-badge-${meta.id}` } as React.CSSProperties}
+            >
+              {meta.categoryLabel}
+            </span>
+            <h1 style={{ viewTransitionName: `tpl-title-${meta.id}` } as React.CSSProperties}>
+              {meta.name}
+            </h1>
             <p>{meta.description}</p>
             {meta.features.length > 0 && (
               <div className={styles.feats}>
@@ -51,7 +58,10 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
           </Link>
         </header>
         {dbTemplate ? (
-          <div className={dbTemplate.id === "retail-2" ? styles.desktopFrame : styles.phoneFrame}>
+          <div
+            className={dbTemplate.id === "retail-2" ? styles.desktopFrame : styles.phoneFrame}
+            style={{ viewTransitionName: `tpl-thumb-${dbTemplate.id}` } as React.CSSProperties}
+          >
             <div className={styles.urlBar}>{meta.id}.rivo.app</div>
             {dbTemplate.id === "retail-2" ? (
               // Bespoke, content-driven renderer matching the uploaded
