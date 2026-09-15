@@ -15,7 +15,7 @@ interface RetailTwoTemplateProps {
    * template's own `name` (gallery_templates.name / templates.name), not
    * a section field, same as how other templates get their brand name. */
   brandName: string;
-  hero?: { headline?: string; subheadline?: string };
+  hero?: { headline?: string; subheadline?: string; image?: string };
   products?: { items?: ProductItem[] };
   about?: { headline?: string; body?: string; credentials?: string[] };
   contact?: { address?: string; phone?: string; email?: string };
@@ -49,7 +49,18 @@ export function RetailTwoTemplate({ brandName, hero, products, about, contact }:
         </div>
       </nav>
 
-      <header className={styles.hero}>
+      <header
+        className={styles.hero}
+        style={
+          hero?.image
+            ? {
+                backgroundImage: `linear-gradient(90deg, rgba(20,15,10,.55) 0%, rgba(20,15,10,.2) 60%, rgba(20,15,10,.05) 100%), url(${hero.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : undefined
+        }
+      >
         {hero?.headline && <h1>{hero.headline}</h1>}
         {hero?.subheadline && <p>{hero.subheadline}</p>}
       </header>
