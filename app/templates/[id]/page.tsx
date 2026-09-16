@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
+import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
+import { isNyoniAccountingGalleryTemplate } from "@/lib/templates/bespoke-templates";
 import { FALLBACK_TEMPLATES } from "../data";
 import { getGalleryTemplateWithContent } from "@/lib/templates/template-store";
 import styles from "./detail.module.css";
@@ -57,23 +59,30 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
               </span>
               {meta.id}.rivo.app
             </div>
-            <div
-              className="site"
-              data-category={dbTemplate.category}
-              data-template={dbTemplate.id}
-              style={
-                {
-                  "--color-primary": "#1c1c22",
-                  "--color-secondary": "#6b6b74",
-                  "--color-accent": "#e2652b",
-                } as React.CSSProperties
-              }
-            >
-              <TemplateRenderer
-                structure={dbTemplate.structure}
+            {isNyoniAccountingGalleryTemplate(dbTemplate.id) ? (
+              <NyoniAccountingTemplate
                 contentBlocks={dbTemplate.contentBlocks}
+                businessName={dbTemplate.name}
               />
-            </div>
+            ) : (
+              <div
+                className="site"
+                data-category={dbTemplate.category}
+                data-template={dbTemplate.id}
+                style={
+                  {
+                    "--color-primary": "#1c1c22",
+                    "--color-secondary": "#6b6b74",
+                    "--color-accent": "#e2652b",
+                  } as React.CSSProperties
+                }
+              >
+                <TemplateRenderer
+                  structure={dbTemplate.structure}
+                  contentBlocks={dbTemplate.contentBlocks}
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.comingSoon}>
