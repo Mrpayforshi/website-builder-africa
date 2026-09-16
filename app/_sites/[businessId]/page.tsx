@@ -6,6 +6,8 @@ import { getSiteConfig } from "@/lib/ai/config-store";
 import { getTemplateById } from "@/lib/templates/template-store";
 import { getWhatsappCtaConfig } from "@/lib/commerce/whatsapp-links";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
+import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
+import { isNyoniAccountingTemplate } from "@/lib/templates/bespoke-templates";
 import { readLiteModeCookie, shouldRenderLiteMode, LITE_MODE_COOKIE } from "@/lib/market-fit/bandwidth";
 import "@/styles/site.css";
 
@@ -59,6 +61,17 @@ export default async function SitePage(props: SitePageProps) {
     secondary?: string;
     accent?: string;
   };
+
+  if (isNyoniAccountingTemplate(template.id)) {
+    return (
+      <NyoniAccountingTemplate
+        contentBlocks={config.content_blocks}
+        businessName={business.name}
+        whatsappNumber={whatsapp.enabled ? whatsapp.number : null}
+        liteMode={liteMode}
+      />
+    );
+  }
 
   return (
     <div
