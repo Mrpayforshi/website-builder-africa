@@ -102,7 +102,7 @@ export default function NyoniAccountingTemplate({
                   {item.price && <span className={styles.cardPrice}>{item.price}</span>}
                   {whatsappNumber && (
                     <div>
-                      
+                      <a
                         className={styles.cardPrice}
                         href={buildWhatsappEnquiryLink(whatsappNumber, item.name)}
                         target="_blank"
