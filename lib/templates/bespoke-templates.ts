@@ -22,3 +22,16 @@ export function isNyoniAccountingGalleryTemplate(id: string): boolean {
 export function isNyoniAccountingTemplate(id: string): boolean {
   return id === NYONI_ACCOUNTING_TEMPLATE_ID;
 }
+
+// "food-1" — the gallery_templates id for Terracotta Table, used by the
+// public preview page only for now. Unlike Nyoni Accounting, there is no
+// live templates.id / isTerracottaTableTemplate check yet — this design is
+// not currently wired into app/_sites/[businessId]/page.tsx for live tenant
+// sites. Add a TERRACOTTA_TABLE_TEMPLATE_ID + a real `templates` row and an
+// isTerracottaTableTemplate() check there if it should become assignable to
+// live tenants, mirroring the Nyoni Accounting pattern above.
+export const TERRACOTTA_TABLE_GALLERY_ID = "food-1";
+
+export function isTerracottaTableGalleryTemplate(id: string): boolean {
+  return id === TERRACOTTA_TABLE_GALLERY_ID;
+}
