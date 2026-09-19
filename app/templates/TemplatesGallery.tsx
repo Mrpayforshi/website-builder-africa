@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ViewTransition } from "react";
 import Link from "next/link";
 import styles from "./templates.module.css";
@@ -26,8 +26,7 @@ const FEATURE_OPTIONS: { key: string; label: string }[] = [
   { key: "delivery", label: "Delivery tracking" },
 ];
 
-// Category → thumbnail treatment. Matches the section personality already
-// defined in styles/site.css, just used decoratively here.
+// Fallback thumbnail for templates that don't have seeded content yet.
 const THUMB_CLASS: Record<string, string> = {
   food: "thumbFood",
   retail: "thumbRetail",
@@ -40,9 +39,11 @@ const THUMB_CLASS: Record<string, string> = {
 export function TemplatesGallery({
   templates,
   categories,
+  thumbs,
 }: {
   templates: TemplateCard[];
   categories: CategoryOption[];
+  thumbs: Record<string, ReactNode>;
 }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeFeatures, setActiveFeatures] = useState<string[]>([]);
@@ -119,14 +120,27 @@ export function TemplatesGallery({
         ) : (
           <div className={styles.grid}>
             {filtered.map((tpl) => (
-              <Link key={tpl.id} className={styles.card} href={`/templates/${tpl.id}`}>
+              // Not a <Link> wrapper: the live thumbnail contains its own
+              // links, and <a> can't nest inside <a>. The title link below
+              // stretches over the whole card instead (see .cardLink::after).
+              <article key={tpl.id} className={styles.card}>
                 <ViewTransition name={`tpl-thumb-${tpl.id}`}>
-                  <div className={`${styles.thumb} ${styles[THUMB_CLASS[tpl.category]]}`} />
+                  <div className={styles.thumb}>
+                    {thumbs[tpl.id] ?? (
+                      <div
+                        className={`${styles.thumbFallback} ${styles[THUMB_CLASS[tpl.category]]}`}
+                      />
+                    )}
+                  </div>
                 </ViewTransition>
                 <div className={styles.cardBody}>
                   <div className={styles.cardTop}>
                     <ViewTransition name={`tpl-title-${tpl.id}`}>
-                      <h3>{tpl.name}</h3>
+                      <h3>
+                        <Link className={styles.cardLink} href={`/templates/${tpl.id}`}>
+                          {tpl.name}
+                        </Link>
+                      </h3>
                     </ViewTransition>
                     <ViewTransition name={`tpl-badge-${tpl.id}`}>
                       <span className={styles.badge}>{tpl.categoryLabel}</span>
@@ -141,7 +155,7 @@ export function TemplatesGallery({
                     </div>
                   )}
                 </div>
-              </Link>
+              </article>
             ))}
           </div>
         )}
