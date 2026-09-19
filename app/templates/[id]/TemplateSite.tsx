@@ -1,6 +1,10 @@
 import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
+import TerracottaTableTemplate from "@/components/templates/terracotta-table";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
-import { isNyoniAccountingGalleryTemplate } from "@/lib/templates/bespoke-templates";
+import {
+  isNyoniAccountingGalleryTemplate,
+  isTerracottaTableGalleryTemplate,
+} from "@/lib/templates/bespoke-templates";
 import type { GalleryTemplateDetail } from "@/lib/templates/template-store";
 import "@/styles/site.css";
 
@@ -10,6 +14,15 @@ export function TemplateSite({ template }: { template: GalleryTemplateDetail }) 
   if (isNyoniAccountingGalleryTemplate(template.id)) {
     return (
       <NyoniAccountingTemplate
+        contentBlocks={template.contentBlocks}
+        businessName={template.name}
+      />
+    );
+  }
+
+  if (isTerracottaTableGalleryTemplate(template.id)) {
+    return (
+      <TerracottaTableTemplate
         contentBlocks={template.contentBlocks}
         businessName={template.name}
       />
