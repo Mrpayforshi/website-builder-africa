@@ -35,3 +35,14 @@ export const TERRACOTTA_TABLE_GALLERY_ID = "food-1";
 export function isTerracottaTableGalleryTemplate(id: string): boolean {
   return id === TERRACOTTA_TABLE_GALLERY_ID;
 }
+
+// "ngo-2" — the gallery_templates id for Green Harare Initiative, reskinned
+// with a sourced glamping/retreat-booking design ("Wild Haven"). Content
+// (mission, programs, gallery, contact) is unchanged from the prior
+// Green Harare Initiative template — only the rendering is new. Gallery
+// preview only, same as Terracotta Table above — no live templates.id yet.
+export const GREEN_HARARE_GALLERY_ID = "ngo-2";
+
+export function isGreenHarareGalleryTemplate(id: string): boolean {
+  return id === GREEN_HARARE_GALLERY_ID;
+}
