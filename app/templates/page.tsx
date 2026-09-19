@@ -1,9 +1,21 @@
+import type { ReactNode } from "react";
+import { getGalleryPreviewDetails } from "@/lib/templates/template-store";
 import styles from "./templates.module.css";
 import { TemplatesGallery } from "./TemplatesGallery";
+import { TemplateThumb } from "./TemplateThumb";
 import { getGalleryTemplateCards, CATEGORIES } from "./data";
 
 export default async function TemplatesPage() {
-  const templates = await getGalleryTemplateCards();
+  const [templates, previews] = await Promise.all([
+    getGalleryTemplateCards(),
+    getGalleryPreviewDetails(),
+  ]);
+
+  // Server-rendered thumbnails, handed to the client gallery by template id.
+  // Templates without seeded content have no entry and keep the gradient.
+  const thumbs: Record<string, ReactNode> = Object.fromEntries(
+    previews.map((t) => [t.id, <TemplateThumb key={t.id} template={t} />])
+  );
 
   return (
     <div className={styles.scene}>
@@ -40,7 +52,7 @@ export default async function TemplatesPage() {
           </p>
         </header>
 
-        <TemplatesGallery templates={templates} categories={CATEGORIES} />
+        <TemplatesGallery templates={templates} categories={CATEGORIES} thumbs={thumbs} />
       </div>
     </div>
   );
