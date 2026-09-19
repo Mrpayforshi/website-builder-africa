@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { TemplateRenderer } from "@/components/TemplateRenderer";
-import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
-import { isNyoniAccountingGalleryTemplate } from "@/lib/templates/bespoke-templates";
-import { FALLBACK_TEMPLATES } from "../data";
-import { getGalleryTemplateWithContent } from "@/lib/templates/template-store";
+import { loadTemplate } from "./load-template";
+import { TemplateBody } from "./TemplateBody";
 import styles from "./detail.module.css";
-import "@/styles/site.css";
 
 interface DetailPageProps {
   params: Promise<{ id: string }>;
@@ -15,18 +11,16 @@ interface DetailPageProps {
 
 export async function generateMetadata(props: DetailPageProps): Promise<Metadata> {
   const params = await props.params;
-  const dbTemplate = await getGalleryTemplateWithContent(params.id);
-  const name = dbTemplate?.name ?? FALLBACK_TEMPLATES.find((t) => t.id === params.id)?.name;
-  return { title: name ? `${name} — Rivo templates` : "Template not found" };
+  const loaded = await loadTemplate(params.id);
+  return { title: loaded ? `${loaded.meta.name} — Rivo templates` : "Template not found" };
 }
 
 export default async function TemplateDetailPage(props: DetailPageProps) {
   const params = await props.params;
-  const dbTemplate = await getGalleryTemplateWithContent(params.id);
+  const loaded = await loadTemplate(params.id);
 
-  const meta = dbTemplate ?? FALLBACK_TEMPLATES.find((t) => t.id === params.id);
-
-  if (!meta) notFound();
+  if (!loaded) notFound();
+  const { meta } = loaded;
 
   return (
     <div className={styles.scene}>
@@ -51,44 +45,7 @@ export default async function TemplateDetailPage(props: DetailPageProps) {
             Use this template
           </Link>
         </header>
-        {dbTemplate ? (
-          <div className={styles.browserFrame}>
-            <div className={styles.urlBar}>
-              <span className={styles.urlDots}>
-                <span /><span /><span />
-              </span>
-              {meta.id}.rivo.app
-            </div>
-            {isNyoniAccountingGalleryTemplate(dbTemplate.id) ? (
-              <NyoniAccountingTemplate
-                contentBlocks={dbTemplate.contentBlocks}
-                businessName={dbTemplate.name}
-              />
-            ) : (
-              <div
-                className="site"
-                data-category={dbTemplate.category}
-                data-template={dbTemplate.id}
-                style={
-                  {
-                    "--color-primary": "#1c1c22",
-                    "--color-secondary": "#6b6b74",
-                    "--color-accent": "#e2652b",
-                  } as React.CSSProperties
-                }
-              >
-                <TemplateRenderer
-                  structure={dbTemplate.structure}
-                  contentBlocks={dbTemplate.contentBlocks}
-                />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className={styles.comingSoon}>
-            <p>Full preview coming soon — this template doesn&apos;t have seeded content yet.</p>
-          </div>
-        )}
+        <TemplateBody {...loaded} />
       </div>
     </div>
   );
