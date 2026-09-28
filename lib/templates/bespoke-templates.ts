@@ -57,3 +57,15 @@ export const RUFARO_STUDIO_GALLERY_ID = "events-1";
 export function isRufaroStudioGalleryTemplate(id: string): boolean {
   return id === RUFARO_STUDIO_GALLERY_ID;
 }
+
+// "ngo-1" — the gallery_templates id for Mwenje Trust, replacing the prior
+// "Tariro Trust" content entirely (new Zimbabwean charity persona). Sourced
+// from an editorial charity design ("Ember Foundation"): two-word serif hero,
+// "Our Story" block, 3-number impact strip, Donate CTA. The stats and cta
+// blocks live in gallery_content_blocks only (not in the ngo-1 structure).
+// Gallery preview only, same as the others — no live templates.id yet.
+export const MWENJE_TRUST_GALLERY_ID = "ngo-1";
+
+export function isMwenjeTrustGalleryTemplate(id: string): boolean {
+  return id === MWENJE_TRUST_GALLERY_ID;
+}
