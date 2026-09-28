@@ -2,12 +2,14 @@ import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
 import TerracottaTableTemplate from "@/components/templates/terracotta-table";
 import GreenHarareTemplate from "@/components/templates/green-harare";
 import RufaroStudioTemplate from "@/components/templates/rufaro-studio";
+import MwenjeTrustTemplate from "@/components/templates/mwenje-trust";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import {
   isNyoniAccountingGalleryTemplate,
   isTerracottaTableGalleryTemplate,
   isGreenHarareGalleryTemplate,
   isRufaroStudioGalleryTemplate,
+  isMwenjeTrustGalleryTemplate,
 } from "@/lib/templates/bespoke-templates";
 import type { GalleryTemplateDetail } from "@/lib/templates/template-store";
 import "@/styles/site.css";
@@ -45,6 +47,15 @@ export function TemplateSite({ template }: { template: GalleryTemplateDetail }) 
   if (isRufaroStudioGalleryTemplate(template.id)) {
     return (
       <RufaroStudioTemplate
+        contentBlocks={template.contentBlocks}
+        businessName={template.name}
+      />
+    );
+  }
+
+  if (isMwenjeTrustGalleryTemplate(template.id)) {
+    return (
+      <MwenjeTrustTemplate
         contentBlocks={template.contentBlocks}
         businessName={template.name}
       />
