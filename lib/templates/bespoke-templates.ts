@@ -69,3 +69,18 @@ export const MWENJE_TRUST_GALLERY_ID = "ngo-1";
 export function isMwenjeTrustGalleryTemplate(id: string): boolean {
   return id === MWENJE_TRUST_GALLERY_ID;
 }
+
+// "services-2" — the gallery_templates id for Mvura Plumbing, replacing the
+// prior generic services-2 content with a sourced plumbing/repair design
+// ("Aquafix"): sticky nav with call pill, blue/lime hero with a rotating
+// photo collage + rating badge, scrolling marquee strip, 3-col services
+// grid, why-us stats block, auto-rotating testimonial card, lime CTA band.
+// Content comes from services/about/gallery/proof/marquee/stats/
+// testimonials/cta/contact — all already present on services-2's existing
+// gallery_content_blocks rows, no schema change needed. Gallery preview
+// only, same as the others above — no live templates.id yet.
+export const MVURA_PLUMBING_GALLERY_ID = "services-2";
+
+export function isMvuraPlumbingGalleryTemplate(id: string): boolean {
+  return id === MVURA_PLUMBING_GALLERY_ID;
+}
