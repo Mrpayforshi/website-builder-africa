@@ -1,0 +1,476 @@
+/* Ever After — sourced wedding-site design (script hero, countdown,
+   travel/things cards, registry, RSVP). Fonts come from next/font in
+   index.tsx via --ea-script / --ea-serif / --ea-sans.
+   Uses container queries (not @media) so it responds to the preview frame's
+   width, not the browser window. */
+.root {
+  --font-script: var(--ea-script), "Snell Roundhand", cursive;
+  --font-serif: var(--ea-serif), Georgia, "Times New Roman", serif;
+  --font-sans: var(--ea-sans), -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --color-ink: #3a3a35;
+  --color-ink-soft: #6b6b63;
+  --color-cream: #fdfcf9;
+  --color-sage: #8a9a7b;
+  --color-gold: #b8a46f;
+  --color-overlay: rgba(38, 46, 34, 0.38);
+  --nav-height: 72px;
+  --max-width: 1080px;
+
+  position: relative;
+  container-type: inline-size;
+  container-name: ea;
+  overflow-x: clip;
+  font-family: var(--font-serif);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.root *,
+.root *::before,
+.root *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.root img {
+  display: block;
+  max-width: 100%;
+}
+.root a {
+  color: inherit;
+  text-decoration: none;
+}
+.sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 40px;
+  pointer-events: none;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.85rem 2.2rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  background: var(--color-sage);
+  border-color: var(--color-sage);
+  color: #fff;
+}
+.btnLight {
+  color: #fff;
+}
+.btnLight:hover {
+  background: #fff;
+  border-color: #fff;
+  color: var(--color-ink);
+}
+.btnSolid {
+  background: var(--color-sage);
+  border-color: var(--color-sage);
+  color: #fff;
+}
+.btnSolid:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+/* ---------- Nav ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--nav-height);
+  margin-bottom: calc(var(--nav-height) * -1); /* float over the hero */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1rem, 4cqi, 3rem);
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+.scrolled {
+  background: rgba(253, 252, 249, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+.scrolled .navLink,
+.scrolled .navLogo,
+.scrolled .navToggle,
+.scrolled .navCta.btnLight {
+  color: var(--color-ink);
+}
+.navLogo {
+  font-family: var(--font-script);
+  font-size: 1.9rem;
+  color: #fff;
+  transition: color 0.35s ease;
+}
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5cqi, 2.4rem);
+  list-style: none;
+}
+.navLink {
+  position: relative;
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fff;
+  transition: color 0.35s ease;
+}
+.navLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+.navLink:hover::after {
+  width: 100%;
+}
+.navCta {
+  padding: 0.55rem 1.5rem;
+}
+.navToggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  transition: color 0.35s ease;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  overflow: hidden;
+  padding: calc(var(--nav-height) + 2rem) 1.5rem 5rem;
+  background: linear-gradient(160deg, #9aa78a, #5c6b52);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--hero-bg, none) center / cover no-repeat;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-overlay);
+}
+.heroEyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+  opacity: 0.95;
+}
+.heroNames {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(3.4rem, 13cqi, 7.5rem);
+  line-height: 1.1;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+}
+.heroDetails {
+  margin-top: 1.4rem;
+  font-size: clamp(0.95rem, 2.4cqi, 1.15rem);
+  letter-spacing: 0.12em;
+}
+.sep {
+  margin: 0 0.8rem;
+  opacity: 0.7;
+}
+.heroActions {
+  margin-top: 2.4rem;
+}
+.heroScroll {
+  position: absolute;
+  bottom: 1.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.4rem;
+  opacity: 0.85;
+  animation: bob 2.2s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, 8px);
+  }
+}
+
+/* ---------- Sections ---------- */
+.section {
+  scroll-margin-top: var(--nav-height);
+  padding: clamp(4rem, 10cqi, 7rem) 1.5rem;
+}
+.sectionAlt {
+  background: #f4f2ec;
+}
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 1rem;
+}
+.title {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 8cqi, 3.8rem);
+  line-height: 1.15;
+  margin-bottom: 1.4rem;
+}
+.title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.55em;
+  color: var(--color-ink-soft);
+}
+.lead {
+  max-width: 560px;
+  margin: 0 auto 3rem;
+  color: var(--color-ink-soft);
+  font-size: 1.08rem;
+}
+
+/* Countdown */
+.countdown {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 5cqi, 3rem);
+  margin-top: 2.5rem;
+}
+.countdownUnit {
+  min-width: 76px;
+}
+.countdownNum {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 7cqi, 3rem);
+  font-weight: 500;
+  color: var(--color-sage);
+}
+.countdownLabel {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  gap: 1.6rem;
+  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  text-align: left;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 30px rgba(58, 58, 53, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 40px rgba(58, 58, 53, 0.14);
+}
+.cardImg {
+  height: 190px;
+  width: 100%;
+  object-fit: cover;
+}
+.cardBody {
+  padding: 1.4rem 1.5rem 1.7rem;
+}
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.cardText {
+  color: var(--color-ink-soft);
+  font-size: 0.98rem;
+  margin-bottom: 0.9rem;
+}
+.cardLink {
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-sage);
+  border-bottom: 1px solid var(--color-sage);
+  padding-bottom: 2px;
+}
+
+/* Registry */
+.registryBtns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* RSVP */
+.form {
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: left;
+  display: grid;
+  gap: 1.1rem;
+}
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+.field label {
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--color-ink);
+  background: #fff;
+  border: 1px solid #ddd8cc;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  outline: none;
+  transition: border-color 0.25s ease;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--color-sage);
+}
+.form .btn {
+  justify-self: center;
+  margin-top: 0.5rem;
+}
+.success {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--color-ink-soft);
+}
+.successBig {
+  font-family: var(--font-script);
+  font-size: 2.6rem;
+  color: var(--color-ink);
+}
+.successWa {
+  margin-top: 1.6rem;
+  color: var(--color-sage);
+}
+
+/* Footer */
+.footer {
+  background: var(--color-ink);
+  color: #e8e6df;
+  text-align: center;
+  padding: 3.5rem 1.5rem 2.5rem;
+}
+.footerNames {
+  font-family: var(--font-script);
+  font-size: 2.6rem;
+  margin-bottom: 0.6rem;
+}
+.footerDate {
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.footerCredit {
+  margin-top: 2.2rem;
+  font-size: 0.8rem;
+  opacity: 0.45;
+}
+
+/* ---------- Narrow container: drawer nav ---------- */
+@container ea (max-width: 760px) {
+  .navToggle {
+    display: block;
+  }
+  .navLinks {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    width: min(280px, 80cqi);
+    padding: 2rem;
+    background: var(--color-cream);
+    box-shadow: -8px 8px 30px rgba(0, 0, 0, 0.08);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.35s ease, visibility 0.35s;
+  }
+  .open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .navLink {
+    color: var(--color-ink);
+    font-size: 0.8rem;
+  }
+  .navCta {
+    margin-top: 1rem;
+  }
+  .navCta.btnLight {
+    color: var(--color-ink);
+  }
+}
