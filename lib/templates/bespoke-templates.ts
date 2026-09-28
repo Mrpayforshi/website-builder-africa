@@ -46,3 +46,13 @@ export const GREEN_HARARE_GALLERY_ID = "ngo-2";
 export function isGreenHarareGalleryTemplate(id: string): boolean {
   return id === GREEN_HARARE_GALLERY_ID;
 }
+
+// "food-2" — the gallery_templates id for Mazoe Café, rendered with the
+// sourced "Groundwork Coffee" design (dark editorial cafe: marquee, story,
+// card menu, map + hours). Gallery preview only, same as Terracotta Table
+// and Green Harare — no live templates.id yet.
+export const MAZOE_CAFE_GALLERY_ID = "food-2";
+
+export function isMazoeCafeGalleryTemplate(id: string): boolean {
+  return id === MAZOE_CAFE_GALLERY_ID;
+}
