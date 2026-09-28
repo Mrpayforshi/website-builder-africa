@@ -1,13 +1,13 @@
 import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
 import TerracottaTableTemplate from "@/components/templates/terracotta-table";
 import GreenHarareTemplate from "@/components/templates/green-harare";
-import MazoeCafeTemplate from "@/components/templates/mazoe-cafe";
+import RufaroStudioTemplate from "@/components/templates/rufaro-studio";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import {
   isNyoniAccountingGalleryTemplate,
   isTerracottaTableGalleryTemplate,
   isGreenHarareGalleryTemplate,
-  isMazoeCafeGalleryTemplate,
+  isRufaroStudioGalleryTemplate,
 } from "@/lib/templates/bespoke-templates";
 import type { GalleryTemplateDetail } from "@/lib/templates/template-store";
 import "@/styles/site.css";
@@ -42,9 +42,9 @@ export function TemplateSite({ template }: { template: GalleryTemplateDetail }) 
     );
   }
 
-  if (isMazoeCafeGalleryTemplate(template.id)) {
+  if (isRufaroStudioGalleryTemplate(template.id)) {
     return (
-      <MazoeCafeTemplate
+      <RufaroStudioTemplate
         contentBlocks={template.contentBlocks}
         businessName={template.name}
       />
