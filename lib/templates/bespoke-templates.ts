@@ -84,3 +84,15 @@ export const MVURA_PLUMBING_GALLERY_ID = "services-2";
 export function isMvuraPlumbingGalleryTemplate(id: string): boolean {
   return id === MVURA_PLUMBING_GALLERY_ID;
 }
+
+// "events-2" — the gallery_templates id for Ever After, replacing the prior
+// "Bulawayo Wedding Co." planner storefront with a sourced couple's-wedding-
+// site design: script-lettered photo hero, live countdown, travel & stay and
+// things-to-do card grids, registry buttons, RSVP form. Extra blocks (event,
+// travel, things, registry, rsvp) live in gallery_content_blocks only, not in
+// the events-2 structure. Gallery preview only — no live templates.id yet.
+export const EVER_AFTER_GALLERY_ID = "events-2";
+
+export function isEverAfterGalleryTemplate(id: string): boolean {
+  return id === EVER_AFTER_GALLERY_ID;
+}
