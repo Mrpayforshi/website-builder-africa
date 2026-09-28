@@ -47,12 +47,13 @@ export function isGreenHarareGalleryTemplate(id: string): boolean {
   return id === GREEN_HARARE_GALLERY_ID;
 }
 
-// "food-2" — the gallery_templates id for Mazoe Café, rendered with the
-// sourced "Groundwork Coffee" design (dark editorial cafe: marquee, story,
-// card menu, map + hours). Gallery preview only, same as Terracotta Table
-// and Green Harare — no live templates.id yet.
-export const MAZOE_CAFE_GALLERY_ID = "food-2";
+// "events-1" — the gallery_templates id for Rufaro Studio, replacing the
+// prior "Lens & Light Photography" content entirely (new Zimbabwean
+// independent-designer persona, not a preserved-content reskin). Sourced
+// from a dark-mode portfolio design with a light/dark theme toggle. Gallery
+// preview only, same as the two above — no live templates.id yet.
+export const RUFARO_STUDIO_GALLERY_ID = "events-1";
 
-export function isMazoeCafeGalleryTemplate(id: string): boolean {
-  return id === MAZOE_CAFE_GALLERY_ID;
+export function isRufaroStudioGalleryTemplate(id: string): boolean {
+  return id === RUFARO_STUDIO_GALLERY_ID;
 }
