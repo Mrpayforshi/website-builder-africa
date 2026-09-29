@@ -111,3 +111,19 @@ export const ZUVA_FRESH_GALLERY_ID = "retail-1";
 export function isZuvaFreshGalleryTemplate(id: string): boolean {
   return id === ZUVA_FRESH_GALLERY_ID;
 }
+
+// "professional-1" — the gallery_templates id for Chirara & Partners,
+// replacing the prior placeholder "Chirara Law Chambers" content (new
+// Harare law-firm persona). Sourced from a dark bronze-on-green law-firm
+// design ("Lexford"): sticky blurred header, portrait hero with offset frame,
+// marquee strip of practice areas, accordion practice-area list, firm story
+// with count-up stats, attorney grid, pull-quote, confidential consultation
+// form (with WhatsApp hand-off), disclaimer bar. hero/about/services/contact
+// keep the professional-1 structure; extra blocks (firm, marquee, stats,
+// team, testimonial) live in gallery_content_blocks only. Gallery preview
+// only — no live templates.id yet.
+export const LEXFORD_GALLERY_ID = "professional-1";
+
+export function isLexfordGalleryTemplate(id: string): boolean {
+  return id === LEXFORD_GALLERY_ID;
+}
