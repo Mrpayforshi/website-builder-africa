@@ -6,6 +6,7 @@ import MwenjeTrustTemplate from "@/components/templates/mwenje-trust";
 import MvuraPlumbingTemplate from "@/components/templates/mvura-plumbing";
 import EverAfterTemplate from "@/components/templates/ever-after";
 import FreshDropTemplate from "@/components/templates/fresh-drop";
+import LexfordTemplate from "@/components/templates/lexford";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import {
   isNyoniAccountingGalleryTemplate,
@@ -16,6 +17,7 @@ import {
   isMvuraPlumbingGalleryTemplate,
   isEverAfterGalleryTemplate,
   isZuvaFreshGalleryTemplate,
+  isLexfordGalleryTemplate,
 } from "@/lib/templates/bespoke-templates";
 import type { GalleryTemplateDetail } from "@/lib/templates/template-store";
 import "@/styles/site.css";
@@ -89,6 +91,15 @@ export function TemplateSite({ template }: { template: GalleryTemplateDetail }) 
   if (isZuvaFreshGalleryTemplate(template.id)) {
     return (
       <FreshDropTemplate
+        contentBlocks={template.contentBlocks}
+        businessName={template.name}
+      />
+    );
+  }
+
+  if (isLexfordGalleryTemplate(template.id)) {
+    return (
+      <LexfordTemplate
         contentBlocks={template.contentBlocks}
         businessName={template.name}
       />
