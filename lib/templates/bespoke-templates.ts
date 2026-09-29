@@ -96,3 +96,18 @@ export const EVER_AFTER_GALLERY_ID = "events-2";
 export function isEverAfterGalleryTemplate(id: string): boolean {
   return id === EVER_AFTER_GALLERY_ID;
 }
+
+// "retail-1" — the gallery_templates id for Zuva Fresh, replacing the prior
+// "Chikwiya Grocers" content entirely (new Harare grocery-delivery persona).
+// Sourced from a green/yellow grocery design ("FreshDrop"): sticky header with
+// live search + cart counter, blob hero with floating badges, category pills
+// that filter the product grid, promo banner, 3-step explainer, footer with
+// hours. Extra blocks (highlights, categories, promo, steps) live in
+// gallery_content_blocks only, not in the retail-1 structure. Product items
+// carry optional category/unit/tag/old_price fields (gallery/bespoke only —
+// not in SECTION_FIELD_SCHEMAS). Gallery preview only — no live templates.id yet.
+export const ZUVA_FRESH_GALLERY_ID = "retail-1";
+
+export function isZuvaFreshGalleryTemplate(id: string): boolean {
+  return id === ZUVA_FRESH_GALLERY_ID;
+}
