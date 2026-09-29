@@ -5,6 +5,7 @@ import RufaroStudioTemplate from "@/components/templates/rufaro-studio";
 import MwenjeTrustTemplate from "@/components/templates/mwenje-trust";
 import MvuraPlumbingTemplate from "@/components/templates/mvura-plumbing";
 import EverAfterTemplate from "@/components/templates/ever-after";
+import FreshDropTemplate from "@/components/templates/fresh-drop";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import {
   isNyoniAccountingGalleryTemplate,
@@ -14,6 +15,7 @@ import {
   isMwenjeTrustGalleryTemplate,
   isMvuraPlumbingGalleryTemplate,
   isEverAfterGalleryTemplate,
+  isZuvaFreshGalleryTemplate,
 } from "@/lib/templates/bespoke-templates";
 import type { GalleryTemplateDetail } from "@/lib/templates/template-store";
 import "@/styles/site.css";
@@ -78,6 +80,15 @@ export function TemplateSite({ template }: { template: GalleryTemplateDetail }) 
   if (isEverAfterGalleryTemplate(template.id)) {
     return (
       <EverAfterTemplate
+        contentBlocks={template.contentBlocks}
+        businessName={template.name}
+      />
+    );
+  }
+
+  if (isZuvaFreshGalleryTemplate(template.id)) {
+    return (
+      <FreshDropTemplate
         contentBlocks={template.contentBlocks}
         businessName={template.name}
       />
