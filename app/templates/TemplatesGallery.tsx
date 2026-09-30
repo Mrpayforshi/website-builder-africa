@@ -40,10 +40,12 @@ export function TemplatesGallery({
   templates,
   categories,
   thumbs,
+  basePath = "/templates",
 }: {
   templates: TemplateCard[];
   categories: CategoryOption[];
   thumbs: Record<string, ReactNode>;
+  basePath?: string;
 }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeFeatures, setActiveFeatures] = useState<string[]>([]);
@@ -137,7 +139,7 @@ export function TemplatesGallery({
                   <div className={styles.cardTop}>
                     <ViewTransition name={`tpl-title-${tpl.id}`}>
                       <h3>
-                        <Link className={styles.cardLink} href={`/templates/${tpl.id}`}>
+                        <Link className={styles.cardLink} href={`${basePath}/${tpl.id}`}>
                           {tpl.name}
                         </Link>
                       </h3>
