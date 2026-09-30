@@ -4,14 +4,17 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { TemplateCard } from "@/lib/templates/template-store";
+import { UseTemplateButton } from "@/app/dashboard/templates/UseTemplateButton";
 import styles from "./modal.module.css";
 
 export function TemplatePreviewModal({
   meta,
   children,
+  ctaMode = "signup",
 }: {
   meta: TemplateCard;
   children: React.ReactNode;
+  ctaMode?: "signup" | "builder";
 }) {
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -55,9 +58,17 @@ export function TemplatePreviewModal({
             <span className={styles.byline}>by Rivo</span>
           </div>
           <div className={styles.dialogHeadRight}>
-            <Link href={`/signup?template=${meta.id}`} className={styles.cta}>
-              Use template
-            </Link>
+            {ctaMode === "builder" ? (
+              <UseTemplateButton
+                templateName={meta.name}
+                categoryLabel={meta.categoryLabel}
+                className={styles.cta}
+              />
+            ) : (
+              <Link href={`/signup?template=${meta.id}`} className={styles.cta}>
+                Use template
+              </Link>
+            )}
             <button
               type="button"
               className={styles.close}
