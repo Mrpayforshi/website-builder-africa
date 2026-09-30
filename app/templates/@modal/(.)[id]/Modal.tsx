@@ -62,6 +62,7 @@ export function TemplatePreviewModal({
               <UseTemplateButton
                 templateName={meta.name}
                 categoryLabel={meta.categoryLabel}
+                galleryTemplateId={meta.id}
                 className={styles.cta}
               />
             ) : (
