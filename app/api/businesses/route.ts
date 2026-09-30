@@ -19,11 +19,19 @@ function randomSuffix(): string {
 }
 
 /**
- * Creates a blank business + owner membership + empty site config + default
- * feature toggles. No name/category collected here — that's entirely the AI
- * intake chat's job now (see lib/ai/tool-executor.ts handleSetBusinessInfo,
- * which is also what assigns a template once a category is known). This
- * route just stakes out a row for the chat to fill in.
+ * Creates a business + owner membership + site config + default feature
+ * toggles.
+ *
+ * Two modes:
+ *  - Body `{ galleryTemplateId }` where that gallery template has a live
+ *    `templates` row (templates.gallery_template_id = galleryTemplateId):
+ *    the business is created WITH that template assigned and its gallery
+ *    demo content copied into site_configs.content_blocks, so the user can
+ *    go straight to the dashboard editor. Business name/category are seeded
+ *    from the template and are expected to be edited by the user.
+ *  - No body, or a gallery template with no live row yet: blank business,
+ *    as before — the AI intake chat fills it in and assigns a template
+ *    (see lib/ai/tool-executor.ts handleSetBusinessInfo).
  *
  * Uses the admin client for the writes deliberately: `businesses` has no
  * owner-level SELECT policy (only `is_business_member`, which reads
@@ -32,7 +40,7 @@ function randomSuffix(): string {
  * RETURNING read. Identity is still verified via the cookie-scoped RLS
  * client before any privileged write happens.
  */
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,7 +50,42 @@ export async function POST() {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  const body = (await request.json().catch(() => null)) as {
+    galleryTemplateId?: unknown;
+  } | null;
+  const galleryTemplateId =
+    typeof body?.galleryTemplateId === "string" ? body.galleryTemplateId : null;
+
   const admin = createAdminClient();
+
+  // Resolve the live template (if this gallery template has one) and its demo
+  // content before creating anything, so a lookup failure can't leave a
+  // half-created business behind.
+  let liveTemplate: { id: string; name: string; category: string } | null = null;
+  let seedContentBlocks: Record<string, unknown> = {};
+
+  if (galleryTemplateId) {
+    const { data: tpl } = await admin
+      .from("templates")
+      .select("id, name, category")
+      .eq("gallery_template_id", galleryTemplateId)
+      .maybeSingle();
+
+    if (tpl) {
+      liveTemplate = tpl;
+      const { data: blocks, error: blocksError } = await admin
+        .from("gallery_content_blocks")
+        .select("section_id, content")
+        .eq("template_id", galleryTemplateId);
+
+      if (blocksError) {
+        return NextResponse.json({ error: blocksError.message }, { status: 500 });
+      }
+      for (const block of blocks ?? []) {
+        seedContentBlocks[block.section_id] = block.content;
+      }
+    }
+  }
 
   let slug = `project-${randomSuffix()}`;
   let business: { id: string; slug: string } | null = null;
@@ -51,7 +94,13 @@ export async function POST() {
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await admin
       .from("businesses")
-      .insert({ owner_user_id: user.id, name: "Untitled project", slug, status: "draft" })
+      .insert({
+        owner_user_id: user.id,
+        name: liveTemplate?.name ?? "Untitled project",
+        slug,
+        status: "draft",
+        ...(liveTemplate ? { category: liveTemplate.category } : {}),
+      })
       .select("id, slug")
       .single();
 
@@ -79,14 +128,18 @@ export async function POST() {
     return NextResponse.json({ error: memberError.message }, { status: 500 });
   }
 
-  await admin.from("site_configs").insert({
+  const { error: configError } = await admin.from("site_configs").insert({
     business_id: business.id,
-    template_id: null,
-    content_blocks: {},
+    template_id: liveTemplate?.id ?? null,
+    content_blocks: seedContentBlocks,
     color_scheme: {},
     status: "draft",
     source: "system",
   });
+
+  if (configError) {
+    return NextResponse.json({ error: configError.message }, { status: 500 });
+  }
 
   await admin.from("feature_toggles").insert(
     FEATURE_KEYS.map((feature_key) => ({
@@ -96,5 +149,9 @@ export async function POST() {
     }))
   );
 
-  return NextResponse.json({ businessId: business.id, slug: business.slug });
+  return NextResponse.json({
+    businessId: business.id,
+    slug: business.slug,
+    templateApplied: Boolean(liveTemplate),
+  });
 }
