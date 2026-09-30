@@ -1,4 +1,5 @@
 import NyoniAccountingTemplate from "@/components/templates/nyoni-accounting";
+import MazoeCafeTemplate from "@/components/templates/mazoe-cafe";
 import TerracottaTableTemplate from "@/components/templates/terracotta-table";
 import GreenHarareTemplate from "@/components/templates/green-harare";
 import RufaroStudioTemplate from "@/components/templates/rufaro-studio";
@@ -10,6 +11,7 @@ import LexfordTemplate from "@/components/templates/lexford";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import {
   isNyoniAccountingGalleryTemplate,
+  isMazoeCafeGalleryTemplate,
   isTerracottaTableGalleryTemplate,
   isGreenHarareGalleryTemplate,
   isRufaroStudioGalleryTemplate,
@@ -28,6 +30,15 @@ export function TemplateSite({ template }: { template: GalleryTemplateDetail }) 
   if (isNyoniAccountingGalleryTemplate(template.id)) {
     return (
       <NyoniAccountingTemplate
+        contentBlocks={template.contentBlocks}
+        businessName={template.name}
+      />
+    );
+  }
+
+  if (isMazoeCafeGalleryTemplate(template.id)) {
+    return (
+      <MazoeCafeTemplate
         contentBlocks={template.contentBlocks}
         businessName={template.name}
       />
