@@ -3,7 +3,9 @@ import type { TemplateStructure } from "@/lib/templates/section-schemas";
 
 // --- Real template CRUD (Workstream C's `templates` table) ---------------
 // This is what the AI tool layer (tool-executor.ts) and the site renderer
-// read from. One row per category in v1 (see templates.category enum).
+// read from. One generic row per category, plus gallery-linked rows
+// (templates.gallery_template_id is set) for designs a user picked from the
+// gallery via "Use template".
 
 export interface Template {
   id: string;
@@ -24,12 +26,17 @@ export async function getTemplateById(id: string): Promise<Template | null> {
   return data as Template;
 }
 
+// Used by the AI intake (tool-executor.ts) to pick a default template for a
+// category when none was chosen up front. Gallery-linked templates are
+// excluded on purpose: they are only ever assigned by an explicit "Use
+// template" click, never auto-picked for a blank business.
 export async function listTemplatesByCategory(category: string): Promise<Template[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("templates")
     .select("id, category, name, structure")
-    .eq("category", category);
+    .eq("category", category)
+    .is("gallery_template_id", null);
 
   if (error || !data) return [];
   return data as Template[];
