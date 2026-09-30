@@ -554,7 +554,7 @@ export default function LexfordTemplate({
             <blockquote>
               <Emph text={testimonial.quote} em={testimonial.quote_em} />
             </blockquote>
-            {testimonial.cite && {testimonial.cite}}
+            {testimonial.cite && <p className={styles.quoteCite}>{testimonial.cite}</p>}
           </div>
         </section>
       )}
