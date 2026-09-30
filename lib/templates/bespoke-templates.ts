@@ -23,13 +23,29 @@ export function isNyoniAccountingTemplate(id: string): boolean {
   return id === NYONI_ACCOUNTING_TEMPLATE_ID;
 }
 
+// "food-2" / uuid — Mazoe Café. Wired for BOTH the public/dashboard gallery
+// preview (gallery id) and live tenant sites (templates.id). The live row is
+// linked to the gallery row via templates.gallery_template_id = 'food-2',
+// which is what POST /api/businesses uses to apply a template when the user
+// clicks "Use template".
+export const MAZOE_CAFE_GALLERY_ID = "food-2";
+export const MAZOE_CAFE_TEMPLATE_ID = "b7e4c1a2-5d3f-4f8e-9a61-2c0d8e7f4a93";
+
+export function isMazoeCafeGalleryTemplate(id: string): boolean {
+  return id === MAZOE_CAFE_GALLERY_ID;
+}
+
+export function isMazoeCafeTemplate(id: string): boolean {
+  return id === MAZOE_CAFE_TEMPLATE_ID;
+}
+
 // "food-1" — the gallery_templates id for Terracotta Table, used by the
 // public preview page only for now. Unlike Nyoni Accounting, there is no
 // live templates.id / isTerracottaTableTemplate check yet — this design is
 // not currently wired into app/_sites/[businessId]/page.tsx for live tenant
 // sites. Add a TERRACOTTA_TABLE_TEMPLATE_ID + a real `templates` row and an
 // isTerracottaTableTemplate() check there if it should become assignable to
-// live tenants, mirroring the Nyoni Accounting pattern above.
+// live tenants, mirroring the Nyoni Accounting / Mazoe Café pattern above.
 export const TERRACOTTA_TABLE_GALLERY_ID = "food-1";
 
 export function isTerracottaTableGalleryTemplate(id: string): boolean {
