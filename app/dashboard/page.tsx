@@ -1,4 +1,4 @@
-import Link from "next/link";
+  import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NewProjectForm } from "./NewProjectForm";
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
 
         <nav className={styles.nav}>
           <span className={`${styles.navItem} ${styles.navItemActive}`}>Dashboard</span>
-          <Link className={styles.navItem} href="/templates">
+          <Link className={styles.navItem} href="/dashboard/templates">
             Templates
           </Link>
           <Link className={styles.navItem} href="/dashboard/connectors">
@@ -110,11 +110,11 @@ export default async function DashboardPage() {
           <div className={styles.tabs}>
             <div className={styles.tabsLeft}>
               <span className={`${styles.tab} ${styles.tabActive}`}>My projects</span>
-              <Link className={styles.tab} href="/templates">
+              <Link className={styles.tab} href="/dashboard/templates">
                 Templates
               </Link>
             </div>
-            <Link className={styles.browseAll} href="/templates">
+            <Link className={styles.browseAll} href="/dashboard/templates">
               Browse all →
             </Link>
           </div>
