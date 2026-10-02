@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 export function UseTemplateButton({
   templateName,
   categoryLabel,
+  galleryTemplateId,
   className,
 }: {
   templateName: string;
   categoryLabel: string;
+  galleryTemplateId?: string;
   className?: string;
 }) {
   const router = useRouter();
@@ -21,7 +23,11 @@ export function UseTemplateButton({
     setLoading(true);
     setError(null);
 
-    const res = await fetch("/api/businesses", { method: "POST" });
+    const res = await fetch("/api/businesses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ galleryTemplateId }),
+    });
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {
@@ -30,6 +36,13 @@ export function UseTemplateButton({
       return;
     }
 
+    // Live template applied: go straight to the editor.
+    if (data.templateApplied) {
+      router.push(`/dashboard/${data.businessId}`);
+      return;
+    }
+
+    // No live template row yet: fall back to the AI intake chat.
     const first = `I want to start from the "${templateName}" template (${categoryLabel}).`;
     router.push(`/dashboard/${data.businessId}/intake?first=${encodeURIComponent(first)}`);
   }
