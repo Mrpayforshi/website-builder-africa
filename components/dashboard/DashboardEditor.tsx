@@ -1,24 +1,37 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { SiteConfig } from "@/types/database";
-import type { Template } from "@/lib/templates/template-store";
+import type { Template, GalleryTemplateDetail } from "@/lib/templates/template-store";
 import { SectionEditor } from "@/components/dashboard/SectionEditor";
 import { FeatureTogglesPanel, type FeatureToggleState } from "@/components/dashboard/FeatureTogglesPanel";
+import { EditorChat } from "@/components/dashboard/EditorChat";
+import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
+import styles from "./editor-workspace.module.css";
 
 interface DashboardEditorProps {
   businessId: string;
+  businessName: string;
+  slug: string;
   initialConfig: SiteConfig;
   template: Template;
+  galleryTemplate: GalleryTemplateDetail | null;
   initialFeatureToggles: FeatureToggleState[];
+  welcome: boolean;
 }
 
 export function DashboardEditor({
   businessId,
+  businessName,
+  slug,
   initialConfig,
   template,
+  galleryTemplate,
   initialFeatureToggles,
+  welcome,
 }: DashboardEditorProps) {
+  const [tab, setTab] = useState<"chat" | "edit" | "preview">("chat");
   const [config, setConfig] = useState(initialConfig);
   const [contentBlocks, setContentBlocks] = useState<Record<string, unknown>>(initialConfig.content_blocks ?? {});
   const [colorScheme, setColorScheme] = useState<Record<string, unknown>>(initialConfig.color_scheme ?? {});
@@ -28,6 +41,19 @@ export function DashboardEditor({
   const [conflict, setConflict] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+
+  // Live preview: the same component the gallery uses, fed with this site's
+  // own (even unsaved) content. Gallery-linked sites keep their bespoke design.
+  const previewTemplate: GalleryTemplateDetail = {
+    id: galleryTemplate?.id ?? template.id,
+    category: template.category,
+    categoryLabel: galleryTemplate?.categoryLabel ?? "",
+    name: businessName,
+    description: galleryTemplate?.description ?? "",
+    features: galleryTemplate?.features ?? [],
+    structure: galleryTemplate?.structure ?? template.structure,
+    contentBlocks,
+  };
 
   function updateSection(sectionId: string, content: Record<string, unknown>) {
     setContentBlocks((prev) => ({ ...prev, [sectionId]: content }));
@@ -101,6 +127,17 @@ export function DashboardEditor({
     setConflict(false);
   }
 
+  // The AI chat just changed the site. Pull the new version into the preview,
+  // unless the user has unsaved edits — then use the existing conflict banner
+  // rather than silently overwriting their typing.
+  async function handleChatChanged() {
+    if (dirty) {
+      setConflict(true);
+      return;
+    }
+    await refetchAndDiscard();
+  }
+
   async function togglePublish() {
     setSaving(true);
     setError(null);
@@ -127,78 +164,121 @@ export function DashboardEditor({
     }
   }
 
+  const isLive = config.status === "published";
+
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem", fontFamily: "sans-serif" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <h1 style={{ fontSize: "1.4rem" }}>Site Editor</h1>
-          <a href={`/dashboard/${businessId}/orders`} style={{ fontSize: "0.9rem" }}>
-            Orders →
-          </a>
+    <div className={styles.root} data-tab={tab}>
+      <header className={styles.topbar}>
+        <div className={styles.topLeft}>
+          <Link href="/dashboard" className={styles.back}>
+            ← Projects
+          </Link>
+          <span className={styles.projectName}>{businessName}</span>
         </div>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <span style={{ fontSize: "0.85rem", color: config.status === "published" ? "green" : "#888" }}>
-            {config.status}
-          </span>
-          <button onClick={togglePublish} disabled={saving}>
-            {config.status === "published" ? "Unpublish" : "Publish"}
+        <div className={styles.topRight}>
+          <Link href={`/dashboard/${businessId}/orders`} className={styles.link}>
+            Orders
+          </Link>
+          <span className={`${styles.status} ${isLive ? styles.statusLive : ""}`}>{isLive ? "Live" : "Draft"}</span>
+          <button className={styles.publishBtn} onClick={togglePublish} disabled={saving}>
+            {isLive ? "Unpublish" : "Publish"}
           </button>
         </div>
       </header>
 
-      {conflict && (
-        <div style={{ background: "#fff3cd", border: "1px solid #ffe69c", padding: "0.75rem", marginBottom: "1rem" }}>
-          This site was edited elsewhere (chat or another tab) since you loaded it. Your unsaved changes here
-          haven&apos;t been saved.
-          <div style={{ marginTop: "0.5rem" }}>
-            <button onClick={refetchAndDiscard}>Reload latest &amp; discard my changes</button>
+      <div className={styles.body}>
+        <aside className={styles.left}>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${tab !== "edit" && tab !== "preview" ? styles.tabActive : ""}`}
+              onClick={() => setTab("chat")}
+            >
+              Chat
+            </button>
+            <button className={`${styles.tab} ${tab === "edit" ? styles.tabActive : ""}`} onClick={() => setTab("edit")}>
+              Edit content
+            </button>
+            <button
+              className={`${styles.tab} ${styles.previewTab} ${tab === "preview" ? styles.tabActive : ""}`}
+              onClick={() => setTab("preview")}
+            >
+              Preview
+            </button>
           </div>
-        </div>
-      )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          {conflict && (
+            <div className={styles.notice}>
+              This site was changed elsewhere (chat or another tab) since you loaded it. Your unsaved edits
+              haven&apos;t been saved.
+              <div>
+                <button onClick={refetchAndDiscard}>Reload latest &amp; discard my changes</button>
+              </div>
+            </div>
+          )}
+          {error && <p className={styles.errorText}>{error}</p>}
 
-      {template.structure.sections.map((section) => (
-        <SectionEditor
-          key={section.id}
-          section={section}
-          content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
-          onChange={(content) => updateSection(section.id, content)}
-        />
-      ))}
-
-      <section style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #ddd" }}>
-        <h2 style={{ fontSize: "1.1rem" }}>Appearance</h2>
-        {(["primary", "secondary", "accent"] as const).map((key) => (
-          <label key={key} style={{ display: "block", marginBottom: "0.5rem" }}>
-            {key}
-            <input
-              type="text"
-              value={(colorScheme[key] as string) ?? ""}
-              placeholder="#000000"
-              onChange={(e) => updateColor(key, e.target.value)}
-              style={{ marginLeft: "0.5rem" }}
+          <div className={styles.pane} style={{ display: tab === "edit" ? "none" : "flex" }}>
+            <EditorChat
+              businessId={businessId}
+              businessName={businessName}
+              welcome={welcome}
+              onSiteChanged={handleChatChanged}
             />
-          </label>
-        ))}
-      </section>
+          </div>
 
-      <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
+          <div className={styles.pane} style={{ display: tab === "edit" ? "flex" : "none" }}>
+            <div className={styles.editPane}>
+              {template.structure.sections.map((section) => (
+                <SectionEditor
+                  key={section.id}
+                  section={section}
+                  content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
+                  onChange={(content) => updateSection(section.id, content)}
+                />
+              ))}
 
-      <div
-        style={{
-          position: "sticky",
-          bottom: 0,
-          background: "white",
-          padding: "1rem 0",
-          borderTop: "1px solid #ddd",
-          marginTop: "2rem",
-        }}
-      >
-        <button onClick={save} disabled={!dirty || saving}>
-          {saving ? "Saving..." : "Save changes"}
-        </button>
-        {savedMessage && <span style={{ marginLeft: "0.75rem", color: "green" }}>{savedMessage}</span>}
+              <section style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #ddd" }}>
+                <h2 style={{ fontSize: "1.1rem" }}>Appearance</h2>
+                {(["primary", "secondary", "accent"] as const).map((key) => (
+                  <label key={key} style={{ display: "block", marginBottom: "0.5rem" }}>
+                    {key}
+                    <input
+                      type="text"
+                      value={(colorScheme[key] as string) ?? ""}
+                      placeholder="#000000"
+                      onChange={(e) => updateColor(key, e.target.value)}
+                      style={{ marginLeft: "0.5rem" }}
+                    />
+                  </label>
+                ))}
+              </section>
+
+              <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
+            </div>
+            <div className={styles.saveBar}>
+              <button onClick={save} disabled={!dirty || saving}>
+                {saving ? "Saving..." : "Save changes"}
+              </button>
+              {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
+            </div>
+          </div>
+        </aside>
+
+        <main className={styles.right}>
+          <div className={styles.previewScroller}>
+            <div className={styles.browser}>
+              <div className={styles.urlBar}>
+                <span className={styles.urlDots}>
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                {slug ? `${slug}.rivo.app` : "your-site.rivo.app"}
+              </div>
+              <TemplateSite template={previewTemplate} />
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
