@@ -1,0 +1,185 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 10, 14, 0.55);
+  backdrop-filter: blur(3px);
+}
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  color: #16161a;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  color: #6b6b74;
+  cursor: pointer;
+}
+.mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #ff7a45, #e2652b 45%, #7b4dff);
+}
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.lead {
+  color: #6b6b74;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dcdce3;
+  background: #f7f7f9;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 15px;
+}
+.input:focus {
+  outline: 2px solid #16161a;
+  outline-offset: 1px;
+  background: #fff;
+}
+.ack {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 16px 0 20px;
+  padding: 14px;
+  border: 1px solid #e5e5ea;
+  background: #fafafb;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #4a4a52;
+  cursor: pointer;
+}
+.ack input {
+  margin-top: 4px;
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.error {
+  color: #c0392b;
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn {
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #dcdce3;
+  background: #fff;
+  color: #16161a;
+}
+.btnPrimary {
+  background: #16161a;
+  color: #fff;
+  border-color: #16161a;
+}
+.btnPrimary:disabled {
+  background: #9a9aa3;
+  border-color: #9a9aa3;
+  cursor: not-allowed;
+}
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 6px 16px;
+  border: 1px solid #e5e5ea;
+  background: #fafafb;
+  border-radius: 14px;
+}
+.step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+.stepText strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+.stepText span {
+  display: block;
+  font-size: 13px;
+  color: #8a8a93;
+  margin-top: 2px;
+}
+.stepPending strong {
+  color: #9a9aa3;
+  font-weight: 500;
+}
+.icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 1px;
+  box-sizing: border-box;
+}
+.tick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #1f9d55;
+  color: #fff;
+  font-size: 11px;
+}
+.spinner {
+  border: 2px solid #d5d5dc;
+  border-top-color: #16161a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c4c4cc;
+  margin: 8px 6px 0;
+  flex: none;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
