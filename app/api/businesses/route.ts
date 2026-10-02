@@ -22,23 +22,12 @@ function randomSuffix(): string {
  * Creates a business + owner membership + site config + default feature
  * toggles.
  *
- * Two modes:
- *  - Body `{ galleryTemplateId }` where that gallery template has a live
- *    `templates` row (templates.gallery_template_id = galleryTemplateId):
- *    the business is created WITH that template assigned and its gallery
- *    demo content copied into site_configs.content_blocks, so the user can
- *    go straight to the dashboard editor. Business name/category are seeded
- *    from the template and are expected to be edited by the user.
- *  - No body, or a gallery template with no live row yet: blank business,
- *    as before — the AI intake chat fills it in and assigns a template
- *    (see lib/ai/tool-executor.ts handleSetBusinessInfo).
- *
- * Uses the admin client for the writes deliberately: `businesses` has no
- * owner-level SELECT policy (only `is_business_member`, which reads
- * `business_users` — a row that doesn't exist yet at the moment this
- * business is inserted). An RLS-scoped insert().select() would fail the
- * RETURNING read. Identity is still verified via the cookie-scoped RLS
- * client before any privileged write happens.
+ *  - Body `{ galleryTemplateId, siteName }`: atomic path via the
+ *    create_site_from_template RPC (runs as the signed-in user; the function
+ *    is SECURITY DEFINER and uses auth.uid(), so no admin client is needed).
+ *  - Legacy path (no siteName, or a template with no live row): unchanged
+ *    behaviour — blank business for the AI intake chat, or seeded from the
+ *    live template with a default name.
  */
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -52,17 +41,48 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => null)) as {
     galleryTemplateId?: unknown;
+    siteName?: unknown;
   } | null;
   const galleryTemplateId =
     typeof body?.galleryTemplateId === "string" ? body.galleryTemplateId : null;
+  const siteName = typeof body?.siteName === "string" ? body.siteName.trim() : "";
 
+  // --- Atomic path -------------------------------------------------------
+  if (galleryTemplateId && siteName) {
+    const { data, error } = await supabase.rpc("create_site_from_template", {
+      p_gallery_template_id: galleryTemplateId,
+      p_site_name: siteName,
+    });
+
+    if (!error && data) {
+      const result = data as { business_id: string; slug: string };
+      return NextResponse.json({
+        businessId: result.business_id,
+        slug: result.slug,
+        templateApplied: true,
+      });
+    }
+
+    if (error?.message.includes("invalid_site_name")) {
+      return NextResponse.json(
+        { error: "Site name must be between 2 and 80 characters." },
+        { status: 400 }
+      );
+    }
+    // Template has no live row: fall through to the legacy path below.
+    if (!error?.message.includes("template_not_available")) {
+      return NextResponse.json(
+        { error: error?.message ?? "Could not create your site" },
+        { status: 500 }
+      );
+    }
+  }
+
+  // --- Legacy path (unchanged) --------------------------------------------
   const admin = createAdminClient();
 
-  // Resolve the live template (if this gallery template has one) and its demo
-  // content before creating anything, so a lookup failure can't leave a
-  // half-created business behind.
   let liveTemplate: { id: string; name: string; category: string } | null = null;
-  let seedContentBlocks: Record<string, unknown> = {};
+  const seedContentBlocks: Record<string, unknown> = {};
 
   if (galleryTemplateId) {
     const { data: tpl } = await admin
@@ -96,7 +116,7 @@ export async function POST(request: Request) {
       .from("businesses")
       .insert({
         owner_user_id: user.id,
-        name: liveTemplate?.name ?? "Untitled project",
+        name: siteName || liveTemplate?.name || "Untitled project",
         slug,
         status: "draft",
         ...(liveTemplate ? { category: liveTemplate.category } : {}),
@@ -109,7 +129,7 @@ export async function POST(request: Request) {
       break;
     }
     lastError = error;
-    if (error.code !== "23505") break; // not a unique-slug violation, don't retry
+    if (error.code !== "23505") break;
     slug = `project-${randomSuffix()}`;
   }
 
