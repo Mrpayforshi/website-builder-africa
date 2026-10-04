@@ -71,6 +71,21 @@
   background: #9a9aa3;
   cursor: not-allowed;
 }
+.saveTop {
+  border: 1px solid #dcdce3;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #fff;
+  color: #16161a;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.saveTop:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ---------- Body layout ---------- */
 .body {
@@ -88,6 +103,7 @@
   border-right: 1px solid #e5e5ea;
 }
 .right {
+  position: relative; /* anchors the floating "Edit on page" toolbar */
   flex: 1;
   min-width: 0;
   min-height: 0;
@@ -97,6 +113,47 @@
   flex: 1;
   overflow: auto;
   padding: 20px;
+}
+
+/* ---------- Floating inline-edit toolbar ---------- */
+.editDock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 20;
+}
+.editPill {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: rgba(20, 20, 24, 0.92);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.editPill button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.editPill .pillOn {
+  background: #6366f1;
+}
+.pillHint {
+  opacity: 0.65;
 }
 
 /* ---------- Tabs ---------- */
@@ -356,6 +413,9 @@
     padding: 10px;
   }
   .topRight .link {
+    display: none;
+  }
+  .pillHint {
     display: none;
   }
 }
