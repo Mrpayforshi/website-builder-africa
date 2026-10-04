@@ -1,0 +1,158 @@
+/* Attachment UI for EditorChat. Light theme to match editor-workspace.module.css. */
+
+/* Replaces the old fragment: same flex-column layout inside .pane, plus a
+   positioned ancestor for the drop overlay. */
+.dropZone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.attachBtn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  line-height: 1;
+  background: #f7f7f9;
+  border: 1px solid #dcdce3;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.attachBtn:hover:not(:disabled) {
+  background: #ececf1;
+}
+
+.attachBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: none;
+  padding: 10px 16px 0;
+  border-top: 1px solid #e5e5ea;
+  background: #fff;
+}
+
+/* The tray draws the divider, so the composer drops its own while a tray shows. */
+.composerUnderTray {
+  border-top: none;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 190px;
+  padding: 4px 6px 4px 4px;
+  border-radius: 10px;
+  background: #f7f7f9;
+  border: 1px solid #dcdce3;
+  font-size: 12.5px;
+  color: #16161a;
+}
+
+.chipThumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.chipIcon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: #ececf1;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.chipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipRemove {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #6b6b74;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chipRemove:hover {
+  background: #e0e0e6;
+  color: #16161a;
+}
+
+.chipUploading {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 12.5px;
+  color: #6b6b74;
+}
+
+/* Attachments shown inside a sent (dark) user bubble */
+.bubbleAttachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.bubbleThumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.bubbleFile {
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 12.5px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px dashed #16161a;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #16161a;
+  pointer-events: none;
+}
