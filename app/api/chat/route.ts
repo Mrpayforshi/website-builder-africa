@@ -4,9 +4,25 @@ import { checkBusinessMembership, getSiteConfig } from "@/lib/ai/config-store";
 import { AI_TOOLS, type AiToolName } from "@/lib/ai/tools";
 import { executeTool } from "@/lib/ai/tool-executor";
 import { buildIntakeSystemPrompt, buildEditSystemPrompt } from "@/lib/ai/system-prompt";
+import {
+  buildReferenceBlocks,
+  describeReferencesBrief,
+  sanitizeReferenceIds,
+  type ContentBlock,
+} from "@/lib/references/server";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-sonnet-4-6";
+
+// Attachments are only re-sent to the model for the most recent messages that
+// carry them. Older ones become a one-line note, which keeps token cost flat.
+const MAX_MESSAGES_WITH_FULL_REFERENCES = 2;
+
+interface IncomingMessage {
+  role: "user" | "assistant";
+  content: string;
+  referenceIds?: unknown;
+}
 
 export async function POST(req: NextRequest) {
   const { businessId, messages, mode } = await req.json();
@@ -38,7 +54,35 @@ export async function POST(req: NextRequest) {
   const systemPrompt =
     mode === "edit" && config ? buildEditSystemPrompt(business, config) : buildIntakeSystemPrompt(business);
 
-  const conversation = [...messages];
+  // Work out which user messages carry attachments, newest first.
+  const incoming = messages as IncomingMessage[];
+  const withRefs = incoming
+    .map((m, i) => ({ i, ids: m.role === "user" ? sanitizeReferenceIds(m.referenceIds) : [] }))
+    .filter((m) => m.ids.length > 0)
+    .reverse();
+  const fullIndexes = new Set(withRefs.slice(0, MAX_MESSAGES_WITH_FULL_REFERENCES).map((m) => m.i));
+
+  // Build the conversation the model sees. The client-only `referenceIds` field
+  // is stripped here — the Anthropic API rejects unknown fields.
+  const conversation: { role: string; content: string | ContentBlock[] }[] = [];
+  for (let i = 0; i < incoming.length; i++) {
+    const m = incoming[i];
+    const ids = sanitizeReferenceIds(m.referenceIds);
+
+    if (m.role !== "user" || ids.length === 0) {
+      conversation.push({ role: m.role, content: m.content });
+    } else if (fullIndexes.has(i)) {
+      const blocks = await buildReferenceBlocks(supabase, businessId, ids);
+      conversation.push({
+        role: "user",
+        content: blocks.length ? [...blocks, { type: "text", text: m.content }] : m.content,
+      });
+    } else {
+      const note = await describeReferencesBrief(supabase, businessId, ids);
+      conversation.push({ role: "user", content: note ? `${note}\n\n${m.content}` : m.content });
+    }
+  }
+
   let finalTextResponse = "";
   const toolResultsLog: Record<string, unknown>[] = [];
 
@@ -62,6 +106,15 @@ export async function POST(req: NextRequest) {
     });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Anthropic API error", data);
+      return NextResponse.json(
+        { error: "The AI couldn't process that — if you attached files, try fewer or smaller ones." },
+        { status: 502 }
+      );
+    }
+
     const toolUseBlocks = (data.content ?? []).filter((b: { type: string }) => b.type === "tool_use");
     const textBlocks = (data.content ?? []).filter((b: { type: string }) => b.type === "text");
 
