@@ -7,6 +7,7 @@ import type { Template, GalleryTemplateDetail } from "@/lib/templates/template-s
 import { SectionEditor } from "@/components/dashboard/SectionEditor";
 import { FeatureTogglesPanel, type FeatureToggleState } from "@/components/dashboard/FeatureTogglesPanel";
 import { EditorChat } from "@/components/dashboard/EditorChat";
+import { InlineEditLayer } from "@/components/dashboard/InlineEditLayer";
 import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
 import styles from "./editor-workspace.module.css";
 
@@ -32,6 +33,7 @@ export function DashboardEditor({
   welcome,
 }: DashboardEditorProps) {
   const [tab, setTab] = useState<"chat" | "edit" | "preview">("chat");
+  const [inlineEdit, setInlineEdit] = useState(true);
   const [config, setConfig] = useState(initialConfig);
   const [contentBlocks, setContentBlocks] = useState<Record<string, unknown>>(initialConfig.content_blocks ?? {});
   const [colorScheme, setColorScheme] = useState<Record<string, unknown>>(initialConfig.color_scheme ?? {});
@@ -180,6 +182,12 @@ export function DashboardEditor({
             Orders
           </Link>
           <span className={`${styles.status} ${isLive ? styles.statusLive : ""}`}>{isLive ? "Live" : "Draft"}</span>
+          {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
+          {dirty && (
+            <button className={styles.saveTop} onClick={save} disabled={saving}>
+              {saving ? "Saving..." : "Save changes"}
+            </button>
+          )}
           <button className={styles.publishBtn} onClick={togglePublish} disabled={saving}>
             {isLive ? "Unpublish" : "Publish"}
           </button>
@@ -275,7 +283,22 @@ export function DashboardEditor({
                 </span>
                 {slug ? `${slug}.rivo.app` : "your-site.rivo.app"}
               </div>
-              <TemplateSite template={previewTemplate} />
+              <InlineEditLayer enabled={inlineEdit} contentBlocks={contentBlocks} onChange={updateSection}>
+                <TemplateSite template={previewTemplate} />
+              </InlineEditLayer>
+            </div>
+          </div>
+
+          <div className={styles.editDock}>
+            <div className={styles.editPill}>
+              <button
+                type="button"
+                className={inlineEdit ? styles.pillOn : ""}
+                onClick={() => setInlineEdit((v) => !v)}
+              >
+                ✎ Edit on page
+              </button>
+              {inlineEdit && <span className={styles.pillHint}>Click any text · Enter saves · Esc cancels</span>}
             </div>
           </div>
         </main>
