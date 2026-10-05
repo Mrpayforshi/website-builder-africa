@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -8,6 +8,8 @@ import { SectionEditor } from "@/components/dashboard/SectionEditor";
 import { FeatureTogglesPanel, type FeatureToggleState } from "@/components/dashboard/FeatureTogglesPanel";
 import { EditorChat } from "@/components/dashboard/EditorChat";
 import { InlineEditLayer } from "@/components/dashboard/InlineEditLayer";
+import { CodeView } from "@/components/dashboard/CodeView";
+import { MorePanel } from "@/components/dashboard/MorePanel";
 import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
 import styles from "./editor-workspace.module.css";
 
@@ -22,6 +24,52 @@ interface DashboardEditorProps {
   welcome: boolean;
 }
 
+type RightTab = "preview" | "edit" | "code" | "more";
+
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "rivo.app";
+
+const RIGHT_TABS: { key: RightTab; label: string; icon: React.ReactNode }[] = [
+  {
+    key: "preview",
+    label: "Preview",
+    icon: (
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
+      </svg>
+    ),
+  },
+  {
+    key: "edit",
+    label: "Edit",
+    icon: (
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <path d="M4 20h4L19 9l-4-4L4 16v4z" />
+        <path d="M13 7l4 4" />
+      </svg>
+    ),
+  },
+  {
+    key: "code",
+    label: "Code",
+    icon: (
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />
+      </svg>
+    ),
+  },
+  {
+    key: "more",
+    label: "More",
+    icon: (
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <path d="M12 3l9 5-9 5-9-5 9-5z" />
+        <path d="M3 13l9 5 9-5" />
+      </svg>
+    ),
+  },
+];
+
 export function DashboardEditor({
   businessId,
   businessName,
@@ -32,7 +80,8 @@ export function DashboardEditor({
   initialFeatureToggles,
   welcome,
 }: DashboardEditorProps) {
-  const [tab, setTab] = useState<"chat" | "edit" | "preview">("chat");
+  const [rightTab, setRightTab] = useState<RightTab>("preview");
+  const [mobileView, setMobileView] = useState<"chat" | "site">("chat");
   const [inlineEdit, setInlineEdit] = useState(true);
   const [config, setConfig] = useState(initialConfig);
   const [contentBlocks, setContentBlocks] = useState<Record<string, unknown>>(initialConfig.content_blocks ?? {});
@@ -167,9 +216,15 @@ export function DashboardEditor({
   }
 
   const isLive = config.status === "published";
+  const siteHost = slug ? `${slug}.${ROOT_DOMAIN}` : null;
+  const siteUrl = siteHost ? `https://${siteHost}` : null;
+
+  function panelClass(tab: RightTab) {
+    return `${styles.panel} ${rightTab === tab ? "" : styles.panelHidden}`;
+  }
 
   return (
-    <div className={styles.root} data-tab={tab}>
+    <div className={styles.root} data-mobile={mobileView}>
       <header className={styles.topbar}>
         <div className={styles.topLeft}>
           <Link href="/dashboard" className={styles.back}>
@@ -177,6 +232,24 @@ export function DashboardEditor({
           </Link>
           <span className={styles.projectName}>{businessName}</span>
         </div>
+
+        <div className={styles.mobileSwitch} role="tablist" aria-label="Chat or site">
+          <button
+            type="button"
+            className={`${styles.mobileBtn} ${mobileView === "chat" ? styles.mobileBtnActive : ""}`}
+            onClick={() => setMobileView("chat")}
+          >
+            Chat
+          </button>
+          <button
+            type="button"
+            className={`${styles.mobileBtn} ${mobileView === "site" ? styles.mobileBtnActive : ""}`}
+            onClick={() => setMobileView("site")}
+          >
+            Site
+          </button>
+        </div>
+
         <div className={styles.topRight}>
           <Link href={`/dashboard/${businessId}/orders`} className={styles.link}>
             Orders
@@ -194,26 +267,8 @@ export function DashboardEditor({
         </div>
       </header>
 
-      <div className={styles.body}>
-        <aside className={styles.left}>
-          <div className={styles.tabs}>
-            <button
-              className={`${styles.tab} ${tab !== "edit" && tab !== "preview" ? styles.tabActive : ""}`}
-              onClick={() => setTab("chat")}
-            >
-              Chat
-            </button>
-            <button className={`${styles.tab} ${tab === "edit" ? styles.tabActive : ""}`} onClick={() => setTab("edit")}>
-              Edit content
-            </button>
-            <button
-              className={`${styles.tab} ${styles.previewTab} ${tab === "preview" ? styles.tabActive : ""}`}
-              onClick={() => setTab("preview")}
-            >
-              Preview
-            </button>
-          </div>
-
+      {(conflict || error) && (
+        <div className={styles.alerts}>
           {conflict && (
             <div className={styles.notice}>
               This site was changed elsewhere (chat or another tab) since you loaded it. Your unsaved edits
@@ -224,8 +279,12 @@ export function DashboardEditor({
             </div>
           )}
           {error && <p className={styles.errorText}>{error}</p>}
+        </div>
+      )}
 
-          <div className={styles.pane} style={{ display: tab === "edit" ? "none" : "flex" }}>
+      <div className={styles.body}>
+        <aside className={styles.left}>
+          <div className={styles.pane}>
             <EditorChat
               businessId={businessId}
               businessName={businessName}
@@ -233,72 +292,137 @@ export function DashboardEditor({
               onSiteChanged={handleChatChanged}
             />
           </div>
-
-          <div className={styles.pane} style={{ display: tab === "edit" ? "flex" : "none" }}>
-            <div className={styles.editPane}>
-              {template.structure.sections.map((section) => (
-                <SectionEditor
-                  key={section.id}
-                  section={section}
-                  content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
-                  onChange={(content) => updateSection(section.id, content)}
-                />
-              ))}
-
-              <section style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #ddd" }}>
-                <h2 style={{ fontSize: "1.1rem" }}>Appearance</h2>
-                {(["primary", "secondary", "accent"] as const).map((key) => (
-                  <label key={key} style={{ display: "block", marginBottom: "0.5rem" }}>
-                    {key}
-                    <input
-                      type="text"
-                      value={(colorScheme[key] as string) ?? ""}
-                      placeholder="#000000"
-                      onChange={(e) => updateColor(key, e.target.value)}
-                      style={{ marginLeft: "0.5rem" }}
-                    />
-                  </label>
-                ))}
-              </section>
-
-              <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
-            </div>
-            <div className={styles.saveBar}>
-              <button onClick={save} disabled={!dirty || saving}>
-                {saving ? "Saving..." : "Save changes"}
-              </button>
-              {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
-            </div>
-          </div>
         </aside>
 
         <main className={styles.right}>
-          <div className={styles.previewScroller}>
-            <div className={styles.browser}>
-              <div className={styles.urlBar}>
-                <span className={styles.urlDots}>
-                  <span />
-                  <span />
-                  <span />
-                </span>
-                {slug ? `${slug}.rivo.app` : "your-site.rivo.app"}
-              </div>
-              <InlineEditLayer enabled={inlineEdit} contentBlocks={contentBlocks} onChange={updateSection}>
-                <TemplateSite template={previewTemplate} />
-              </InlineEditLayer>
+          <div className={styles.rightBar}>
+            <div className={styles.tabGroup} role="tablist" aria-label="Site views">
+              {RIGHT_TABS.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={rightTab === t.key}
+                  className={`${styles.tabBtn} ${rightTab === t.key ? styles.tabBtnActive : ""}`}
+                  onClick={() => setRightTab(t.key)}
+                  title={t.label}
+                >
+                  {t.icon}
+                  <span className={styles.tabBtnLabel}>{t.label}</span>
+                </button>
+              ))}
+            </div>
+            <div className={styles.rightBarEnd}>
+              {siteHost && <span className={styles.hostChip}>{siteHost}</span>}
+              {isLive && siteUrl && (
+                <a className={styles.openLink} href={siteUrl} target="_blank" rel="noreferrer">
+                  Open ↗
+                </a>
+              )}
             </div>
           </div>
 
-          <div className={styles.editDock}>
-            <div className={styles.editPill}>
-              <button
-                type="button"
-                className={inlineEdit ? styles.pillOn : ""}
-                onClick={() => setInlineEdit((v) => !v)}
-              >
-                ✎ Edit on page
-              </button>
-              {inlineEdit && <span className={styles.pillHint}>Click any text · Enter saves · Esc cancels</span>}
+          <div className={styles.panels}>
+            <div className={`${panelClass("preview")} ${styles.previewPanel}`}>
+              <div className={styles.previewScroller}>
+                <div className={styles.browser}>
+                  <div className={styles.urlBar}>
+                    <span className={styles.urlDots}>
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    {siteHost ?? `your-site.${ROOT_DOMAIN}`}
+                  </div>
+                  <InlineEditLayer enabled={inlineEdit} contentBlocks={contentBlocks} onChange={updateSection}>
+                    <TemplateSite template={previewTemplate} />
+                  </InlineEditLayer>
+                </div>
+              </div>
+
+              <div className={styles.editDock}>
+                <div className={styles.editPill}>
+                  <button
+                    type="button"
+                    className={inlineEdit ? styles.pillOn : ""}
+                    onClick={() => setInlineEdit((v) => !v)}
+                  >
+                    ✎ Edit on page
+                  </button>
+                  {inlineEdit && <span className={styles.pillHint}>Click any text · Enter saves · Esc cancels</span>}
+                </div>
+              </div>
+            </div>
+
+            <div className={`${panelClass("edit")} ${styles.editPanel}`}>
+              <div className={styles.editPane}>
+                {template.structure.sections.map((section) => (
+                  <SectionEditor
+                    key={section.id}
+                    section={section}
+                    content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
+                    onChange={(content) => updateSection(section.id, content)}
+                  />
+                ))}
+
+                <section style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #ddd" }}>
+                  <h2 style={{ fontSize: "1.1rem" }}>Appearance</h2>
+                  {(["primary", "secondary", "accent"] as const).map((key) => (
+                    <label key={key} style={{ display: "block", marginBottom: "0.5rem" }}>
+                      {key}
+                      <input
+                        type="text"
+                        value={(colorScheme[key] as string) ?? ""}
+                        placeholder="#000000"
+                        onChange={(e) => updateColor(key, e.target.value)}
+                        style={{ marginLeft: "0.5rem" }}
+                      />
+                    </label>
+                  ))}
+                </section>
+
+                <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
+              </div>
+              <div className={styles.saveBar}>
+                <button onClick={save} disabled={!dirty || saving}>
+                  {saving ? "Saving..." : "Save changes"}
+                </button>
+                {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
+              </div>
+            </div>
+
+            <div className={panelClass("code")}>
+              <CodeView
+                businessId={businessId}
+                businessName={businessName}
+                slug={slug}
+                status={config.status}
+                version={config.version}
+                publishedAt={config.published_at}
+                templateId={template.id}
+                templateName={template.name}
+                templateCategory={template.category}
+                templateStructure={template.structure}
+                sectionIds={template.structure.sections.map((s) => s.id)}
+                contentBlocks={contentBlocks}
+                colorScheme={colorScheme}
+                featureToggles={featureToggles}
+              />
+            </div>
+
+            <div className={panelClass("more")}>
+              <MorePanel
+                businessId={businessId}
+                businessName={businessName}
+                slug={slug}
+                isLive={isLive}
+                version={config.version}
+                siteHost={siteHost}
+                siteUrl={siteUrl}
+                featureToggles={featureToggles}
+                busy={saving}
+                onTogglePublish={togglePublish}
+              />
             </div>
           </div>
         </main>
