@@ -1,4 +1,4 @@
-  "use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { EditorChat } from "@/components/dashboard/EditorChat";
 import { InlineEditLayer } from "@/components/dashboard/InlineEditLayer";
 import { CodeView } from "@/components/dashboard/CodeView";
 import { MorePanel } from "@/components/dashboard/MorePanel";
+import { BuilderMenu, type ProjectLink } from "@/components/dashboard/BuilderMenu";
 import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
 import styles from "./editor-workspace.module.css";
 
@@ -22,6 +23,8 @@ interface DashboardEditorProps {
   galleryTemplate: GalleryTemplateDetail | null;
   initialFeatureToggles: FeatureToggleState[];
   welcome: boolean;
+  projects: ProjectLink[];
+  userEmail: string;
 }
 
 type RightTab = "preview" | "edit" | "code" | "more";
@@ -79,8 +82,11 @@ export function DashboardEditor({
   galleryTemplate,
   initialFeatureToggles,
   welcome,
+  projects,
+  userEmail,
 }: DashboardEditorProps) {
   const [rightTab, setRightTab] = useState<RightTab>("preview");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [mobileView, setMobileView] = useState<"chat" | "site">("chat");
   const [inlineEdit, setInlineEdit] = useState(true);
   const [config, setConfig] = useState(initialConfig);
@@ -227,9 +233,19 @@ export function DashboardEditor({
     <div className={styles.root} data-mobile={mobileView}>
       <header className={styles.topbar}>
         <div className={styles.topLeft}>
-          <Link href="/dashboard" className={styles.back}>
-            ← Projects
-          </Link>
+          <button
+            type="button"
+            className={styles.menuBtn}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+            title="Menu"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+              <rect x="3" y="4" width="18" height="16" rx="3" />
+              <path d="M9 4v16" />
+            </svg>
+          </button>
           <span className={styles.projectName}>{businessName}</span>
         </div>
 
@@ -250,7 +266,32 @@ export function DashboardEditor({
           </button>
         </div>
 
+        <div className={styles.topCenter}>
+          <div className={styles.tabGroup} role="tablist" aria-label="Site views">
+            {RIGHT_TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={rightTab === t.key}
+                className={`${styles.tabBtn} ${rightTab === t.key ? styles.tabBtnActive : ""}`}
+                onClick={() => setRightTab(t.key)}
+                title={t.label}
+              >
+                {t.icon}
+                <span className={styles.tabBtnLabel}>{t.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className={styles.topRight}>
+          {siteHost && <span className={styles.hostChip}>{siteHost}</span>}
+          {isLive && siteUrl && (
+            <a className={styles.openLink} href={siteUrl} target="_blank" rel="noreferrer">
+              Open ↗
+            </a>
+          )}
           <Link href={`/dashboard/${businessId}/orders`} className={styles.link}>
             Orders
           </Link>
@@ -266,6 +307,15 @@ export function DashboardEditor({
           </button>
         </div>
       </header>
+
+      <BuilderMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        projects={projects}
+        currentId={businessId}
+        userEmail={userEmail}
+        dirty={dirty}
+      />
 
       {(conflict || error) && (
         <div className={styles.alerts}>
@@ -295,33 +345,6 @@ export function DashboardEditor({
         </aside>
 
         <main className={styles.right}>
-          <div className={styles.rightBar}>
-            <div className={styles.tabGroup} role="tablist" aria-label="Site views">
-              {RIGHT_TABS.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={rightTab === t.key}
-                  className={`${styles.tabBtn} ${rightTab === t.key ? styles.tabBtnActive : ""}`}
-                  onClick={() => setRightTab(t.key)}
-                  title={t.label}
-                >
-                  {t.icon}
-                  <span className={styles.tabBtnLabel}>{t.label}</span>
-                </button>
-              ))}
-            </div>
-            <div className={styles.rightBarEnd}>
-              {siteHost && <span className={styles.hostChip}>{siteHost}</span>}
-              {isLive && siteUrl && (
-                <a className={styles.openLink} href={siteUrl} target="_blank" rel="noreferrer">
-                  Open ↗
-                </a>
-              )}
-            </div>
-          </div>
-
           <div className={styles.panels}>
             <div className={`${panelClass("preview")} ${styles.previewPanel}`}>
               <div className={styles.previewScroller}>
