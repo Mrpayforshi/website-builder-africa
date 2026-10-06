@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { applyElementStyles, pathKey, type ElementStyles } from "@/lib/dashboard/element-styles";
 
 type Path = (string | number)[];
 type Target = { path: Path; paragraph?: number };
@@ -108,14 +109,21 @@ function placeCaret(el: HTMLElement, x: number, y: number) {
   sel.addRange(range);
 }
 
+/** Content path of the clicked element, e.g. "hero.headline" — the key its style overrides are stored under. */
+export type InlineSelection = { key: string };
+
 interface Props {
   enabled: boolean;
   contentBlocks: Record<string, unknown>;
   onChange: (sectionId: string, content: Record<string, unknown>) => void;
+  /** Saved per-element style overrides (color_scheme.element_styles). Re-applied after every render. */
+  elementStyles?: ElementStyles;
+  /** Fired when an element is clicked (or null when empty space is clicked). */
+  onSelect?: (selection: InlineSelection | null) => void;
   children: ReactNode;
 }
 
-export function InlineEditLayer({ enabled, contentBlocks, onChange, children }: Props) {
+export function InlineEditLayer({ enabled, contentBlocks, onChange, elementStyles, onSelect, children }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const targets = useMemo(() => {
     const m = new Map<string, Target[]>();
@@ -130,6 +138,19 @@ export function InlineEditLayer({ enabled, contentBlocks, onChange, children }: 
   blocksRef.current = contentBlocks;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
+
+  // Re-apply saved style overrides to the matching elements after every render
+  // (the template re-renders on every keystroke, and React won't know about our inline styles).
+  useEffect(() => {
+    const root = wrapRef.current;
+    if (!root) return;
+    applyElementStyles(root, elementStyles ?? {}, (text) => {
+      const t = targets.get(text)?.[0];
+      return t ? pathKey(t.path) : undefined;
+    });
+  });
 
   useEffect(() => {
     const root = wrapRef.current;
@@ -221,6 +242,7 @@ export function InlineEditLayer({ enabled, contentBlocks, onChange, children }: 
       e.preventDefault();
       e.stopPropagation();
       const hit = findMatch(t, root, targetsRef.current);
+      onSelectRef.current?.(hit ? { key: pathKey(hit.target.path) } : null);
       if (hit) begin(hit.el, hit.target, e);
     };
 
