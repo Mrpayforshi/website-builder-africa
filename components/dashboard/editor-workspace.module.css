@@ -352,12 +352,25 @@
 
 /* Preview */
 .previewPanel {
-  position: relative; /* anchors the floating "Edit on page" toolbar */
+  position: relative; /* anchors the floating "Edit on page" toolbar and the details card */
 }
 .previewScroller {
   flex: 1;
   overflow: auto;
   padding: 20px;
+}
+
+/* Floating "edit details" card (Spacing / Typography / Color) shown over the
+   preview when an element is selected. The card itself is styled in
+   style-panel.module.css; this only positions it. */
+.detailsDock {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 300px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  z-index: 25; /* above the .editDock toolbar (20) */
 }
 
 /* Edit */
@@ -1142,6 +1155,9 @@
   }
   .pillHint {
     display: none;
+  }
+  .detailsDock {
+    display: none; /* the Edit tab shows the same panel on small screens */
   }
   .codeRoot,
   .moreRoot {
