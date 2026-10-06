@@ -1,0 +1,200 @@
+/* Lovable-style "edit details" card. Light surface on purpose: it stays readable
+   whether the surrounding editor chrome is dark or light. */
+.card {
+  --sp-bg: #fbfaf8;
+  --sp-border: #e4e1da;
+  --sp-ink: #1a1a1a;
+  --sp-muted: #6b675f;
+  --sp-field: #ffffff;
+  --sp-accent: #1a1a1a;
+
+  background: var(--sp-bg);
+  color: var(--sp-ink);
+  border: 1px solid var(--sp-border);
+  border-radius: 14px;
+  padding: 14px 16px 6px;
+  font: 13px/1.4 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-shadow: 0 1px 2px rgba(20, 18, 14, 0.04), 0 8px 24px rgba(20, 18, 14, 0.08);
+}
+
+.empty {
+  margin: 0 0 8px;
+  color: var(--sp-muted);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--sp-border);
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sp-muted);
+}
+.target {
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 2px;
+}
+.reset {
+  border: 1px solid var(--sp-border);
+  background: var(--sp-field);
+  color: var(--sp-ink);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.reset:hover { background: #f1efe9; }
+
+.group { padding: 14px 0 6px; }
+.group + .group { border-top: 1px solid var(--sp-border); }
+.groupTitle {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.field { min-width: 0; }
+.label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--sp-muted);
+}
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+.num,
+.select select,
+.colorBox {
+  height: 34px;
+  border: 1px solid var(--sp-border);
+  background: var(--sp-field);
+  border-radius: 8px;
+  color: var(--sp-ink);
+}
+.num {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  color: var(--sp-muted);
+}
+.num input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--sp-ink);
+  -moz-appearance: textfield;
+}
+.num input::-webkit-outer-spin-button,
+.num input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.select { position: relative; }
+.select select {
+  width: 100%;
+  appearance: none;
+  padding: 0 28px 0 10px;
+  font: inherit;
+  cursor: pointer;
+}
+.select::after {
+  content: "";
+  position: absolute;
+  right: 11px;
+  top: 13px;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--sp-muted);
+  border-bottom: 1.5px solid var(--sp-muted);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.num:focus-within,
+.select select:focus-visible,
+.colorBox:focus-within {
+  outline: 2px solid #1a1a1a22;
+  border-color: #1a1a1a;
+}
+
+.segment {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 34px;
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--sp-field);
+}
+.segment button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--sp-muted);
+  cursor: pointer;
+}
+.segment button + button { border-left: 1px solid var(--sp-border); }
+.segment button:hover { background: #f1efe9; }
+.segment .segOn { background: #e7eefc; color: #1d4ed8; }
+
+.colorBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+.colorBox input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--sp-ink);
+}
+.colorWell {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--sp-border);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+.colorWell::-webkit-color-swatch-wrapper { padding: 0; }
+.colorWell::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.colorWell::-moz-color-swatch { border: 0; border-radius: 50%; }
+
+.swatches { display: flex; gap: 6px; margin-top: 6px; }
+.swatches button {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--sp-border);
+  padding: 0;
+  cursor: pointer;
+}
+.swatches .swatchOn { outline: 2px solid #1a1a1a; outline-offset: 1px; }
+
+.brandRow { margin-bottom: 12px; }
