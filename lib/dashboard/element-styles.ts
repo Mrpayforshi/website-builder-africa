@@ -1,499 +1,107 @@
-"use client";
+// Per-element style overrides ("edit details"), stored in site_configs.color_scheme.element_styles
+// keyed by the content path of the text element (e.g. "hero.headline", "products.items.2.name").
+// Values are validated on the way OUT (toCss), so whatever is stored can never inject arbitrary CSS.
 
-import { useState } from "react";
-import Link from "next/link";
-import type { SiteConfig } from "@/types/database";
-import type { Template, GalleryTemplateDetail } from "@/lib/templates/template-store";
-import { SectionEditor } from "@/components/dashboard/SectionEditor";
-import { FeatureTogglesPanel, type FeatureToggleState } from "@/components/dashboard/FeatureTogglesPanel";
-import { EditorChat } from "@/components/dashboard/EditorChat";
-import { InlineEditLayer } from "@/components/dashboard/InlineEditLayer";
-import { CodeView } from "@/components/dashboard/CodeView";
-import { MorePanel } from "@/components/dashboard/MorePanel";
-import { BuilderMenu, type ProjectLink } from "@/components/dashboard/BuilderMenu";
-import { StylePanel, BrandColors, labelFromKey, type Selection } from "@/components/dashboard/StylePanel";
-import { readElementStyles, type ElementStyle, type ElementStyles } from "@/lib/dashboard/element-styles";
-import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
-import styles from "./editor-workspace.module.css";
-
-interface DashboardEditorProps {
-  businessId: string;
-  businessName: string;
-  slug: string;
-  initialConfig: SiteConfig;
-  template: Template;
-  galleryTemplate: GalleryTemplateDetail | null;
-  initialFeatureToggles: FeatureToggleState[];
-  welcome: boolean;
-  projects: ProjectLink[];
-  userEmail: string;
+export interface ElementStyle {
+  mx?: number; // horizontal margin, px
+  my?: number; // vertical margin, px
+  px?: number; // horizontal padding, px
+  py?: number; // vertical padding, px
+  size?: string;
+  family?: string;
+  weight?: string;
+  align?: "left" | "center" | "right" | "justify";
+  color?: string;
+  bg?: string;
 }
 
-type RightTab = "preview" | "edit" | "code" | "more";
+export type ElementStyles = Record<string, ElementStyle>;
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "rivo.app";
-
-const RIGHT_TABS: { key: RightTab; label: string; icon: React.ReactNode }[] = [
-  {
-    key: "preview",
-    label: "Preview",
-    icon: (
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
-      </svg>
-    ),
-  },
-  {
-    key: "edit",
-    label: "Edit",
-    icon: (
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-        <path d="M4 20h4L19 9l-4-4L4 16v4z" />
-        <path d="M13 7l4 4" />
-      </svg>
-    ),
-  },
-  {
-    key: "code",
-    label: "Code",
-    icon: (
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-        <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />
-      </svg>
-    ),
-  },
-  {
-    key: "more",
-    label: "More",
-    icon: (
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-        <path d="M12 3l9 5-9 5-9-5 9-5z" />
-        <path d="M3 13l9 5 9-5" />
-      </svg>
-    ),
-  },
+export const SIZE_OPTIONS = [
+  { value: "", label: "Template default" },
+  { value: "0.875rem", label: "Small" },
+  { value: "1rem", label: "Body" },
+  { value: "1.25rem", label: "Large" },
+  { value: "1.75rem", label: "Heading" },
+  { value: "2.5rem", label: "Title" },
+  { value: "3.5rem", label: "Display" },
 ];
 
-export function DashboardEditor({
-  businessId,
-  businessName,
-  slug,
-  initialConfig,
-  template,
-  galleryTemplate,
-  initialFeatureToggles,
-  welcome,
-  projects,
-  userEmail,
-}: DashboardEditorProps) {
-  const [rightTab, setRightTab] = useState<RightTab>("preview");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [mobileView, setMobileView] = useState<"chat" | "site">("chat");
-  const [inlineEdit, setInlineEdit] = useState(true);
-  const [config, setConfig] = useState(initialConfig);
-  const [contentBlocks, setContentBlocks] = useState<Record<string, unknown>>(initialConfig.content_blocks ?? {});
-  const [colorScheme, setColorScheme] = useState<Record<string, unknown>>(initialConfig.color_scheme ?? {});
-  const [featureToggles, setFeatureToggles] = useState(initialFeatureToggles);
-  const [dirty, setDirty] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [conflict, setConflict] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [savedMessage, setSavedMessage] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Selection | null>(null);
+export const FAMILY_OPTIONS = [
+  { value: "", label: "Template default" },
+  { value: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", label: "Sans" },
+  { value: "Georgia, 'Times New Roman', serif", label: "Serif" },
+  { value: "ui-monospace, SFMono-Regular, Menlo, monospace", label: "Mono" },
+];
 
-  const elementStyles: ElementStyles = readElementStyles(colorScheme);
+export const WEIGHT_OPTIONS = [
+  { value: "", label: "Template default" },
+  { value: "400", label: "Regular" },
+  { value: "500", label: "Medium" },
+  { value: "600", label: "Semibold" },
+  { value: "700", label: "Bold" },
+];
 
-  // Live preview: the same component the gallery uses, fed with this site's
-  // own (even unsaved) content. Gallery-linked sites keep their bespoke design.
-  const previewTemplate: GalleryTemplateDetail = {
-    id: galleryTemplate?.id ?? template.id,
-    category: template.category,
-    categoryLabel: galleryTemplate?.categoryLabel ?? "",
-    name: businessName,
-    description: galleryTemplate?.description ?? "",
-    features: galleryTemplate?.features ?? [],
-    structure: galleryTemplate?.structure ?? template.structure,
-    contentBlocks,
-  };
+const ALIGNS = new Set(["left", "center", "right", "justify"]);
+const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+const allowed = (opts: { value: string }[], v?: string) => !!v && opts.some((o) => o.value === v);
+const toPx = (n?: number) =>
+  typeof n === "number" && Number.isFinite(n) ? `${Math.min(200, Math.max(0, Math.round(n)))}px` : null;
 
-  function updateSection(sectionId: string, content: Record<string, unknown>) {
-    setContentBlocks((prev) => ({ ...prev, [sectionId]: content }));
-    setDirty(true);
-  }
+export const pathKey = (path: (string | number)[]) => path.join(".");
 
-  function updateColor(key: string, value: string) {
-    setColorScheme((prev) => ({ ...prev, [key]: value }));
-    setDirty(true);
-  }
+export function readElementStyles(colorScheme: Record<string, unknown> | null | undefined): ElementStyles {
+  const raw = colorScheme?.element_styles;
+  return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as ElementStyles) : {};
+}
 
-  function updateElementStyle(key: string, patch: Partial<ElementStyle>) {
-    setColorScheme((prev) => {
-      const all = readElementStyles(prev);
-      const next: Record<string, unknown> = { ...(all[key] ?? {}), ...patch };
-      // Drop empty values so "Template default" really means default.
-      Object.keys(next).forEach((k) => {
-        if (next[k] === undefined || next[k] === "") delete next[k];
-      });
-      const merged: ElementStyles = { ...all };
-      if (Object.keys(next).length) merged[key] = next as ElementStyle;
-      else delete merged[key];
-      return { ...prev, element_styles: merged };
-    });
-    setDirty(true);
-  }
+/** Validated CSS declarations (kebab-case property -> value) for one element's overrides. */
+export function toCss(s: ElementStyle): Record<string, string> {
+  const out: Record<string, string> = {};
+  const mx = toPx(s.mx), my = toPx(s.my), ppx = toPx(s.px), ppy = toPx(s.py);
+  if (mx) { out["margin-left"] = mx; out["margin-right"] = mx; }
+  if (my) { out["margin-top"] = my; out["margin-bottom"] = my; }
+  if (ppx) { out["padding-left"] = ppx; out["padding-right"] = ppx; }
+  if (ppy) { out["padding-top"] = ppy; out["padding-bottom"] = ppy; }
+  if (allowed(SIZE_OPTIONS, s.size)) out["font-size"] = s.size!;
+  if (allowed(FAMILY_OPTIONS, s.family)) out["font-family"] = s.family!;
+  if (allowed(WEIGHT_OPTIONS, s.weight)) out["font-weight"] = s.weight!;
+  if (s.align && ALIGNS.has(s.align)) out["text-align"] = s.align;
+  if (s.color && HEX.test(s.color)) out["color"] = s.color;
+  if (s.bg && HEX.test(s.bg)) out["background-color"] = s.bg;
+  return out;
+}
 
-  function resetElementStyle(key: string) {
-    setColorScheme((prev) => {
-      const merged: ElementStyles = { ...readElementStyles(prev) };
-      delete merged[key];
-      return { ...prev, element_styles: merged };
-    });
-    setDirty(true);
-  }
+const APPLIED = "data-rivo-styled";
 
-  function updateToggle(featureKey: string, enabled: boolean, toggleConfig?: Record<string, unknown>) {
-    setFeatureToggles((prev) => {
-      const existing = prev.find((f) => f.feature_key === featureKey);
-      if (existing) {
-        return prev.map((f) =>
-          f.feature_key === featureKey ? { ...f, enabled, config: toggleConfig ?? f.config } : f
-        );
-      }
-      return [...prev, { feature_key: featureKey, enabled, config: toggleConfig ?? {} }];
-    });
-    setDirty(true);
-  }
+const isTextLeaf = (el: HTMLElement) => Array.from(el.children).every((c) => c.tagName === "BR");
 
-  async function save() {
-    setSaving(true);
-    setError(null);
-    setConflict(false);
-    try {
-      const res = await fetch(`/api/site-config/${businessId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          expectedVersion: config.version,
-          contentBlocksPatch: contentBlocks,
-          colorSchemePatch: colorScheme,
-          featureTogglesPatch: featureToggles,
-        }),
-      });
-
-      if (res.status === 409) {
-        setConflict(true);
-        return;
-      }
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? `Save failed (${res.status})`);
-      }
-
-      const result = await res.json();
-      setConfig((prev) => ({ ...prev, version: result.newVersion }));
-      setDirty(false);
-      setSavedMessage("Saved");
-      setTimeout(() => setSavedMessage(null), 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function refetchAndDiscard() {
-    const res = await fetch(`/api/site-config/${businessId}`);
-    if (!res.ok) return;
-    const latest = await res.json();
-    setConfig(latest);
-    setContentBlocks(latest.content_blocks ?? {});
-    setColorScheme(latest.color_scheme ?? {});
-    setDirty(false);
-    setConflict(false);
-  }
-
-  // The AI chat just changed the site. Pull the new version into the preview,
-  // unless the user has unsaved edits — then use the existing conflict banner
-  // rather than silently overwriting their typing.
-  async function handleChatChanged() {
-    if (dirty) {
-      setConflict(true);
-      return;
-    }
-    await refetchAndDiscard();
-  }
-
-  async function togglePublish() {
-    setSaving(true);
-    setError(null);
-    try {
-      const nextStatus = config.status === "published" ? "draft" : "published";
-      const res = await fetch(`/api/site-config/${businessId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ expectedVersion: config.version, configStatus: nextStatus }),
-      });
-
-      if (res.status === 409) {
-        setConflict(true);
-        return;
-      }
-      if (!res.ok) throw new Error("Publish toggle failed");
-
-      const result = await res.json();
-      setConfig((prev) => ({ ...prev, version: result.newVersion, status: nextStatus }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const isLive = config.status === "published";
-  const siteHost = slug ? `${slug}.${ROOT_DOMAIN}` : null;
-  const siteUrl = siteHost ? `https://${siteHost}` : null;
-
-  function panelClass(tab: RightTab) {
-    return `${styles.panel} ${rightTab === tab ? "" : styles.panelHidden}`;
-  }
-
-  return (
-    <div className={styles.root} data-mobile={mobileView}>
-      <header className={styles.topbar}>
-        <div className={styles.topLeft}>
-          <button
-            type="button"
-            className={styles.menuBtn}
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Menu"
-            aria-expanded={menuOpen}
-            title="Menu"
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-              <rect x="3" y="4" width="18" height="16" rx="3" />
-              <path d="M9 4v16" />
-            </svg>
-          </button>
-          <span className={styles.projectName}>{businessName}</span>
-        </div>
-
-        <div className={styles.mobileSwitch} role="tablist" aria-label="Chat or site">
-          <button
-            type="button"
-            className={`${styles.mobileBtn} ${mobileView === "chat" ? styles.mobileBtnActive : ""}`}
-            onClick={() => setMobileView("chat")}
-          >
-            Chat
-          </button>
-          <button
-            type="button"
-            className={`${styles.mobileBtn} ${mobileView === "site" ? styles.mobileBtnActive : ""}`}
-            onClick={() => setMobileView("site")}
-          >
-            Site
-          </button>
-        </div>
-
-        <div className={styles.topCenter}>
-          <div className={styles.tabGroup} role="tablist" aria-label="Site views">
-            {RIGHT_TABS.map((t) => (
-              <button
-                key={t.key}
-                type="button"
-                role="tab"
-                aria-selected={rightTab === t.key}
-                className={`${styles.tabBtn} ${rightTab === t.key ? styles.tabBtnActive : ""}`}
-                onClick={() => setRightTab(t.key)}
-                title={t.label}
-              >
-                {t.icon}
-                <span className={styles.tabBtnLabel}>{t.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.topRight}>
-          {siteHost && <span className={styles.hostChip}>{siteHost}</span>}
-          {isLive && siteUrl && (
-            <a className={styles.openLink} href={siteUrl} target="_blank" rel="noreferrer">
-              Open ↗
-            </a>
-          )}
-          <Link href={`/dashboard/${businessId}/orders`} className={styles.link}>
-            Orders
-          </Link>
-          <span className={`${styles.status} ${isLive ? styles.statusLive : ""}`}>{isLive ? "Live" : "Draft"}</span>
-          {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
-          {dirty && (
-            <button className={styles.saveTop} onClick={save} disabled={saving}>
-              {saving ? "Saving..." : "Save changes"}
-            </button>
-          )}
-          <button className={styles.publishBtn} onClick={togglePublish} disabled={saving}>
-            {isLive ? "Unpublish" : "Publish"}
-          </button>
-        </div>
-      </header>
-
-      <BuilderMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        projects={projects}
-        currentId={businessId}
-        userEmail={userEmail}
-        dirty={dirty}
-      />
-
-      {(conflict || error) && (
-        <div className={styles.alerts}>
-          {conflict && (
-            <div className={styles.notice}>
-              This site was changed elsewhere (chat or another tab) since you loaded it. Your unsaved edits
-              haven&apos;t been saved.
-              <div>
-                <button onClick={refetchAndDiscard}>Reload latest &amp; discard my changes</button>
-              </div>
-            </div>
-          )}
-          {error && <p className={styles.errorText}>{error}</p>}
-        </div>
-      )}
-
-      <div className={styles.body}>
-        <aside className={styles.left}>
-          <div className={styles.pane}>
-            <EditorChat
-              businessId={businessId}
-              businessName={businessName}
-              welcome={welcome}
-              onSiteChanged={handleChatChanged}
-            />
-          </div>
-        </aside>
-
-        <main className={styles.right}>
-          <div className={styles.panels}>
-            <div className={`${panelClass("preview")} ${styles.previewPanel}`}>
-              <div className={styles.previewScroller}>
-                <div className={styles.browser}>
-                  <div className={styles.urlBar}>
-                    <span className={styles.urlDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </span>
-                    {siteHost ?? `your-site.${ROOT_DOMAIN}`}
-                  </div>
-                  <InlineEditLayer
-                    enabled={inlineEdit}
-                    contentBlocks={contentBlocks}
-                    onChange={updateSection}
-                    elementStyles={elementStyles}
-                    onSelect={(s) => setSelected(s ? { key: s.key, label: labelFromKey(s.key) } : null)}
-                  >
-                    <TemplateSite template={previewTemplate} />
-                  </InlineEditLayer>
-                </div>
-              </div>
-
-              {inlineEdit && selected && (
-                <div className={styles.detailsDock}>
-                  <StylePanel
-                    selection={selected}
-                    value={elementStyles[selected.key] ?? {}}
-                    onChange={(patch) => updateElementStyle(selected.key, patch)}
-                    onReset={() => resetElementStyle(selected.key)}
-                  />
-                </div>
-              )}
-
-              <div className={styles.editDock}>
-                <div className={styles.editPill}>
-                  <button
-                    type="button"
-                    className={inlineEdit ? styles.pillOn : ""}
-                    onClick={() => setInlineEdit((v) => !v)}
-                  >
-                    ✎ Edit on page
-                  </button>
-                  {inlineEdit && <span className={styles.pillHint}>Click any text · Enter saves · Esc cancels</span>}
-                </div>
-              </div>
-            </div>
-
-            <div className={`${panelClass("edit")} ${styles.editPanel}`}>
-              <div className={styles.editPane}>
-                <div style={{ margin: "0 0 1.5rem" }}>
-                  <StylePanel
-                    selection={selected}
-                    value={selected ? elementStyles[selected.key] ?? {} : {}}
-                    onChange={(patch) => selected && updateElementStyle(selected.key, patch)}
-                    onReset={() => selected && resetElementStyle(selected.key)}
-                  />
-                </div>
-
-                {template.structure.sections.map((section) => (
-                  <SectionEditor
-                    key={section.id}
-                    section={section}
-                    content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
-                    onChange={(content) => updateSection(section.id, content)}
-                  />
-                ))}
-
-                <div style={{ margin: "1.5rem 0" }}>
-                  <BrandColors colorScheme={colorScheme} onChange={updateColor} />
-                </div>
-
-                <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
-              </div>
-              <div className={styles.saveBar}>
-                <button onClick={save} disabled={!dirty || saving}>
-                  {saving ? "Saving..." : "Save changes"}
-                </button>
-                {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
-              </div>
-            </div>
-
-            <div className={panelClass("code")}>
-              <CodeView
-                businessId={businessId}
-                businessName={businessName}
-                slug={slug}
-                status={config.status}
-                version={config.version}
-                publishedAt={config.published_at}
-                templateId={template.id}
-                templateName={template.name}
-                templateCategory={template.category}
-                templateStructure={template.structure}
-                sectionIds={template.structure.sections.map((s) => s.id)}
-                contentBlocks={contentBlocks}
-                colorScheme={colorScheme}
-                featureToggles={featureToggles}
-              />
-            </div>
-
-            <div className={panelClass("more")}>
-              <MorePanel
-                businessId={businessId}
-                businessName={businessName}
-                slug={slug}
-                isLive={isLive}
-                version={config.version}
-                siteHost={siteHost}
-                siteUrl={siteUrl}
-                featureToggles={featureToggles}
-                busy={saving}
-                onTogglePublish={togglePublish}
-              />
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  );
+/**
+ * Applies overrides to every plain-text element under `root`.
+ * `keyFor` maps an element's whitespace-stripped text to its content-path key.
+ * Idempotent: clears what it set last time first. Used by the editor preview and (later) the published site.
+ */
+export function applyElementStyles(
+  root: HTMLElement,
+  styles: ElementStyles,
+  keyFor: (strippedText: string) => string | undefined
+) {
+  root.querySelectorAll<HTMLElement>(`[${APPLIED}]`).forEach((el) => {
+    (el.getAttribute(APPLIED) ?? "").split(",").forEach((p) => p && el.style.removeProperty(p));
+    el.removeAttribute(APPLIED);
+  });
+  if (!Object.keys(styles).length) return;
+  root.querySelectorAll<HTMLElement>("*").forEach((el) => {
+    if (!isTextLeaf(el)) return;
+    const text = (el.textContent ?? "").replace(/\s+/g, "");
+    if (!text) return;
+    const key = keyFor(text);
+    const style = key ? styles[key] : undefined;
+    if (!style) return;
+    const css = toCss(style);
+    const props = Object.keys(css);
+    if (!props.length) return;
+    props.forEach((p) => el.style.setProperty(p, css[p]));
+    el.setAttribute(APPLIED, props.join(","));
+  });
 }
