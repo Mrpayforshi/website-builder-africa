@@ -11,6 +11,8 @@ import { InlineEditLayer } from "@/components/dashboard/InlineEditLayer";
 import { CodeView } from "@/components/dashboard/CodeView";
 import { MorePanel } from "@/components/dashboard/MorePanel";
 import { BuilderMenu, type ProjectLink } from "@/components/dashboard/BuilderMenu";
+import { StylePanel, BrandColors, labelFromKey, type Selection } from "@/components/dashboard/StylePanel";
+import { readElementStyles, type ElementStyle, type ElementStyles } from "@/lib/dashboard/element-styles";
 import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
 import styles from "./editor-workspace.module.css";
 
@@ -98,6 +100,9 @@ export function DashboardEditor({
   const [conflict, setConflict] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Selection | null>(null);
+
+  const elementStyles: ElementStyles = readElementStyles(colorScheme);
 
   // Live preview: the same component the gallery uses, fed with this site's
   // own (even unsaved) content. Gallery-linked sites keep their bespoke design.
@@ -119,6 +124,31 @@ export function DashboardEditor({
 
   function updateColor(key: string, value: string) {
     setColorScheme((prev) => ({ ...prev, [key]: value }));
+    setDirty(true);
+  }
+
+  function updateElementStyle(key: string, patch: Partial<ElementStyle>) {
+    setColorScheme((prev) => {
+      const all = readElementStyles(prev);
+      const next: Record<string, unknown> = { ...(all[key] ?? {}), ...patch };
+      // Drop empty values so "Template default" really means default.
+      Object.keys(next).forEach((k) => {
+        if (next[k] === undefined || next[k] === "") delete next[k];
+      });
+      const merged: ElementStyles = { ...all };
+      if (Object.keys(next).length) merged[key] = next as ElementStyle;
+      else delete merged[key];
+      return { ...prev, element_styles: merged };
+    });
+    setDirty(true);
+  }
+
+  function resetElementStyle(key: string) {
+    setColorScheme((prev) => {
+      const merged: ElementStyles = { ...readElementStyles(prev) };
+      delete merged[key];
+      return { ...prev, element_styles: merged };
+    });
     setDirty(true);
   }
 
@@ -357,11 +387,28 @@ export function DashboardEditor({
                     </span>
                     {siteHost ?? `your-site.${ROOT_DOMAIN}`}
                   </div>
-                  <InlineEditLayer enabled={inlineEdit} contentBlocks={contentBlocks} onChange={updateSection}>
+                  <InlineEditLayer
+                    enabled={inlineEdit}
+                    contentBlocks={contentBlocks}
+                    onChange={updateSection}
+                    elementStyles={elementStyles}
+                    onSelect={(s) => setSelected(s ? { key: s.key, label: labelFromKey(s.key) } : null)}
+                  >
                     <TemplateSite template={previewTemplate} />
                   </InlineEditLayer>
                 </div>
               </div>
+
+              {inlineEdit && selected && (
+                <div className={styles.detailsDock}>
+                  <StylePanel
+                    selection={selected}
+                    value={elementStyles[selected.key] ?? {}}
+                    onChange={(patch) => updateElementStyle(selected.key, patch)}
+                    onReset={() => resetElementStyle(selected.key)}
+                  />
+                </div>
+              )}
 
               <div className={styles.editDock}>
                 <div className={styles.editPill}>
@@ -379,6 +426,15 @@ export function DashboardEditor({
 
             <div className={`${panelClass("edit")} ${styles.editPanel}`}>
               <div className={styles.editPane}>
+                <div style={{ margin: "0 0 1.5rem" }}>
+                  <StylePanel
+                    selection={selected}
+                    value={selected ? elementStyles[selected.key] ?? {} : {}}
+                    onChange={(patch) => selected && updateElementStyle(selected.key, patch)}
+                    onReset={() => selected && resetElementStyle(selected.key)}
+                  />
+                </div>
+
                 {template.structure.sections.map((section) => (
                   <SectionEditor
                     key={section.id}
@@ -388,21 +444,9 @@ export function DashboardEditor({
                   />
                 ))}
 
-                <section style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #ddd" }}>
-                  <h2 style={{ fontSize: "1.1rem" }}>Appearance</h2>
-                  {(["primary", "secondary", "accent"] as const).map((key) => (
-                    <label key={key} style={{ display: "block", marginBottom: "0.5rem" }}>
-                      {key}
-                      <input
-                        type="text"
-                        value={(colorScheme[key] as string) ?? ""}
-                        placeholder="#000000"
-                        onChange={(e) => updateColor(key, e.target.value)}
-                        style={{ marginLeft: "0.5rem" }}
-                      />
-                    </label>
-                  ))}
-                </section>
+                <div style={{ margin: "1.5rem 0" }}>
+                  <BrandColors colorScheme={colorScheme} onChange={updateColor} />
+                </div>
 
                 <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
               </div>
