@@ -15,6 +15,7 @@ import { StylePanel, BrandColors, labelFromKey, type Selection } from "@/compone
 import { readElementStyles, type ElementStyle, type ElementStyles } from "@/lib/dashboard/element-styles";
 import { TemplateSite } from "@/app/templates/[id]/TemplateSite";
 import styles from "./editor-workspace.module.css";
+import inspector from "./edit-inspector.module.css";
 
 interface DashboardEditorProps {
   businessId: string;
@@ -90,7 +91,6 @@ export function DashboardEditor({
   const [rightTab, setRightTab] = useState<RightTab>("preview");
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileView, setMobileView] = useState<"chat" | "site">("chat");
-  const [inlineEdit, setInlineEdit] = useState(true);
   const [config, setConfig] = useState(initialConfig);
   const [contentBlocks, setContentBlocks] = useState<Record<string, unknown>>(initialConfig.content_blocks ?? {});
   const [colorScheme, setColorScheme] = useState<Record<string, unknown>>(initialConfig.color_scheme ?? {});
@@ -259,6 +259,11 @@ export function DashboardEditor({
     return `${styles.panel} ${rightTab === tab ? "" : styles.panelHidden}`;
   }
 
+  // Preview and Edit share ONE live canvas. Edit turns on click-to-select /
+  // inline typing and shows the inspector column; Preview is the clean view.
+  const editing = rightTab === "edit";
+  const showCanvas = rightTab === "preview" || editing;
+
   return (
     <div className={styles.root} data-mobile={mobileView}>
       <header className={styles.topbar}>
@@ -376,85 +381,82 @@ export function DashboardEditor({
 
         <main className={styles.right}>
           <div className={styles.panels}>
-            <div className={`${panelClass("preview")} ${styles.previewPanel}`}>
-              <div className={styles.previewScroller}>
-                <div className={styles.browser}>
-                  <div className={styles.urlBar}>
-                    <span className={styles.urlDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </span>
-                    {siteHost ?? `your-site.${ROOT_DOMAIN}`}
+            <div className={`${styles.panel} ${showCanvas ? "" : styles.panelHidden} ${styles.previewPanel}`}>
+              <div className={inspector.canvasWrap}>
+                <div className={inspector.canvas}>
+                  <div className={styles.browser}>
+                    <div className={styles.urlBar}>
+                      <span className={styles.urlDots}>
+                        <span />
+                        <span />
+                        <span />
+                      </span>
+                      {siteHost ?? `your-site.${ROOT_DOMAIN}`}
+                    </div>
+                    <InlineEditLayer
+                      enabled={editing}
+                      contentBlocks={contentBlocks}
+                      onChange={updateSection}
+                      elementStyles={elementStyles}
+                      onSelect={(s) => setSelected(s ? { key: s.key, label: labelFromKey(s.key) } : null)}
+                    >
+                      <TemplateSite template={previewTemplate} />
+                    </InlineEditLayer>
                   </div>
-                  <InlineEditLayer
-                    enabled={inlineEdit}
-                    contentBlocks={contentBlocks}
-                    onChange={updateSection}
-                    elementStyles={elementStyles}
-                    onSelect={(s) => setSelected(s ? { key: s.key, label: labelFromKey(s.key) } : null)}
-                  >
-                    <TemplateSite template={previewTemplate} />
-                  </InlineEditLayer>
-                </div>
-              </div>
-
-              {inlineEdit && selected && (
-                <div className={styles.detailsDock}>
-                  <StylePanel
-                    selection={selected}
-                    value={elementStyles[selected.key] ?? {}}
-                    onChange={(patch) => updateElementStyle(selected.key, patch)}
-                    onReset={() => resetElementStyle(selected.key)}
-                  />
-                </div>
-              )}
-
-              <div className={styles.editDock}>
-                <div className={styles.editPill}>
-                  <button
-                    type="button"
-                    className={inlineEdit ? styles.pillOn : ""}
-                    onClick={() => setInlineEdit((v) => !v)}
-                  >
-                    ✎ Edit on page
-                  </button>
-                  {inlineEdit && <span className={styles.pillHint}>Click any text · Enter saves · Esc cancels</span>}
-                </div>
-              </div>
-            </div>
-
-            <div className={`${panelClass("edit")} ${styles.editPanel}`}>
-              <div className={styles.editPane}>
-                <div style={{ margin: "0 0 1.5rem" }}>
-                  <StylePanel
-                    selection={selected}
-                    value={selected ? elementStyles[selected.key] ?? {} : {}}
-                    onChange={(patch) => selected && updateElementStyle(selected.key, patch)}
-                    onReset={() => selected && resetElementStyle(selected.key)}
-                  />
                 </div>
 
-                {template.structure.sections.map((section) => (
-                  <SectionEditor
-                    key={section.id}
-                    section={section}
-                    content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
-                    onChange={(content) => updateSection(section.id, content)}
-                  />
-                ))}
+                {editing && (
+                  <aside className={inspector.inspector} aria-label="Edit details">
+                    <div className={inspector.inspectorBody}>
+                      <StylePanel
+                        selection={selected}
+                        value={selected ? elementStyles[selected.key] ?? {} : {}}
+                        onChange={(patch) => selected && updateElementStyle(selected.key, patch)}
+                        onReset={() => selected && resetElementStyle(selected.key)}
+                      />
+                      {!selected && (
+                        <p className={inspector.hint}>Click any text · Enter saves · Esc cancels</p>
+                      )}
 
-                <div style={{ margin: "1.5rem 0" }}>
-                  <BrandColors colorScheme={colorScheme} onChange={updateColor} />
-                </div>
+                      <div className={inspector.groups}>
+                        <details className={inspector.group}>
+                          <summary>Page content</summary>
+                          <div className={inspector.groupBody}>
+                            {template.structure.sections.map((section) => (
+                              <SectionEditor
+                                key={section.id}
+                                section={section}
+                                content={(contentBlocks[section.id] as Record<string, unknown>) ?? {}}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            ))}
+                          </div>
+                        </details>
 
-                <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
-              </div>
-              <div className={styles.saveBar}>
-                <button onClick={save} disabled={!dirty || saving}>
-                  {saving ? "Saving..." : "Save changes"}
-                </button>
-                {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
+                        <details className={inspector.group}>
+                          <summary>Brand colours</summary>
+                          <div className={inspector.groupBody}>
+                            <BrandColors colorScheme={colorScheme} onChange={updateColor} />
+                          </div>
+                        </details>
+
+                        <details className={inspector.group}>
+                          <summary>Features</summary>
+                          <div className={inspector.groupBody}>
+                            <FeatureTogglesPanel toggles={featureToggles} onChange={updateToggle} />
+                          </div>
+                        </details>
+                      </div>
+                    </div>
+
+                    <div className={inspector.saveBar}>
+                      <button type="button" onClick={save} disabled={!dirty || saving}>
+                        {saving ? "Saving..." : "Save changes"}
+                      </button>
+                      {savedMessage && <span className={styles.saved}>{savedMessage}</span>}
+                    </div>
+                  </aside>
+                )}
               </div>
             </div>
 
