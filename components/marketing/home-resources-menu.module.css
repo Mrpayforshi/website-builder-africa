@@ -1,0 +1,127 @@
+/* components/marketing/home-resources-menu.module.css
+   Dark glass dropdown for the home page nav. Uses the --lp-* variables that
+   app/page.module.css defines on .scene, so it must render inside that tree. */
+
+.group {
+  position: relative;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lp-ink-soft);
+}
+
+.trigger:hover,
+.trigger[aria-expanded="true"] {
+  color: var(--lp-ink);
+}
+
+.chev {
+  opacity: 0.7;
+  transition: transform 0.18s ease;
+}
+
+.chevOpen {
+  transform: rotate(180deg);
+}
+
+/* The wrap carries the top padding so the pointer can cross the gap between
+   the trigger and the panel without the menu closing. */
+.panelWrap {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: 18px;
+  z-index: 60;
+}
+
+.panel {
+  width: 540px;
+  padding: 22px 26px 18px;
+  border-radius: 22px;
+  background: rgba(15, 14, 22, 0.9);
+  border: 1px solid var(--lp-panel-border);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+
+.head {
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-ink-faint);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 28px;
+}
+
+/* `.panel .item` outranks page.module.css's `.navLinks a` rule, which would
+   otherwise turn these anchors into inline-flex. */
+.panel .item {
+  display: block;
+  padding: 9px 10px;
+  margin: 0 -10px;
+  border-radius: 10px;
+  color: var(--lp-ink);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.panel a.item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--lp-ink);
+}
+
+.itemOff {
+  cursor: default;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.itemOff .title {
+  color: var(--lp-ink-soft);
+}
+
+.desc {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--lp-ink-faint);
+}
+
+.soon {
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--lp-panel-border);
+  background: var(--lp-panel);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lp-ink-soft);
+}
