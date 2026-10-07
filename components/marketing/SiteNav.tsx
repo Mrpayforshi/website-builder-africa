@@ -4,21 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "./marketing.module.css";
 import { RESOURCES } from "./resources";
+import { SOLUTIONS_WHO, SOLUTIONS_USE } from "./solutions";
 
 type Item = { title: string; desc: string; href?: string };
-
-const SOLUTIONS_WHO: Item[] = [
-  { title: "For work", desc: "Run on what you build.", href: "/for-work" },
-  { title: "Founders", desc: "Ship before you pitch.", href: "/founders" },
-  { title: "Shops & retail", desc: "Sell online in a day.", href: "/templates" },
-  { title: "Restaurants & cafés", desc: "Menus that take orders.", href: "/templates" },
-];
-
-const SOLUTIONS_USE: Item[] = [
-  { title: "Websites", desc: "From idea to live site.", href: "/templates" },
-  { title: "WhatsApp ordering", desc: "Orders where customers already are.", href: "/for-work#connectors" },
-  { title: "EcoCash checkout", desc: "Get paid the local way.", href: "/founders#payments" },
-];
 
 function Entry({ item, onNavigate }: { item: Item; onNavigate: () => void }) {
   const body = (
@@ -86,7 +74,7 @@ export function SiteNav() {
                 {SOLUTIONS_WHO.map((i) => <Entry key={i.title} item={i} onNavigate={close} />)}
               </div>
               <div className={`${styles.menuCol} ${styles.menuColAlt}`}>
-                <div className={styles.menuHead}>Use cases</div>
+                <div className={styles.menuHead}>Industries &amp; use cases</div>
                 {SOLUTIONS_USE.map((i) => <Entry key={i.title} item={i} onNavigate={close} />)}
               </div>
             </>
