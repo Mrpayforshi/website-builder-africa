@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./page.module.css";
 import { HomeResourcesMenu } from "@/components/marketing/HomeResourcesMenu";
+import { HomeSolutionsMenu } from "@/components/marketing/HomeSolutionsMenu";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
               <a href="#product">Product</a>
               <Link href="/templates">Templates</Link>
               <a href="#pricing">Pricing</a>
+              <HomeSolutionsMenu />
               <HomeResourcesMenu />
               <a href="#payments">WhatsApp &amp; EcoCash</a>
             </nav>
