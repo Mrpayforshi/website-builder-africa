@@ -404,15 +404,6 @@ export default function Home() {
             layby, and delivery available as paid add-ons.
           </p>
         </section>
-
-        <section id="resources" className={styles.placeholder}>
-          <span className={styles.placeholderBadge}>Coming soon</span>
-          <h2>Resources</h2>
-          <p className={styles.placeholderIntro}>
-            Guides, docs, and support content are on the way. In the meantime,
-            reach out directly and we&apos;ll help you get set up.
-          </p>
-        </section>
       </div>
 
       <footer className={styles.footer}>
@@ -441,8 +432,8 @@ export default function Home() {
             </div>
             <div className={styles.footerCol}>
               <h4>Resources</h4>
-              <a href="#">Guides</a>
-              <a href="#">Blog</a>
+              <Link href="/guides">Guides</Link>
+              <Link href="/blog">Blog</Link>
               <a href="#">Support</a>
               <a href="#">Sitemap</a>
             </div>
