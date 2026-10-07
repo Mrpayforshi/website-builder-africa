@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import styles from "@/components/marketing/marketing.module.css";
+import { TEAM_PAGES } from "@/components/marketing/solutions";
 
 export const metadata: Metadata = {
   title: "Rivo for work — the site that runs your business",
@@ -61,6 +62,21 @@ export default function ForWorkPage() {
             overwrite each other.
           </p>
         </div>
+      </div>
+
+      <div className={styles.sectionHead}>
+        <h2 className={styles.h2}>Tools tailored to your team</h2>
+        <p className={styles.sectionLede}>
+          Every team has a tool it&apos;s been waiting on. Pick yours and see what teams like it build first.
+        </p>
+      </div>
+      <div className={`${styles.useGrid} ${styles.toolGrid}`}>
+        {TEAM_PAGES.map((t) => (
+          <Link key={t.slug} href={`/solutions/${t.slug}`} className={styles.useCard} style={{ minHeight: 170 }}>
+            <h3 style={{ fontSize: 18 }}>{t.title}</h3>
+            <p style={{ fontSize: 13.5 }}>{t.desc}</p>
+          </Link>
+        ))}
       </div>
 
       <div id="connectors" className={styles.sectionHead}>
