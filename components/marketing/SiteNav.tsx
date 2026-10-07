@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "./marketing.module.css";
+import { RESOURCES } from "./resources";
 
 type Item = { title: string; desc: string; href?: string };
 
@@ -17,15 +18,6 @@ const SOLUTIONS_USE: Item[] = [
   { title: "Websites", desc: "From idea to live site.", href: "/templates" },
   { title: "WhatsApp ordering", desc: "Orders where customers already are.", href: "/for-work#connectors" },
   { title: "EcoCash checkout", desc: "Get paid the local way.", href: "/founders#payments" },
-];
-
-const RESOURCES: Item[] = [
-  { title: "Templates", desc: "Begin with a template.", href: "/templates" },
-  { title: "Connectors", desc: "Build from what you already use.", href: "/for-work#connectors" },
-  { title: "Guides", desc: "Learn as you build." },
-  { title: "Docs", desc: "Everything under the hood." },
-  { title: "Blog", desc: "Ideas, updates, stories." },
-  { title: "Customer stories", desc: "See what businesses have built." },
 ];
 
 function Entry({ item, onNavigate }: { item: Item; onNavigate: () => void }) {
