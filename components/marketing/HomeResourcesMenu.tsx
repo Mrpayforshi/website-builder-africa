@@ -30,6 +30,8 @@ function Entry({ item, onNavigate }: { item: ResourceItem; onNavigate: () => voi
 export function HomeResourcesMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  // Last pointer type seen on the trigger ("mouse" | "touch" | "pen").
+  const pointerType = useRef<string>("mouse");
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -61,7 +63,16 @@ export function HomeResourcesMenu() {
         aria-expanded={open}
         aria-haspopup="true"
         aria-controls="home-resources-menu"
-        onClick={() => setOpen((v) => !v)}
+        onPointerDown={(e) => {
+          pointerType.current = e.pointerType;
+        }}
+        onClick={(e) => {
+          // A mouse click arrives after hover has already opened the menu, so
+          // toggling here would shut it again. Keep it open for real mouse
+          // clicks; touch taps and keyboard presses (detail 0) still toggle.
+          if (e.detail > 0 && pointerType.current === "mouse") setOpen(true);
+          else setOpen((v) => !v);
+        }}
       >
         Resources
         <svg
