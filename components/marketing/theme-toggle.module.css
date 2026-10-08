@@ -1,0 +1,37 @@
+/* components/marketing/theme-toggle.module.css
+   Used in both the home nav and the marketing nav, so it takes its colours
+   from the surrounding text colour (currentColor) instead of a theme variable. */
+
+.btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+/* Show the icon for the mode you would switch TO: a moon while the page is
+   light, a sun while it is dark. With no attribute (script blocked) the page
+   renders in its base theme, which is dark on the home page, so default to the sun. */
+.moon {
+  display: none;
+}
+
+:global(html[data-theme="light"]) .moon {
+  display: block;
+}
+
+:global(html[data-theme="light"]) .sun {
+  display: none;
+}
