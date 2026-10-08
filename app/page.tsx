@@ -1,8 +1,7 @@
 import Link from "next/link";
 import styles from "./page.module.css";
 import { HomeResourcesMenu } from "@/components/marketing/HomeResourcesMenu";
-import { HomeSolutionsMenu } from "@/components/marketing/HomeSolutionsMenu";
-import PlatformSection from "@/components/marketing/PlatformSection";
+import { ThemeToggle } from "@/components/marketing/ThemeToggle";
 
 export default function Home() {
   return (
@@ -21,11 +20,11 @@ export default function Home() {
               <a href="#product">Product</a>
               <Link href="/templates">Templates</Link>
               <a href="#pricing">Pricing</a>
-              <HomeSolutionsMenu />
               <HomeResourcesMenu />
               <a href="#payments">WhatsApp &amp; EcoCash</a>
             </nav>
             <div className={styles.navRight}>
+              <ThemeToggle />
               <a className={styles.navSignin} href="/login">
                 Log in
               </a>
@@ -109,8 +108,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        <PlatformSection />
 
         <section id="product" className={styles.infra}>
           <h2>Built to run, not just to launch</h2>
