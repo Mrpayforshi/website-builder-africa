@@ -1,4 +1,4 @@
- /* components/marketing/home-resources-menu.module.css
+/* components/marketing/home-resources-menu.module.css
    Dark glass dropdown for the home page nav. Uses the --lp-* variables that
    app/page.module.css defines on .scene, so it must render inside that tree. */
 
@@ -49,11 +49,11 @@
   width: 540px;
   padding: 22px 26px 18px;
   border-radius: 22px;
-  background: #0e0d15;
+  background: var(--lp-menu-bg);
   border: 1px solid var(--lp-panel-border);
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
-  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  box-shadow: var(--lp-menu-shadow);
 }
 
 .head {
@@ -62,7 +62,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--lp-ink-faint);
+  color: var(--lp-ink-soft);
 }
 
 .grid {
@@ -84,7 +84,7 @@
 }
 
 .panel a.item:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgb(var(--lp-fg) / 0.06);
   color: var(--lp-ink);
 }
 
@@ -110,7 +110,7 @@
   margin-top: 2px;
   font-size: 12.5px;
   font-weight: 500;
-  color: var(--lp-ink-faint);
+  color: var(--lp-ink-soft);
 }
 
 .soon {
