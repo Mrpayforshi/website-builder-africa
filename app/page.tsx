@@ -2,6 +2,7 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import { HomeResourcesMenu } from "@/components/marketing/HomeResourcesMenu";
 import { HomeSolutionsMenu } from "@/components/marketing/HomeSolutionsMenu";
+import PlatformSection from "@/components/marketing/PlatformSection";
 
 export default function Home() {
   return (
@@ -108,6 +109,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <PlatformSection />
 
         <section id="product" className={styles.infra}>
           <h2>Built to run, not just to launch</h2>
