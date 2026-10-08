@@ -1,9 +1,33 @@
+/* Theme tokens. Light is the base; the dark block below overrides it when
+   <html data-theme="dark"> is present (set before first paint by the script
+   in app/layout.tsx). Shared by resources.module.css. */
 .page {
+  color-scheme: light;
   --m-bg: #f6f3ec;
   --m-card: #fbfaf7;
+  --m-card-hover: #f4f1e9;
+  --m-tint: #f3efe6;
+  --m-tint-hover: #efeadd;
   --m-ink: #111111;
+  --m-on-ink: #ffffff;
+  --m-ink-hover: #2a2a2a;
   --m-muted: #5f5b53;
+  --m-faint: #8a857b;
   --m-line: #e6e1d6;
+  --m-line-soft: #efebe1;
+  --m-border: #cfc9bb;
+  --m-hover: #ece8dd;
+  --m-chip: #e8e3d6;
+  --m-surface: #ffffff;
+  --m-surface-hover: #f1eee6;
+  --m-shadow: rgb(30 25 10 / 0.12);
+  --m-cta-bg: #111111;
+  --m-cta-fg: #ffffff;
+  --m-cta-border: transparent;
+  --m-ok-bg: #dcefd9;
+  --m-ok-fg: #2c5e27;
+  --m-paid-bg: #e4dcf7;
+  --m-paid-fg: #4c3a8c;
   --m-a: var(--lp-grad-a, #ff7a45);
   --m-b: #ff2e7e;
   --m-c: var(--lp-grad-c, #a78bfa);
@@ -13,6 +37,34 @@
   color: var(--m-ink);
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+:global(html[data-theme="dark"]) .page {
+  color-scheme: dark;
+  --m-bg: #0a0910;
+  --m-card: #12111a;
+  --m-card-hover: #17161f;
+  --m-tint: #181722;
+  --m-tint-hover: #201e2d;
+  --m-ink: #f3f2f7;
+  --m-on-ink: #0a0910;
+  --m-ink-hover: #ffffff;
+  --m-muted: #a6a2b8;
+  --m-faint: #8a869c;
+  --m-line: #2a2838;
+  --m-line-soft: #1f1d2b;
+  --m-border: #3a374e;
+  --m-hover: #201e2d;
+  --m-chip: #26233a;
+  --m-surface: #1d1b29;
+  --m-surface-hover: #282538;
+  --m-shadow: rgb(0 0 0 / 0.55);
+  --m-cta-bg: #17151f;
+  --m-cta-fg: #ffffff;
+  --m-cta-border: var(--m-line);
+  --m-ok-bg: #17331a;
+  --m-ok-fg: #8fd68a;
+  --m-paid-bg: #2a2352;
+  --m-paid-fg: #c3b3f7;
 }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
@@ -89,12 +141,12 @@
   cursor: pointer;
   border: 1px solid transparent;
 }
-.btnGhost { background: transparent; color: var(--m-ink); border-color: #cfc9bb; }
-.btnGhost:hover { background: #ece8dd; }
-.btnDark { background: var(--m-ink); color: #fff; }
-.btnDark:hover { background: #2a2a2a; }
-.btnLight { background: #fff; color: var(--m-ink); border-color: #cfc9bb; }
-.btnLight:hover { background: #f1eee6; }
+.btnGhost { background: transparent; color: var(--m-ink); border-color: var(--m-border); }
+.btnGhost:hover { background: var(--m-hover); }
+.btnDark { background: var(--m-ink); color: var(--m-on-ink); }
+.btnDark:hover { background: var(--m-ink-hover); }
+.btnLight { background: var(--m-surface); color: var(--m-ink); border-color: var(--m-border); }
+.btnLight:hover { background: var(--m-surface-hover); }
 .btnLg { height: 48px; padding: 0 22px; font-size: 15px; border-radius: 11px; }
 
 .menu {
@@ -106,17 +158,17 @@
   background: var(--m-card);
   border: 1px solid var(--m-line);
   border-radius: 20px;
-  box-shadow: 0 18px 50px rgba(30, 25, 10, 0.12);
+  box-shadow: 0 18px 50px var(--m-shadow);
   overflow: hidden;
 }
 .menuCol { padding: 22px 24px; flex: 1; }
-.menuColAlt { background: #f3efe6; }
+.menuColAlt { background: var(--m-tint); }
 .menuHead { font-size: 12px; color: var(--m-muted); margin-bottom: 14px; }
 .menuGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; min-width: 460px; }
 .menuItem { display: block; padding: 8px 0; text-decoration: none; color: var(--m-ink); }
 .menuItem:hover .menuTitle { color: var(--m-muted); }
 .menuItemOff { cursor: default; }
-.menuItemOff .menuTitle { color: #8a857b; }
+.menuItemOff .menuTitle { color: var(--m-faint); }
 .menuTitle { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
 .menuDesc { display: block; font-size: 12.5px; color: var(--m-muted); margin-top: 1px; }
 .soon {
@@ -125,10 +177,10 @@
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 999px;
-  background: #e8e3d6;
+  background: var(--m-chip);
   color: var(--m-muted);
 }
-.burger { display: none; height: 38px; width: 38px; border: 1px solid #cfc9bb; background: transparent; border-radius: 9px; color: var(--m-ink); cursor: pointer; place-items: center; }
+.burger { display: none; height: 38px; width: 38px; border: 1px solid var(--m-border); background: transparent; border-radius: 9px; color: var(--m-ink); cursor: pointer; place-items: center; }
 
 /* ---------- hero ---------- */
 .hero { text-align: center; padding: 56px 0 72px; }
@@ -146,6 +198,7 @@
   padding: 0.12em 0.5em 0.2em;
   margin-top: 0.05em;
   isolation: isolate;
+  color: #14121f; /* always dark: the blob behind it is a bright gradient in both themes */
 }
 .blob::before {
   content: "";
@@ -170,7 +223,7 @@
   gap: 24px;
   align-items: stretch;
   background: var(--m-card);
-  border: 1px solid #efebe1;
+  border: 1px solid var(--m-line-soft);
   border-radius: 28px;
   padding: 16px;
   margin-bottom: 20px;
@@ -198,12 +251,13 @@
   width: 100%;
   max-width: 340px;
   background: #fff;
+  color: #111; /* this is a picture of a light app screen, so its text must not follow the page theme */
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 14px 40px rgba(20, 20, 60, 0.18);
   font-size: 13px;
 }
-.mockPrompt { color: #777; min-height: 54px; }
+.mockPrompt { color: #6b6b6b; min-height: 54px; }
 .mockRow { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 .pill { padding: 6px 11px; border: 1px solid #e3e3e3; border-radius: 999px; font-size: 12px; color: #444; background: #fff; }
 .pillOn { background: #111; color: #fff; border-color: #111; }
@@ -220,13 +274,13 @@
   padding: 22px;
   border: 1px solid var(--m-line);
   border-radius: 20px;
-  background: #f3efe6;
+  background: var(--m-tint);
   text-decoration: none;
   color: var(--m-ink);
   min-height: 190px;
 }
-.useCard:hover { background: #efeadd; }
-.useIcon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #fff; border: 1px solid var(--m-line); margin-bottom: 28px; font-size: 16px; }
+.useCard:hover { background: var(--m-tint-hover); }
+.useIcon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--m-surface); border: 1px solid var(--m-line); margin-bottom: 28px; font-size: 16px; }
 .useCard h3 { margin: 0 0 6px; font-size: 21px; letter-spacing: -0.02em; }
 .useCard p { margin: 0; color: var(--m-muted); font-size: 14.5px; line-height: 1.5; }
 
@@ -240,9 +294,12 @@
   padding: 72px 24px;
   margin: 24px 0 64px;
   border-radius: 28px;
-  background: var(--m-ink);
-  color: #fff;
+  background: var(--m-cta-bg);
+  color: var(--m-cta-fg);
+  border: 1px solid var(--m-cta-border);
 }
+.cta .btnLight { background: #fff; color: #111; border-color: #fff; }
+.cta .btnLight:hover { background: #ececf2; }
 .cta h2 { margin: 0 0 20px; font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -0.03em; }
 
 .footer { border-top: 1px solid var(--m-line); padding: 28px 0 40px; color: var(--m-muted); font-size: 13.5px; }
