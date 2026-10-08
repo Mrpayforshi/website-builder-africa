@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./page.module.css";
 import { HomeResourcesMenu } from "@/components/marketing/HomeResourcesMenu";
+import { HomeSolutionsMenu } from "@/components/marketing/HomeSolutionsMenu";
 import { ThemeToggle } from "@/components/marketing/ThemeToggle";
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
             </Link>
             <nav className={styles.navLinks}>
               <a href="#product">Product</a>
+              <HomeSolutionsMenu />
               <Link href="/templates">Templates</Link>
               <a href="#pricing">Pricing</a>
               <HomeResourcesMenu />
