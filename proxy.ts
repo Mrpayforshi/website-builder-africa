@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { hasAuthCookie, refreshSession } from "@/lib/supabase/session";
 
 // Slugs that must never resolve to a tenant site, so the platform's own
 // marketing/auth/dashboard/api routes stay reachable at these hosts.
@@ -29,12 +30,24 @@ export async function proxy(req: NextRequest) {
     (rootDomain !== null && (hostname === rootDomain || hostname === `www.${rootDomain}`));
 
   if (isPlatformHost) {
-    // Forward the request pathname to Server Components (e.g. the root
-    // layout) that need to branch on route without a client-side hook —
-    // specifically so lite mode can be scoped away from /dashboard.
-    const requestHeaders = new Headers(req.headers);
-    requestHeaders.set("x-pathname", url.pathname);
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    const pathname = url.pathname;
+
+    // Convenience redirect only: a visitor with no auth cookie at all who
+    // opens a dashboard URL goes to /login and is sent back afterwards. The
+    // real gate is still each page/route's own getUser() check.
+    const isDashboard = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+    if (isDashboard && !hasAuthCookie(req)) {
+      const loginUrl = url.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.search = "";
+      loginUrl.searchParams.set("next", pathname + url.search);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Refreshes an expiring Supabase session (Server Components can't write
+    // cookies) and forwards the request pathname to Server Components (e.g.
+    // the root layout) so lite mode can be scoped away from /dashboard.
+    return refreshSession(req, pathname);
   }
 
   const admin = createAdminClient();
