@@ -176,3 +176,64 @@
 }
 
 .empty { text-align: center; padding: 80px 0; color: var(--ink-faint); }
+
+/* ---- Mobile / tablet ---- */
+@media (max-width: 900px) {
+  .nav { padding: 0 20px; top: 12px; }
+  .navInner { padding: 10px 14px; gap: 12px; }
+  .navRight { gap: 14px; }
+
+  .glow { width: 700px; height: 700px; }
+
+  .wrap { padding: 0 20px; }
+  .pageHead { padding: 36px 0 24px; }
+  .pageHead h1 { font-size: 34px; }
+
+  /* Sidebar stops being a left column and becomes a filter bar above the grid. */
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-bottom: 64px; }
+  .sidebar { position: static; padding: 16px; border-radius: 16px; }
+  .sidebar h4 { margin-bottom: 10px; }
+
+  /* Categories become a horizontally scrolling row of pills. */
+  .catList {
+    flex-direction: row;
+    gap: 8px;
+    margin: 0;
+    padding-bottom: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .catList::-webkit-scrollbar { display: none; }
+  .catList li { flex: none; }
+  .catList button {
+    width: auto;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--panel-border);
+    white-space: nowrap;
+  }
+  .catList button.active { border-color: var(--panel-border-hover); }
+
+  .divider { margin: 16px 0; }
+
+  .featList { flex-direction: row; flex-wrap: wrap; gap: 4px 18px; }
+  .featItem label { min-height: 36px; }
+  .featItem input { width: 20px; height: 20px; }
+}
+
+@media (max-width: 640px) {
+  .nav { padding: 0 12px; top: 10px; }
+  .wrap { padding: 0 16px; }
+  .pageHead h1 { font-size: 28px; }
+  .pageHead p { font-size: 15px; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .resultsBar { margin-bottom: 14px; }
+}
+
+@media (max-width: 560px) {
+  /* "Log in" is hidden so logo + Get started fit on one line at 360px. */
+  .navSignin { display: none; }
+  .btnWhite { padding: 10px 16px; font-size: 14px; }
+}
