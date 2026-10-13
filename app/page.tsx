@@ -3,6 +3,8 @@ import styles from "./page.module.css";
 import { HomeResourcesMenu } from "@/components/marketing/HomeResourcesMenu";
 import { HomeSolutionsMenu } from "@/components/marketing/HomeSolutionsMenu";
 import { ThemeToggle } from "@/components/marketing/ThemeToggle";
+import { HomeMobileNav } from "@/components/marketing/HomeMobileNav";
+import mobileNav from "@/components/marketing/home-mobile-nav.module.css";
 
 export default function Home() {
   return (
@@ -25,14 +27,15 @@ export default function Home() {
               <HomeResourcesMenu />
               <a href="#payments">WhatsApp &amp; EcoCash</a>
             </nav>
-            <div className={styles.navRight}>
+            <div className={`${styles.navRight} ${mobileNav.navRightTight}`}>
               <ThemeToggle />
-              <a className={styles.navSignin} href="/login">
+              <a className={`${styles.navSignin} ${mobileNav.hideOnMobile}`} href="/login">
                 Log in
               </a>
-              <a className={`${styles.btn} ${styles.btnWhite}`} href="/signup">
+              <a className={`${styles.btn} ${styles.btnWhite} ${mobileNav.compactBtn}`} href="/signup">
                 Get started
               </a>
+              <HomeMobileNav />
             </div>
           </div>
         </header>
