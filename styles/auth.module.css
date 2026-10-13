@@ -12,6 +12,7 @@
 
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,4 +190,63 @@
   margin-top: 8px;
   font-weight: 700;
   color: var(--lp-ink);
+}
+
+/* ---- Mobile (phones) ---- */
+@media (max-width: 640px) {
+  .scene {
+    padding: 24px 16px;
+  }
+
+  .glow {
+    width: 560px;
+    height: 560px;
+    right: -35%;
+    top: -10%;
+    filter: blur(60px);
+  }
+
+  .card {
+    padding: 28px 20px 24px;
+    border-radius: 18px;
+  }
+
+  .logo {
+    margin-bottom: 22px;
+  }
+
+  .card h1 {
+    font-size: 22px;
+  }
+
+  .lede {
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    padding: 11px 0;
+    font-size: 14px;
+  }
+
+  .field {
+    font-size: 14px;
+  }
+
+  /* 16px stops iOS Safari from zooming the page when an input is focused. */
+  .field input {
+    box-sizing: border-box;
+    font-size: 16px;
+    min-height: 48px;
+    padding: 12px 14px;
+  }
+
+  .submit {
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .switch a,
+  .link {
+    padding: 6px 0;
+  }
 }
