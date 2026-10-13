@@ -107,3 +107,15 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+/* ---- Mobile ---- */
+@media (max-width: 720px) {
+  .scene { padding: 20px 16px 64px; }
+  .back { padding: 8px 0; margin-bottom: 16px; }
+  .head { gap: 16px; margin-bottom: 24px; }
+  .head h1 { font-size: 26px; }
+  .head p { font-size: 15px; }
+  .cta { width: 100%; padding: 14px 24px; }
+  .browserFrame { border-radius: 12px; }
+  .urlBar { padding: 8px 12px; gap: 8px; white-space: nowrap; overflow: hidden; }
+}
