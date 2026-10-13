@@ -110,3 +110,28 @@
   padding: 22px;
   background: #08080d;
 }
+
+/* ---- Mobile ---- */
+@media (max-width: 720px) {
+  .dialogHead { padding: 14px 16px; gap: 12px; }
+  .dialogHeadLeft { flex: 1 1 140px; row-gap: 4px; }
+  .dialogHeadLeft h2 { font-size: 16px; overflow-wrap: anywhere; }
+  .byline { display: none; }
+  .scrollArea { padding: 12px; }
+}
+
+@media (max-width: 640px) {
+  /* Full-screen sheet on phones. */
+  .overlay { padding: 0; align-items: stretch; }
+  .dialog {
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+  }
+  .close { width: 40px; height: 40px; font-size: 22px; }
+  .cta { min-height: 40px; padding: 10px 18px; }
+  .scrollArea { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+}
