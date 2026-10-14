@@ -1089,3 +1089,120 @@
 [data-template="professional-2"] .whatsapp-cta {
   border-radius: 999px;
 }
+
+/* ==========================================================================
+   MOBILE REFINEMENTS
+   Appended last on purpose: these rules use the same selectors as the ones
+   above, so source order is what lets them win. Nothing here changes the
+   desktop layout except the Gallery "hidden in lite mode" notice, which
+   now spans the full grid width at every size.
+   ========================================================================== */
+
+/* ---- All sizes ---- */
+
+/* The lite-mode notice used to sit in a single grid cell next to the photos. */
+.site .gallery__lite-notice {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* Embedded maps and other iframes can never be wider than the page. */
+.site iframe {
+  max-width: 100%;
+}
+
+.site .contact__map-link {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* Use the small-viewport height so the hero is not taller than the screen
+   while the browser's address bar is showing. Browsers that do not know
+   `svh` ignore these lines and keep the `vh` values from above. */
+[data-template="retail-2"] .hero {
+  min-height: 60svh;
+}
+
+[data-template="professional-2"] .hero {
+  min-height: 70svh;
+}
+
+/* ---- Phones ---- */
+@media (max-width: 639px) {
+  /* `1fr` alone lets a long word stretch its column past the screen edge;
+     `minmax(0, 1fr)` keeps both columns at exactly half. */
+  .site .product-grid,
+  .site .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site .programs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Long product names, emails and addresses wrap instead of overflowing. */
+  .site h1,
+  .site h2,
+  .site h3,
+  .site .product-grid__item p,
+  .site .menu__item-name,
+  .site .services-list__item p,
+  .site .programs__item p,
+  .site .contact__address,
+  .site .contact__phone,
+  .site .contact__email {
+    overflow-wrap: anywhere;
+  }
+
+  /* Menu: the name takes the free space and the price stays on the right,
+     even when the name is long. */
+  .site .menu__item {
+    gap: 0 var(--space-3);
+  }
+
+  .site .menu__item-name {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .site .menu__item .price {
+    flex: none;
+  }
+
+  /* Order / Enquire buttons: at least 44px tall so a thumb can hit them. */
+  .site .whatsapp-cta {
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* In the narrow 2-column product cards the button fills the card. */
+  .site .product-grid__item .whatsapp-cta {
+    display: flex;
+  }
+
+  /* FAQ: answers wrap onto more lines on a phone, so 240px cut them off. */
+  .site .faq__item--open .faq__answer {
+    max-height: 560px;
+  }
+
+  .site .faq__question {
+    min-height: 48px;
+  }
+
+  /* Maps pasted from Google carry height="450". That attribute made the map
+     taller than the screen; this keeps a 4:3 shape at any width. */
+  .site .contact__map iframe {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .site .contact__map-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
